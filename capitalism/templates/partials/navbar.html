@@ -1,3 +1,4 @@
+{% load control_tags %}
 <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
   <div class="container-md">
     <div class="btn-group" role="group" aria-label="Main Navigation Bar">
@@ -31,5 +32,10 @@
         </li>
       </ul>
     </div>
+    {% control_states %} 
+
   </div>
+</div>
+
+
 </nav>

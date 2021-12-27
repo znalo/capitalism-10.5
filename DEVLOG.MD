@@ -27,3 +27,6 @@ Now working, as far as we got
 
 ## Commit ported 10.3 to this new version
 
+Added Control Menu in navbar that takes its input from ControlSuperStates
+
+## Commit primitive control menu, no actions as yet

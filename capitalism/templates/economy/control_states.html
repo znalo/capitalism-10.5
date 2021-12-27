@@ -1,0 +1,10 @@
+<div class="btn-group">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuClickable" data-bs-toggle="dropdown"
+    data-bs-auto-close="false" aria-expanded="false">
+    Controls
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenuClickable">
+    {% for state in superstates %}
+    <li> {{ state }} </li>
+    {% endfor %}
+  </ul>

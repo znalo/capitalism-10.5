@@ -26,30 +26,30 @@ def initialize(request):
     Project.objects.all().delete()
     TimeStamp.objects.all().delete()
 
-    # mc=ControlSuperState(name=M_C, first_substate_name=DEMAND, next_superstate_name=C_P)
-    # mc.save()
-    # demand=ControlSubState(name=DEMAND,super_state_name=M_C, next_substate_name=SUPPLY)
-    # demand.save()
-    # supply=ControlSubState(name=SUPPLY,super_state_name=M_C, next_substate_name=ALLOCATE)
-    # supply.save()
-    # allocate=ControlSubState(name=ALLOCATE,super_state_name=M_C, next_substate_name=TRADE)
-    # allocate.save()
-    # trade=ControlSubState(name=TRADE,super_state_name=M_C,next_substate_name=PRODUCE)
-    # trade.save()
-    # cp=ControlSuperState(name=C_P,first_substate_name=PRODUCE)
-    # cp.save()
-    # produce=ControlSubState(name=PRODUCE,super_state_name=C_P, next_substate_name=PRICES)
-    # produce.save()
-    # prices=ControlSubState(name=PRICES,super_state_name=C_P, next_substate_name=REPRODUCE)
-    # prices.save()
-    # reproduce=ControlSubState(name=REPRODUCE,super_state_name=C_P, next_substate_name=REVENUE)
-    # reproduce.save()
-    # cm=ControlSuperState(name=C_M, first_substate_name=REVENUE)
-    # cm.save()
-    # revenue=ControlSubState(name=REVENUE,super_state_name=C_M,next_substate_name=ACCUMULATE)
-    # revenue.save()
-    # accumulate=ControlSubState(name=ACCUMULATE,super_state_name=C_M, next_substate_name=DEMAND)
-    # accumulate.save()
+    mc=ControlSuperState(name=M_C, first_substate_name=DEMAND, next_superstate_name=C_P)
+    mc.save()
+    demand=ControlSubState(name=DEMAND,super_state_name=M_C, next_substate_name=SUPPLY)
+    demand.save()
+    supply=ControlSubState(name=SUPPLY,super_state_name=M_C, next_substate_name=ALLOCATE)
+    supply.save()
+    allocate=ControlSubState(name=ALLOCATE,super_state_name=M_C, next_substate_name=TRADE)
+    allocate.save()
+    trade=ControlSubState(name=TRADE,super_state_name=M_C,next_substate_name=PRODUCE)
+    trade.save()
+    cp=ControlSuperState(name=C_P,first_substate_name=PRODUCE)
+    cp.save()
+    produce=ControlSubState(name=PRODUCE,super_state_name=C_P, next_substate_name=PRICES)
+    produce.save()
+    prices=ControlSubState(name=PRICES,super_state_name=C_P, next_substate_name=REPRODUCE)
+    prices.save()
+    reproduce=ControlSubState(name=REPRODUCE,super_state_name=C_P, next_substate_name=REVENUE)
+    reproduce.save()
+    cm=ControlSuperState(name=C_M, first_substate_name=REVENUE)
+    cm.save()
+    revenue=ControlSubState(name=REVENUE,super_state_name=C_M,next_substate_name=ACCUMULATE)
+    revenue.save()
+    accumulate=ControlSubState(name=ACCUMULATE,super_state_name=C_M, next_substate_name=DEMAND)
+    accumulate.save()
 
 
 
@@ -67,10 +67,13 @@ def initialize(request):
     df = pd.read_csv(file_name)
 
     for row in df.itertuples(index=False, name='Pandas'):
+        initial_super_state=ControlSuperState.objects.get(name=C_P)
+        initial_sub_state=ControlSubState.objects.get(name=DEMAND)
         time_stamp = TimeStamp(
             project_FK=Project.objects.get(number=row.project_FK),
             period=row.period,
-            # super_state=row.super_state,
+            super_state_FK=initial_super_state,
+            sub_state_FK=initial_sub_state,
             comparator_time_stamp_ID=row.comparator_time_stamp_ID,
             description=row.description,
             melt=row.MELT,
