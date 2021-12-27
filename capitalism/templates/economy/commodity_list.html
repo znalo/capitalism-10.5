@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+  <div class="col-sm-12">
+    <table id="commodities" class="table-sm cell-border" style="width:100%">
+      <thead>
+        <tr>
+          <th>Time Stamp</th>
+          <th>Name</th>
+          <th>Origin</th>
+          <th>Usage</th>
+          <th>Quantity</th>
+          <th>Value</th>
+          <th>Price</th>
+          <th>Unit Value</th>
+          <th>Unit Price</th>
+          <th>Turnover Time</th>
+          <th>Demand</th>
+          <th>Supply</th>
+          <th>Allocation Ratio</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for commodity in time_stamped_commodity_list %}
+        <tr>
+          <td> {{ commodity.time_stamp_FK}} </td>
+          <td> {{ commodity.name }}</td>
+          <td> {{ commodity.origin }} </td>
+          <td> {{ commodity.usage}} </td>
+          <td> {{ commodity.size}} </td>
+          <td> {{ commodity.total_value}} </td>
+          <td> {{ commodity.total_price}} </td>
+          <td> {{ commodity.unit_value }}</td>
+          <td> {{ commodity.unit_price}}</td>
+          <td> {{ commodity.turnover_time }} </td>
+          <td> {{ commodity.demand }} </td>
+          <td> {{ commodity.supply }} </td>
+          <td> {{ commodity.allocation_ratio }} </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="//code.jquery.com/jquery-1.12.4.js"></script>
+<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="//cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('#commodities').DataTable(
+      {
+        "paging": false,
+      }
+    );
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% load app_filters %}
+
+
+<div class="row">
+  <div class="col-sm-12">
+    <table id="owners" class="table-sm cell-border" style="width:100%">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Time Stamp</th>
+          <th>Owner Name</th>
+          <th>Sales Commodity</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for record in stockowner_list %}
+        <tr>
+          <td> {{ record.id }}</td>
+          <td> {{ record.time_stamp_FK }}</td>
+          <td> {{ record.name }}</td>
+          <td> {{ record.commodity_FK.name }}</td>
+          <td> {{ record.stock_owner_type }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="//code.jquery.com/jquery-1.12.4.js"></script>
+<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="//cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('#owners').DataTable(
+      {
+        "paging": false,
+        "searching": false,
+        "info": false
+      }
+    );
+  });
+</script>
+
+{% endblock %}

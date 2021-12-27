@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% load app_filters %}
+
+<div class="row">
+  <div class="col-sm-12">
+    <table id="stocks" class="table-sm cell-border" style="width:100%">
+      <thead>
+        <tr>
+          <th>Time Stamp</th>
+          <th>Name</th>
+          <th>Population</th>
+          <th>Commodity for Sale</th>
+          <th>Sales Stock</th>
+          <th>Consumption Goods</th>
+          <th>Money</th>
+          <th>Participation Ratio</th>
+          <th>Consumption Ratio</th>
+          <th>Revenue</th>
+          <th>Assets</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for record in time_stamped_social_class_list %}
+        <tr>
+          <td> {{ record.time_stamp_FK }}</td>
+          <td> {{ record.name }}</td>
+          <td> {{ record.population }}</td>
+          <td> {{ record.commodity_FK.name }}</td>
+          <td> {{ record.class_stock.all|sales_filter }}</td>
+          <td> {{ record.class_stock.all|consumption_filter }}</td>
+          <td> {{ record.class_stock.all|money_filter }}</td>
+          <td> {{ record.participation_ratio }}</td>
+          <td> {{ record.consumption_ratio }}</td>
+          <td> {{ record.revenue }}</td>
+          <td> {{ record.assets }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="//code.jquery.com/jquery-1.12.4.js"></script>
+<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="//cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('#stocks').DataTable(
+      {
+        "paging": false,
+        "info": false
+      }
+    );
+  });
+</script>
+
+{% endblock %}

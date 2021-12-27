@@ -1,0 +1,51 @@
+body {
+  margin-top: 2rem;
+  background-color: lightgrey;
+}
+
+ul {
+  list-style-type: none;
+}
+
+/*! For the collapsible log display */
+.collapsible {
+  background-color: #777;
+  color: white;
+  cursor: pointer;
+  padding: 4px;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 12px;
+}
+
+.active, .collapsible:hover {
+  background-color: #555;
+}
+
+.content {
+  padding: 0 4px;
+  display: none;
+  overflow: hidden;
+  background-color: #f1f1f1;
+}
+
+.log-level1 {
+    color: blue;
+    margin-left:1em
+}
+
+.log-level2 {
+    color: green;
+    margin-left:2em
+}
+
+.log-level3 {
+   color: red;
+   margin-left:3em
+}
+
+.log-level4 {
+  margin-left:4em
+}
+

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load bootstrap %}
+{% block content %}
+
+<!-- !Just a skeleton with one api-view, as a template -->
+
+<body>
+  <div class="container" style="font-size: .6em;">
+    <div class="d-flex justify-content-center">
+      <button class="btn btn-outline-success btn-sm" type="button"><a
+          href="{% url 'api-commodities' %}">Commodities</a></button>
+    </div>
+</body>
+{% endblock %}

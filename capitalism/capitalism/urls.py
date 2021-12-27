@@ -1,21 +1,48 @@
-"""capitalism URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/3.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
-from django.urls import path
+from django.conf.urls import url
+from rest_framework import routers
+from economy import views
+from economy.actions import control, exchange, produce
+from django.urls import path, include
+
+router = routers.DefaultRouter()
+router.register(r'api-commodities', views.CommodityViewSet)
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('', views.landingPage, name='landing-page'),
+    url('^admin/', admin.site.urls),
+    url('^api/', include(router.urls)),
+    path('api/tables/', include('economy.urls')),
+    url('api/commodities', views.commodityTable, name='api-commodities'),
+    url('api/views', views.apiViews, name='api-views'),
+
+    url('log/collapsible', views.log_collapsible, name='log-collapsible'),
+    url('log/table', views.LogView.as_view(), name='log'),
+
+    url('tables/economy', views.EconomyView.as_view(), name='economy'),
+    url('tables/time-stamps', views.TimeStampView.as_view(), name='time-stamps'),
+    url('tables/industries', views.IndustryView.as_view(), name='industries'),
+    url('tables/commodities', views.CommodityView.as_view(), name='commodities'),
+    url('tables/social-classes', views.SocialClassView.as_view(), name='social-classes'),
+    url('tables/all-owners', views.AllOwnersView.as_view(), name='all-owners'),
+    url('tables/industry-stocks', views.IndustryStockView.as_view(), name='industry-stocks'),
+    url('tables/social-stocks', views.SocialStockView.as_view(), name='social-stocks'),
+    url('tables/all-stocks', views.AllStocksView.as_view(), name='all-stocks'),
+    url('exchange/demand', exchange.calculate_demand, name='calculate-demand'),
+    url('exchange/supply', exchange.calculate_supply, name='calculate-supply'),
+    url('exchange/allocate', exchange.allocate_supply, name='allocate'),
+    url('exchange/trade', exchange.trade, name='trade'),
+
+    url('control/sandbox', views.sandbox, name='sandbox'),
+    url('control/move-one-stamp', control.move_one_stamp, name='move-one-stamp'),
+    url('control/initialize', control.initialize, name='initialize'),
+
+    url('production/produce', produce.produce_all, name='produce'),
+    url('production/prices', produce.prices, name='prices'),
+    url('production/reproduce', produce.reproduce, name='reproduce'),
 ]
+
+urlpatterns += [
+    path('api-auth/', include('rest_framework.urls')),
+]
+

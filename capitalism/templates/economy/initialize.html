@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Initializing ...</h1>
+
+<h4>Projects</h4>
+<ul>
+  {% for project in projects %}
+  <li style="list-style-type:none;"> {{ project.number }} {{ project.description }}</li>
+  {% endfor %}
+</ul>
+
+<h4>Time Stamps</h4>
+<ul>
+  {% for time_stamp in time_stamps %}
+  <li style="list-style-type:none;"> {{ time_stamp.project_FK }}; [{{ time_stamp.description }}] Response Type: {{ time_stamp.price_response_type }} </li>
+  {% endfor %}
+</ul>
+
+<h4>Commodities</h4>
+<ul>
+  {% for commodity in commodities %}
+  <li style="list-style-type:none;"> {{ commodity.time_stamp_FK }}; [{{ commodity.name }}] </li>
+  {% endfor %}
+</ul>
+
+<h4>Industries</h4>
+<ul>
+  {% for industry in industries %}
+  <li style="list-style-type:none;"> {{ industry.time_stamp_FK }}; [{{ industry.name }}]</li>
+  {% endfor %}
+</ul>
+
+<h4>Social Classes</h4>
+<ul>
+  {% for social_class in social_classes%}
+  <li style="list-style-type:none;"> {{ social_class.time_stamp_FK }}; [{{ social_class.name }}]</li>
+  {% endfor %}
+</ul>
+
+<h4>Industry Stocks</h4>
+<ul>
+  {% for industry_stock in industry_stocks %}
+  <li style="list-style-type:none;"> {{ industry_stock }}; </li>
+  {% endfor %}
+</ul>
+
+<h4>Social Stocks</h4>
+<ul>
+  {% for social_stock in social_stocks %}
+  <li style="list-style-type:none;"> {{ social_stock }}]</li>
+  {% endfor %}
+</ul>
+
+
+
+{% endblock %}

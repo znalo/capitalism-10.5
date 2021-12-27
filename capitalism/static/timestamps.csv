@@ -1,0 +1,9 @@
+id,time_stamp_ID,project_FK,period,super_state,comparator_time_stamp_ID,description,MELT,population_growth_rate,investment_ratio,labour_supply_response,price_response_type,melt_response_type,currency_symbol,quantity_symbol,owner
+1,1,1,1,,1,Start,1,0,0,FIXED,VALUES,,$,#,1
+2,1,2,1,,1,Start,0.5,0,0,FIXED,VALUES,PRICE_DRIVEN,$,#,1
+3,1,3,1,,1,Start,1,0,0,FIXED,VALUES,,$,#,1
+4,1,4,1,,1,Start,1,0,0,FIXED,VALUES,,$,#,1
+5,1,5,1,,1,Start,1,0,0.5,FLEXIBLE,VALUES,,£,H,1
+6,1,6,1,,1,Start,1,0,0,FLEXIBLE,EQUALIZED,PRICE_DRIVEN,$,#,1
+7,1,7,1,,1,Start,0.5,0.01,0,FIXED,DYNAMIC,PRICE_DRIVEN,$,#,1
+8,1,8,1,,1,Start,1,0,0,FIXED,VALUES,,$,#,1

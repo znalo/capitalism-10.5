@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+{% load app_filters %}
+{% load bootstrap_icons %}
+
+
+<button class="btn btn-default btn-xs" type="button" data-toggle="collapse" data-target=".log2,.log3,.log4">
+  1
+</button>
+<button class="btn btn-default btn-xs" type="button" data-toggle="collapse" data-target=".log3,.log4">
+  2
+</button>
+<button class="btn btn-default btn-xs" type="button" data-toggle="collapse" data-target=".log4">
+  3
+</button>
+
+<ul>
+  {% for entry in log_iterator %}
+  <div class="log{{entry.level}}">
+    [Project {{entry.project_id}}] [Time Stamp {{entry.time_stamp_id}}]<span class="log-level{{entry.level}}">{{ entry.message }}</span>
+  </div>
+  {% endfor %}
+</ul>
+{% endblock %}
+
+{% block extra_js%}
+
+<script>
+  var coll = document.getElementsByClassName("collapsible");
+  var i;
+
+  for (i = 0; i < coll.length; i++) {
+    coll[i].addEventListener("click", function () {
+      this.classList.toggle("active");
+      var content = this.nextElementSibling;
+      if (content.style.display === "block") {
+        content.style.display = "none";
+      } else {
+        content.style.display = "block";
+      }
+    });
+  }
+</script>
+
+{% endblock %}

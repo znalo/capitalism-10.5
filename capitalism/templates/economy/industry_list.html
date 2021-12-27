@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% load app_filters %}
+
+
+
+<div class="row">
+  <div class="col-sm-12">
+    <table id="industry" class="table-sm cell-border" style="width:100%">
+      <thead>
+        <tr>
+          <th>Time Stamp</th>
+          <th>Industry</th>
+          <th>Sales Stocks</th>
+          <th>Money Stocks</th>
+          <th>Scale</th>
+          <th>Growth Rate</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for record in time_stamped_industry_list %}
+        <tr>
+          <td> {{ record.time_stamp_FK }}</td>
+          <td> {{ record.name }}</td>
+          <td> {{ record.industrystock_set.all|sales_filter}} </td>
+          <td> {{ record.industrystock_set.all|money_filter }} </td>
+          <td> {{ record.output_scale }}</td>
+          <td> {{ record.output_growth_rate }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="//code.jquery.com/jquery-1.12.4.js"></script>
+<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="//cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('#industry').DataTable(
+      {
+        "paging": false,
+        "searching": false,
+        "info": false
+      }
+    );
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row">
+  <div class="col-sm-12">
+    <table id="log" class="table-sm cell-border" style="width:100%">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Time Stamp</th>
+          <th>Project</th>
+          <th>Level</th>
+          <th>Message</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in log_list %}
+        <tr>
+          <td>{{ log.id}} </td>
+          <td>{{ log.time_stamp_id}} </td>
+          <td>{{ log.project_id}} </td>
+          <td>{{ log.level}} </td>
+          <td class="pl-{{log.level}}">{{log.message}} </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="//code.jquery.com/jquery-1.12.4.js"></script>
+<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="//cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('#log').DataTable(
+      {
+        "paging": false,
+        "info": false
+      }
+    );
+  });
+</script>
+
+{% endblock %}

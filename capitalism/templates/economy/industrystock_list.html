@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row">
+  <div class="col-sm-12">
+    <table id="stocks" class="table-sm cell-border" style="width:100%">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Time Stamp</th>
+          <th>Industry</th>
+          <th>Commodity</th>
+          <th>Stock Type</th>
+          <th>Size</th>
+          <th>Production Requirement</th>
+          <th>Demand</th>
+          <th>Owner</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for stock in stock_list %}
+        <tr>
+          <td> {{ stock.id }} </td>
+          <td> {{ stock.time_stamp_FK }}</td>
+          <td> {{ stock.industry_FK.name}} </td>
+          <td> {{ stock.commodity_FK.name }}</td>
+          <td> {{ stock.usage_type }}</td>
+          <td> {{ stock.size }}</td>
+          <td> {{ stock.production_requirement }}</td>
+          <td> {{ stock.demand }}</td>
+          <td> {{ stock.owner }}</td>
+
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="//code.jquery.com/jquery-1.12.4.js"></script>
+<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="//cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('#stocks').DataTable(
+      {
+        "paging": false,
+        "info": false
+      }
+    );
+  });
+</script>
+
+{% endblock %}
