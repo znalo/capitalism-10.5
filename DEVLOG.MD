@@ -35,4 +35,18 @@ Added actions, no progression yet
 
 ## Commit actions, no progression yet
 
+* NOTE: we're using @staticmethods in general to get the logic clear. But we could consider @classmethods
+* See https://www.programiz.com/python-programming/methods/built-in/classmethod
+* Main disadvantage of static method seems to be that we can't easily subclass. But in the use cases so far, we don't want to.
+* But see also https://www.geeksforgeeks.org/class-method-vs-static-method-python/
+* Classmethod has access to the state of the class.
+* However, we store all state information in the DB, so I don't think we need class state variables as such
+* Keep a watching brief on this as development proceeds
+
+Templates and Tags: see https://realpython.com/django-template-custom-tags-filters/#string-filters
+
+Stepping is now implemented (but for substates only)
+
+## Commit stepping implemented (substates only)
+
 

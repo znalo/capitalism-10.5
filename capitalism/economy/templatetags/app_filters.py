@@ -1,6 +1,7 @@
 from django import template
 from datetime import date, timedelta
 from capitalism.global_constants import *
+from economy.models.states import ControlSubState, State
 
 register = template.Library()
 
@@ -26,7 +27,6 @@ def sales_filter(value):
         stock=stocks.get()
         return stock.size
 
-
 @register.filter(name='consumption_filter')
 def consumption_filter(value):
     stocks=value.filter(usage_type=CONSUMPTION)
@@ -39,3 +39,8 @@ def consumption_filter(value):
 @register.filter
 def multiply(value, arg):
     return value * arg
+
+@register.filter(name='current_control_state')
+def current_control_state(value):
+    sub_state= State.current_control_substate()
+    return sub_state

@@ -1,4 +1,5 @@
 {% load control_tags %}
+{% load app_filters %}
 <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
   <div class="container-md">
     <div class="btn-group" role="group" aria-label="Main Navigation Bar">
@@ -9,7 +10,8 @@
       <a href="{% url 'economy' %}" class="btn btn-light btn-sm" role="button">Economy</a>
       <a href="{% url 'admin:index' %}" class="btn btn-light btn-sm" role="button">Admin</a>
       <a href="{% url 'api-views' %}" class="btn btn-light btn-sm" role="button">API views</a>
-      <a href=" {% url 'initialize' %}" class="btn btn-light btn-sm" role="button" method="get">Initialize</a>
+      <a href="{% url 'initialize' %}" class="btn btn-light btn-sm" role="button" method="get">Initialize</a>
+      <a href="{% url 'move-one-stamp' %}" class="btn btn-light btn-sm" role="button" method="get">Step ({{ "A String"|current_control_state }})</a>
     </div> <!-- btn-group -->
 
     {% control_states %} 

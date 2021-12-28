@@ -99,6 +99,8 @@ def log_collapsible(request):
 def landingPage(request):
     return render(request, 'landing.html')
 
+#! The viewsets below provide access to the API
+#! This development branch currently not being followed
 def apiViews(request):
     return render(request, 'api_views.html')
 
@@ -122,9 +124,6 @@ def industryStockTable(request):
 
 def timeStampTable(request):
     return render(request, 'api-time-stamps.html')
-
-# The viewsets below provide access to the API
-
 
 class CommodityViewSet(viewsets.ModelViewSet):
     queryset = Commodity.objects.all()
