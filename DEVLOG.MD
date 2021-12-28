@@ -49,4 +49,6 @@ Stepping is now implemented (but for substates only)
 
 ## Commit stepping implemented (substates only)
 
+Time Comparison Color change (method works, has to be extended to all magnitudes)
 
+## Commit Time comparison Color Changes working; to be extended to all magnitudes

@@ -17,6 +17,30 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
     supply=models.FloatField(verbose_name="Supply", default=0)
     owner = models.ForeignKey('auth.User', related_name='%(app_label)s_%(class)s_related', on_delete=models.CASCADE, default=1)
 
+    def comparator_stock(self):
+        comparator_time_stamp=self.time_stamp_FK.comparator_time_stamp_FK
+       
+        comparator_stock=Stock.objects.filter(
+            time_stamp_FK=comparator_time_stamp,
+            stock_owner_name=self.stock_owner_name,
+            commodity_FK__name=self.commodity_FK.name,
+            usage_type=self.usage_type
+            )
+        if comparator_stock.count()>1:
+            return self
+        elif comparator_stock.count()<1:
+            return None
+        else:
+            return comparator_stock.first()
+    
+    @property
+    def old_size(self):
+        if self.comparator_stock()==None:
+            return -1
+        else:
+            last_size=self.comparator_stock().size
+        return last_size
+
 class IndustryStock(Stock):
     industry_FK = models.ForeignKey("Industry", verbose_name="Industry", on_delete=models.CASCADE, null=True)
     production_requirement = models.FloatField(verbose_name="Production Requirement", default=0)

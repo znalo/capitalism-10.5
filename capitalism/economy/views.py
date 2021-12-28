@@ -42,7 +42,8 @@ class IndustryView(ListView):
     model=Industry
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        qs=Industry.time_stamped_queryset()
+        # qs=Industry.time_stamped_queryset() #! use this in deployment
+        qs=Industry.objects.all()
         context['time_stamped_industry_list']=qs
         return context    
 
@@ -50,7 +51,8 @@ class CommodityView(ListView):
     model=Commodity
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        qs=Commodity.time_stamped_queryset()
+        # qs=Commodity.time_stamped_queryset() #! use this in deployment
+        qs=Commodity.objects.all()
         context['time_stamped_commodity_list']=qs
         return context    
 
@@ -58,7 +60,8 @@ class SocialClassView(ListView):
     model=SocialClass
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        qs=SocialClass.time_stamped_queryset()
+        # qs=SocialClass.time_stamped_queryset() #! use this in deployment
+        qs=SocialClass.objects.all()
         context['time_stamped_social_class_list']=qs
         return context
 
@@ -70,7 +73,8 @@ class SocialStockView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        stock_list=SocialStock.time_stamped_queryset()
+        # stock_list=SocialStock.time_stamped_queryset()#! use this in deployment
+        stock_list=SocialStock.objects.all()
         context['stock_list']= stock_list
         return context    
 
@@ -78,7 +82,8 @@ class IndustryStockView(ListView):
     model=IndustryStock
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        stock_list=IndustryStock.time_stamped_queryset()
+        # stock_list=IndustryStock.time_stamped_queryset()#! use this in deployment
+        stock_list=IndustryStock.objects.all()
         context['stock_list']= stock_list
         return context
         

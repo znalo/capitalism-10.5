@@ -58,7 +58,7 @@ class TimeStamp(models.Model):
     period = models.IntegerField(verbose_name="Period", default=1)
     super_state_FK = models.ForeignKey(ControlSuperState, max_length=20, on_delete=models.CASCADE, default=1)
     sub_state_FK = models.ForeignKey(ControlSubState, max_length=20, on_delete=models.CASCADE, default=1)
-    comparator_time_stamp_ID = models.IntegerField(verbose_name="Comparator", default=1)
+    comparator_time_stamp_FK = models.ForeignKey("TimeStamp", on_delete=models.DO_NOTHING, null=True)
     melt = models.CharField(verbose_name="MELT", max_length=50, default=UNDEFINED)
     population_growth_rate = models.IntegerField(verbose_name="Population Growth Rate", default=1)
     investment_ratio = models.IntegerField(verbose_name="Investment Ratio", default=1)
@@ -75,7 +75,7 @@ class TimeStamp(models.Model):
         ordering=['project_FK__number','time_stamp',]
 
     def __str__(self):
-        return f"[Time {self.time_stamp}] [Project {self.project_FK.number}] {self.description}"
+        return f"[Time {self.time_stamp}(id:{self.id}) description: {self.description}] [Project {self.project_FK.number}] "
 
 class State(models.Model):
     name = models.CharField(primary_key=True, default="Initial", max_length=50)
@@ -110,24 +110,96 @@ class State(models.Model):
         Log.enter(0, "MOVING ONE TIME STAMP FORWARD")
         # ! there's always only one record in this queryset
         current_state = State.current_state()
-        current_time_stamp = current_state.time_stamp_FK
+        current_time_stamp = State.get_current_time_stamp()
         this_project = current_time_stamp.project_FK
         old_time_stamp = TimeStamp.objects.filter(
             project_FK=this_project).order_by('time_stamp').last()
         #! create a new timestamp object by saving with pk=None. Forces Django to create a new database object
+        remember_where_we_parked=old_time_stamp.id
         new_time_stamp = old_time_stamp
         new_time_stamp.pk = None
         new_time_stamp.time_stamp += 1
-        new_time_stamp.description = "NEXT"
+        new_time_stamp.description = State.current_control_substate()
+        print(f"old time stamp id before save is {old_time_stamp.id} and new time stamp id is {new_time_stamp.id}")
+        remembered_time_stamp=TimeStamp.objects.get(id=remember_where_we_parked)
         new_time_stamp.save()
+        print(f"old time stamp id after save is {old_time_stamp.id}, new time stamp id is {new_time_stamp.id}, remembered is {remembered_time_stamp.id}")
+        new_time_stamp.comparator_time_stamp_FK=remembered_time_stamp
+        new_time_stamp.save()
+        print(f"old time stamp id after save is {old_time_stamp.id}, new time stamp id is {new_time_stamp.id}, remembered is {remembered_time_stamp.id}")
+
     #! reset the current state
         current_state.time_stamp_FK = new_time_stamp
         current_state.save()
         Log.enter(
-            1, f"Stepping from Old Time Stamp {old_time_stamp} to New Time Stamp {new_time_stamp}; state is now {current_state}")
+            1, f"Stepping from Old Time Stamp {new_time_stamp.comparator_time_stamp_FK} to New Time Stamp {new_time_stamp}")
         return new_time_stamp
 
-    #! this method works with create_stamp (and should perhaps be integrated into it)
+    #! create a complete clone of each object and set it to point to the new time stamp
+    #! when this is done, pass through the newly-created children linking them to their new parents
+    #! cloning method is to set pk=0 and save. See https://django.fun/docs/django-orm-cookbook/en/2.0/copy/
+    #! but we must set both .pk and .id to None before it works (see https://www.youtube.com/watch?v=E0oM9r3LhQU)
+    #! seems a bit quirky but haven't found another way
+    @staticmethod
+    def clone(old_time_stamp, new_time_stamp):
+       #! import these here to avoid circular imports
+        from .commodity import Commodity
+        from .stocks import IndustryStock, SocialStock
+        from .owners import Industry, SocialClass
+        
+        industries = Industry.objects.filter(time_stamp_FK=old_time_stamp)
+        for industry in industries:
+            industry.time_stamp_FK = new_time_stamp
+            industry.pk = None
+            industry.id = None
+            industry.save()
+            Log.enter(
+                1, f"Created a new Industry record {industry} with time stamp {industry.time_stamp_FK.time_stamp}")
+            print(f"There are now {Industry.objects.all().count()} industry records")
+
+        commodities = Commodity.objects.filter(time_stamp_FK=old_time_stamp)
+        for commodity in commodities:
+            commodity.pk = None
+            commodity.id = None
+            commodity.time_stamp_FK = new_time_stamp
+            commodity.save()
+            Log.enter(
+                1, f"Created a new Commodity record {commodity} with time stamp {commodity.time_stamp_FK.time_stamp}")
+            print(f"There are now {Commodity.objects.all().count()} commodity records")
+
+        social_classes = SocialClass.objects.filter(time_stamp_FK=old_time_stamp)
+        for social_class in social_classes:
+            social_class.pk = None
+            social_class.id = None
+            social_class.time_stamp_FK = new_time_stamp
+            social_class.save()
+            Log.enter(
+                1, f"Created a new Social Class record {social_class} with time stamp {social_class.time_stamp_FK.time_stamp}")
+            print(f"There are now {SocialClass.objects.all().count()} social class records")
+
+        social_stocks = SocialStock.objects.filter(time_stamp_FK=old_time_stamp)
+        for social_stock in social_stocks:
+            social_stock.pk = None
+            social_stock.id = None
+            social_stock.time_stamp_FK = new_time_stamp
+            social_stock.save()
+            Log.enter(
+                1, f"Created a new Social Stock record {social_stock} with time stamp {social_stock.time_stamp_FK}")
+            print(f"There are now {SocialStock.objects.all().count()} social stock records")
+
+        industry_stocks = IndustryStock.objects.filter(
+            time_stamp_FK=old_time_stamp)
+        for industry_stock in industry_stocks:
+            industry_stock.pk = None
+            industry_stock.id = None
+            industry_stock.time_stamp_FK = new_time_stamp
+            industry_stock.save()
+            Log.enter(
+                1, f"Created a new Industry Stock record {industry_stock} with time stamp {industry_stock.time_stamp_FK}")
+            print(f"There are now {IndustryStock.objects.all().count()} industry stock records")
+        return
+
+ #! this method works with create_stamp (and should perhaps be integrated into it)
     #! when a new stamp is created (by 'move_one_stamp'), it first creates the stamp and then clones every object 
     #! so that the time_stamp and the objects together constitute a new 'state' of the simulation
     #! Therefore, once the new objects have been created, all their foreign keys must be linked to their correct parents
@@ -195,57 +267,7 @@ class State(models.Model):
             social_stock.save()
             new_social_class.save()
 
-    #! create a complete clone of each object and set it to point to the new time stamp
-    #! when this is done, pass through the newly-created children linking them to their new parents
-    #! cloning method is to set pk=0 and save. See https://django.fun/docs/django-orm-cookbook/en/2.0/copy/
-    @staticmethod
-    def clone(old_time_stamp, new_time_stamp):
-       #! import these here to avoid circular imports
-        from .commodity import Commodity
-        from .stocks import IndustryStock, SocialStock
-        from .owners import Industry, SocialClass
-        
-        commodities = Commodity.objects.filter(time_stamp_FK=old_time_stamp)
-        for commodity in commodities:
-            commodity.pk = None
-            commodity.time_stamp_FK = new_time_stamp
-            commodity.save()
-            Log.enter(
-                1, f"Created a new Commodity record {commodity} with time stamp {commodity.time_stamp_FK.time_stamp}")
-
-        industries = Industry.objects.filter(time_stamp_FK=old_time_stamp)
-        for industry in industries:
-            industry.pk = None
-            industry.time_stamp_FK = new_time_stamp
-            industry.save()
-            Log.enter(
-                1, f"Created a new Industry record {industry} with time stamp {industry.time_stamp_FK.time_stamp}")
-
-        social_classes = SocialClass.objects.filter(time_stamp_FK=old_time_stamp)
-        for social_class in social_classes:
-            social_class.pk = None
-            social_class.time_stamp_FK = new_time_stamp
-            social_class.save()
-            Log.enter(
-                1, f"Created a new Social Class record {social_class} with time stamp {social_class.time_stamp_FK.time_stamp}")
-
-        social_stocks = SocialStock.objects.filter(time_stamp_FK=old_time_stamp)
-        for social_stock in social_stocks:
-            social_stock.pk = None
-            social_stock.time_stamp_FK = new_time_stamp
-            social_stock.save()
-            Log.enter(
-                1, f"Created a new Social Stock record {social_stock} with time stamp {social_stock.time_stamp_FK}")
-
-        industry_stocks = IndustryStock.objects.filter(
-            time_stamp_FK=old_time_stamp)
-        for industry_stock in industry_stocks:
-            industry_stock.pk = None
-            industry_stock.time_stamp_FK = new_time_stamp
-            industry_stock.save()
-            Log.enter(
-                1, f"Created a new Industry Stock record {industry_stock} with time stamp {industry_stock.time_stamp_FK}")
-        return
+   
 
     #! Create a complete copy of all obects together with a new time stamp and connect their FKs, thus making a complete new state of the simulation    
     @staticmethod
@@ -259,10 +281,14 @@ class State(models.Model):
     #! Tell us what the current (proposed) action is
     @staticmethod
     def current_control_substate():
-        state=State.current_state()
-        time_stamp=state.time_stamp_FK
-        substate=time_stamp.sub_state_FK
-        return substate.name        
+        #! right at the beginning, there is no current state
+        try:
+            state=State.current_state()
+            time_stamp=state.time_stamp_FK
+            substate=time_stamp.sub_state_FK
+            return substate.name        
+        except:
+            return "Initial"
 
     #! Create a new state by moving forward one time stamp (see 'move_one_stamp')
     #! Then perform the next action, so that the state represents the results of this action

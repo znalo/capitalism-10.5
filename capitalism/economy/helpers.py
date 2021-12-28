@@ -7,8 +7,7 @@ from django.template import loader
 from capitalism.global_constants import *
 
 def get_economy_view_context(context): ## helper function abstract from EconomyView to be used elsewhere also
-        current_state=State.objects.get(name ="Initial")
-        current_time_stamp=current_state.time_stamp_FK
+        current_time_stamp=State.get_current_time_stamp()
         industry_stocks = IndustryStock.objects.filter(time_stamp_FK=current_time_stamp)
         industries=Industry.objects.filter(time_stamp_FK=current_time_stamp)
         productive_stocks=industry_stocks.filter(usage_type=PRODUCTION)

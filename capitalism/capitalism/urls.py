@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.conf.urls import url
 from rest_framework import routers
 from economy import views
-from economy.actions import control, exchange, produce
+from economy.actions import control, exchange, produce, distribution
 from django.urls import path, include
 
 router = routers.DefaultRouter()
@@ -41,6 +41,10 @@ urlpatterns = [
     url('production/produce', produce.produce_all, name='produce'),
     url('production/prices', produce.prices, name='prices'),
     url('production/reproduce', produce.reproduce, name='reproduce'),
+
+    url('distribution/revenue', distribution.revenue,name='revenue'),
+    url('distribution/accumulate', distribution.revenue,name='accumulate'),
+
 ]
 
 urlpatterns += [

@@ -1,3 +1,4 @@
+from datetime import time
 from ..models.states import (ControlSubState, ControlSuperState, Project, TimeStamp, State, Log)
 from ..models.commodity import Commodity
 from ..models.owners import Industry, SocialClass
@@ -10,6 +11,7 @@ import os
 import pandas as pd
 from capitalism.global_constants import *
 from django.shortcuts import redirect
+from django.urls import reverse
 
 #! Gets the whole thing going from CSV static files
 # TODO EITHER: Loads of error checking
@@ -28,7 +30,7 @@ def initialize(request):
     #TODO use reverse() to get the URLs
     mc=ControlSuperState(name=M_C, first_substate_name=DEMAND, next_superstate_name=C_P)
     mc.save()
-    demand=ControlSubState(name=DEMAND,super_state_name=M_C, next_substate_name=SUPPLY, URL="/exchange/demand")
+    demand=ControlSubState(name=DEMAND,super_state_name=M_C, next_substate_name=SUPPLY, URL=reverse("calculate-demand"))
     demand.save()
     supply=ControlSubState(name=SUPPLY,super_state_name=M_C, next_substate_name=ALLOCATE, URL="exchange/supply")
     supply.save()
@@ -72,7 +74,6 @@ def initialize(request):
             period=row.period,
             super_state_FK=initial_super_state,
             sub_state_FK=initial_sub_state,
-            comparator_time_stamp_ID=row.comparator_time_stamp_ID,
             description=row.description,
             melt=row.MELT,
             population_growth_rate=row.population_growth_rate,
@@ -84,7 +85,9 @@ def initialize(request):
             quantity_symbol=row.quantity_symbol
         )
         time_stamp.save()
-
+        time_stamp.comparator_time_stamp_FK=time_stamp #! no belly-button in first stamp
+        time_stamp.save()
+        
     state = State(name="Initial", time_stamp_FK=TimeStamp.objects.get(
         time_stamp=1, project_FK__number=1))
     state.save()

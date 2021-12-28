@@ -13,6 +13,7 @@
           <th>Stock Owner</th>
           <th>Stock Owner FK</th>
           <th>Size</th>
+          <th>Last Size</th>
           <th>Value</th>
           <th>Price</th>
           <th>Demand</th>
@@ -26,10 +27,13 @@
           <td> {{ stock.id }} </td>
           <td> {{ stock.time_stamp_FK }}</td>
           <td> {{ stock.commodity_FK.name }}</td>
-          <td> {{ stock.type }}</td>
+          <td> {{ stock.usage_type }}</td>
           <td> {{ stock.stock_owner_name }}</td>
           <td> {{ stock.stock_owner_FK.name }}</td>
-          <td> {{ stock.size }}</td>
+          <td>
+            {{ stock.size }}
+          </td>
+          <td> {{ stock.old_size }}</td>
           <td> {{ stock.value}}</td>
           <td> {{ stock.price}}</td>
           <td> {{ stock.demand }}</td>

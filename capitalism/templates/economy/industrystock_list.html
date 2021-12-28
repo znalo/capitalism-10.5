@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+{% load app_filters %}
 
 <div class="row">
   <div class="col-sm-12">
@@ -12,6 +13,7 @@
           <th>Commodity</th>
           <th>Stock Type</th>
           <th>Size</th>
+          <th>Old Size</th>
           <th>Production Requirement</th>
           <th>Demand</th>
           <th>Owner</th>
@@ -25,7 +27,8 @@
           <td> {{ stock.industry_FK.name}} </td>
           <td> {{ stock.commodity_FK.name }}</td>
           <td> {{ stock.usage_type }}</td>
-          <td> {{ stock.size }}</td>
+          <td> {{ stock.size|has_changed:stock.old_size}}</td>
+          <td> {{ stock.old_size}}</td>
           <td> {{ stock.production_requirement }}</td>
           <td> {{ stock.demand }}</td>
           <td> {{ stock.owner }}</td>

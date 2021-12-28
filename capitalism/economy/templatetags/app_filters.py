@@ -2,6 +2,7 @@ from django import template
 from datetime import date, timedelta
 from capitalism.global_constants import *
 from economy.models.states import ControlSubState, State
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -13,7 +14,9 @@ register = template.Library()
 def money_filter(value):
     stocks=value.filter(usage_type=MONEY)
     if stocks.count()>1:
-        return "DUPLICATE STOCK ERROR"
+        return "DUPLICATE MONEY STOCKS "
+    elif stocks.count()<1:
+        return "NO MONEY STOCK"
     else:
         stock=stocks.get()
         return stock.size
@@ -22,7 +25,9 @@ def money_filter(value):
 def sales_filter(value):
     stocks=value.filter(usage_type=SALES)
     if stocks.count()>1:
-        return "DUPLICATE STOCK ERROR"
+        return "DUPLICATE SALES STOCKS"
+    elif stocks.count()<1:
+        return "NO SALES STOCK"
     else:
         stock=stocks.get()
         return stock.size
@@ -31,7 +36,9 @@ def sales_filter(value):
 def consumption_filter(value):
     stocks=value.filter(usage_type=CONSUMPTION)
     if stocks.count()>1:
-        return "DUPLICATE STOCK ERROR"
+        return "DUPLICATE CONSUMPTION STOCKS"
+    elif stocks.count()<1:
+        return "NO CONSUMPTION STOCK"
     else:
         stock=stocks.get()
         return stock.size
@@ -44,3 +51,11 @@ def multiply(value, arg):
 def current_control_state(value):
     sub_state= State.current_control_substate()
     return sub_state
+
+@register.filter
+def has_changed(new,old):
+    print(f"old was {new} new is {old}")
+    if old==new:
+        return new
+    else:
+        return mark_safe("<span style=\"color:red\">"+str(new)+"</span>")

@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-
 {% load app_filters %}
 <div class="row">
   <div class="col-sm-12">
@@ -30,7 +29,7 @@
           {% for stock in productive_stocks %}
           {% if stock.industry_FK.name == industry.name %}
           <td>
-            {{ stock.size}}
+            {{ stock.size|has_changed:stock.old_size}}
           </td>
           <td>
             {{ stock.production_requirement}}
