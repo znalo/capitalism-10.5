@@ -12,26 +12,6 @@
       <a href=" {% url 'initialize' %}" class="btn btn-light btn-sm" role="button" method="get">Initialize</a>
     </div> <!-- btn-group -->
 
-    <div class="btn-group">
-      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuClickable"
-        data-bs-toggle="dropdown" data-bs-auto-close="false" aria-expanded="false">
-        Actions
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuClickable">
-        <li><a href=" {% url 'move-one-stamp' %}" class="btn btn-light btn-sm" role="button" method="get">Step</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li><a href=" {% url 'calculate-demand' %}" class="btn btn-light btn-sm" role="button" method="get">Demand</a></li>
-        <li><a href=" {% url 'calculate-supply' %}" class="btn btn-light btn-sm" role="button" method="get">Supply</a></li>
-        <li><a href=" {% url 'allocate' %}" class="btn btn-light btn-sm" role="button" method="get">Allocate</a></li>
-        <li><a href=" {% url 'trade' %}" class="btn btn-light btn-sm" role="button" method="get">Trade</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li><a href=" {% url 'produce' %}" class="btn btn-light btn-sm" role="button" method="get">Produce</a></li>
-        <li><a href=" {% url 'prices' %}" class="btn btn-light btn-sm" role="button" method="get">Price</a></li>
-        <li><a href=" {% url 'reproduce' %}" class="btn btn-light btn-sm" role="button" method="get">Reproduce</a>
-        <li><hr class="dropdown-divider"></li>
-        </li>
-      </ul>
-    </div>
     {% control_states %} 
 
   </div>

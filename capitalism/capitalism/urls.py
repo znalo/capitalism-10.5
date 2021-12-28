@@ -28,6 +28,7 @@ urlpatterns = [
     url('tables/industry-stocks', views.IndustryStockView.as_view(), name='industry-stocks'),
     url('tables/social-stocks', views.SocialStockView.as_view(), name='social-stocks'),
     url('tables/all-stocks', views.AllStocksView.as_view(), name='all-stocks'),
+
     url('exchange/demand', exchange.calculate_demand, name='calculate-demand'),
     url('exchange/supply', exchange.calculate_supply, name='calculate-supply'),
     url('exchange/allocate', exchange.allocate_supply, name='allocate'),

@@ -6,5 +6,9 @@ register = template.Library()
 
 @register.inclusion_tag('economy/control_states.html')
 def control_states():
-      obj = ControlSuperState.objects.values_list('name', flat=True)
-      return {'superstates': obj}
+      super_states = ControlSuperState.objects.all()
+      sub_states= ControlSubState.objects.all()
+      context={}
+      context['superstates']=super_states
+      context['substates']=sub_states
+      return context

@@ -3,8 +3,9 @@
     data-bs-auto-close="false" aria-expanded="false">
     Controls
   </button>
-  <ul class="dropdown-menu" aria-labelledby="dropdownMenuClickable">
-    {% for state in superstates %}
-    <li> {{ state }} </li>
+  <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuClickable">
+    {% for state in substates %}
+    <li> <a href= "{{ state.URL }}" class="dropdown-item" method="get">{{ state.name }} </a>
+    </li>
     {% endfor %}
   </ul>
