@@ -67,5 +67,23 @@ TODO choice of displaying value, quantity, price
 
 ## Commit rest and be thankful
 
+TODO 29/12
+* Extend the display DONE but some TBAs
+* Finish comparisons IN PROGRESS
+* Superstate stepper FRAMEWORK ESTABLISHED (ALL TABLE-DRIVEN NOW) BUT REMAINS TO CODE THE SUPERSTATE STEPS
+* Commodity totals for quantity price and value either incomplete or incorrect
+* Revenue and Accumulate steps
+* De-activate disallowed action choices
+* Amalgamate Demand and Supply Project selection
+* Full initialise vs one project initialise
+
+NOTE the control database either has to be initialized at startup, or we have to assume it is in place.
+TODO better to initialize the control database at startup.
+
+## Commit stepping framework in place
+
+
+
+
 
 

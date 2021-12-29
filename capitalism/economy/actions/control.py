@@ -12,6 +12,42 @@ import pandas as pd
 from capitalism.global_constants import *
 from django.shortcuts import redirect
 from django.urls import reverse
+from .exchange import calculate_demand,calculate_supply, allocate_supply, trade, all_exchange
+from .produce import producers, prices, reproduce, all_production
+from .distribution import revenue, accumulate, all_distribution
+
+action_list={
+    'demand':calculate_demand,
+    'supply':calculate_supply,
+    'allocate':allocate_supply,
+    'trade':trade,
+    'produce':producers,
+    'prices':prices,
+    'reproduce':reproduce,
+    'revenue': revenue,
+    'accumulate':accumulate,
+    'all_exchange':all_exchange,
+    'all_production': all_production,
+    'all_distribution': all_distribution
+    }
+
+def execute(request,act):
+    print (f"action {act} requested")
+    action=action_list[act]
+    print(f"this will execute {action} ")
+    action()
+    template = loader.get_template('economy/economy.html')
+    context = get_economy_view_context({})
+    return HttpResponse(template.render(context, request))    
+
+def stage(request,act):
+    print (f"superstate {act} requested")
+    action=action_list[act]
+    print(f"this will execute {action} ")
+    action()
+    template = loader.get_template('economy/economy.html')
+    context = get_economy_view_context({})
+    return HttpResponse(template.render(context, request))    
 
 #! Gets the whole thing going from CSV static files
 # TODO EITHER: Loads of error checking
@@ -27,30 +63,30 @@ def initialize(request):
     Project.objects.all().delete()
     TimeStamp.objects.all().delete()
 
-    #TODO use reverse() to get the URLs
-    mc=ControlSuperState(name=M_C, first_substate_name=DEMAND, next_superstate_name=C_P)
+    mc=ControlSuperState(name=M_C, first_substate_name=DEMAND, next_superstate_name=C_P, URL="stage/all_exchange")
     mc.save()
-    demand=ControlSubState(name=DEMAND,super_state_name=M_C, next_substate_name=SUPPLY, URL=reverse("calculate-demand"))
-    demand.save()
-    supply=ControlSubState(name=SUPPLY,super_state_name=M_C, next_substate_name=ALLOCATE, URL="exchange/supply")
-    supply.save()
-    allocate=ControlSubState(name=ALLOCATE,super_state_name=M_C, next_substate_name=TRADE, URL="exchange/allocate")
-    allocate.save()
-    trade=ControlSubState(name=TRADE,super_state_name=M_C,next_substate_name=PRODUCE, URL="exchange/trade")
-    trade.save()
-    cp=ControlSuperState(name=C_P,first_substate_name=PRODUCE)
+    cp=ControlSuperState(name=C_P,first_substate_name=PRODUCE,URL="stage/all_production")
     cp.save()
-    produce=ControlSubState(name=PRODUCE,super_state_name=C_P, next_substate_name=PRICES, URL="production/produce")
-    produce.save()
-    prices=ControlSubState(name=PRICES,super_state_name=C_P, next_substate_name=REPRODUCE, URL="production/prices")
-    prices.save()
-    reproduce=ControlSubState(name=REPRODUCE,super_state_name=C_P, next_substate_name=REVENUE, URL="production/reproduce")
-    reproduce.save()
-    cm=ControlSuperState(name=C_M, first_substate_name=REVENUE)
+    cm=ControlSuperState(name=C_M, first_substate_name=REVENUE, URL="stage/all_distribution")
     cm.save()
-    revenue=ControlSubState(name=REVENUE,super_state_name=C_M,next_substate_name=ACCUMULATE, URL="distribution/revenue")
+
+    demand=ControlSubState(name=DEMAND,super_state_name=M_C, next_substate_name=SUPPLY, URL="execute/demand")
+    demand.save()
+    supply=ControlSubState(name=SUPPLY,super_state_name=M_C, next_substate_name=ALLOCATE, URL="execute/supply")
+    supply.save()
+    allocate=ControlSubState(name=ALLOCATE,super_state_name=M_C, next_substate_name=TRADE, URL="execute/allocate")
+    allocate.save()
+    trade=ControlSubState(name=TRADE,super_state_name=M_C,next_substate_name=PRODUCE, URL="execute/trade")
+    trade.save()
+    produce=ControlSubState(name=PRODUCE,super_state_name=C_P, next_substate_name=PRICES, URL="execute/produce")
+    produce.save()
+    prices=ControlSubState(name=PRICES,super_state_name=C_P, next_substate_name=REPRODUCE, URL="execute/prices")
+    prices.save()
+    reproduce=ControlSubState(name=REPRODUCE,super_state_name=C_P, next_substate_name=REVENUE, URL="execute/reproduce")
+    reproduce.save()
+    revenue=ControlSubState(name=REVENUE,super_state_name=C_M,next_substate_name=ACCUMULATE, URL="execute/revenue")
     revenue.save()
-    accumulate=ControlSubState(name=ACCUMULATE,super_state_name=C_M, next_substate_name=DEMAND, URL="distribution/accumulate")
+    accumulate=ControlSubState(name=ACCUMULATE,super_state_name=C_M, next_substate_name=DEMAND, URL="execute/accumulate")
     accumulate.save()
 
     Log.enter(1, f"Reading projects from {file_name}")

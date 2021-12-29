@@ -4,7 +4,7 @@
     Controls
   </button>
   <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuClickable">
-    {% for state in substates %}
+    {% for state in superstates %}
     <li> <a href= "{{ state.URL }}" class="dropdown-item" method="get">{{ state.name }} </a> </li>
     {% endfor %}
   </ul>

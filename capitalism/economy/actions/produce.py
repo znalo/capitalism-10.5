@@ -70,7 +70,7 @@ def produce(industry):
     sales_stock.save()
     Log.enter(1,f"{industry.name}'s sales stock has increased by {industry.output_scale} to {sales_stock.size} and its value has risen to {sales_stock.value}" )
 
-def produce_all(request):
+def producers():
 #! For each industry, check in case stock availability reduces output scale. Should not normally happen but we have to catch it
 #! if it does, to prevent negative stocks
     Log.enter(0,"Start Producing")
@@ -85,24 +85,17 @@ def produce_all(request):
 #TODO Recalculate commodity size on the fly, and use the below only as a double check
     set_commodity_sizes()
 
-    template = loader.get_template('economy/economy.html')
-    context = get_economy_view_context({})
-    return HttpResponse(template.render(context, request))
-
 #! Production determines output values and prices
 #! Once we have a sophisticated pricing model, prices will change as a result of reproduction (in response to demand, etc)
 #! In any case, we suppose for simplicity a quantity-response model of social demand
 #! So in the next stage (reproduction) classes set levels of consumption dependent on what they can afford
 #! Then, in the sophisticated model, prices will respond to the changes in stocks. If stocks have fallen, prices will fall and vice versa.
 
-def prices(request):
+def prices():
     set_total_value_and_price()
-    template = loader.get_template('economy/economy.html')
-    context = get_economy_view_context({})
-    return HttpResponse(template.render(context, request))
 
 #! Social Consumption
-def reproduce(request):
+def reproduce():
     Log.enter(0,f"Social Consumption")
     current_state = State.objects.get(name="Initial")
     classes=SocialClass.objects.filter(time_stamp_FK=current_state.time_stamp_FK)
@@ -142,6 +135,7 @@ def reproduce(request):
             Log.enter(1,f"Social Class {social_class} has consumed {quantity_consumed} and created {sales_amount} of sales stocks")
             Log.enter(1,f"{social_class} now owns {cs.size} in consumption goods and has {sales_stock.size} to sell")
 
-    template = loader.get_template('economy/economy.html')
-    context = get_economy_view_context({})
-    return HttpResponse(template.render(context, request))
+def all_production():
+    #TODO complete this
+    print ("Produce all")
+

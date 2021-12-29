@@ -41,6 +41,21 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
             last_size=self.comparator_stock().size
         return last_size
 
+    @property
+    def old_demand(self):
+        if self.comparator_stock()==None:
+            return -1
+        else:
+            return self.comparator_stock().demand
+
+    @property
+    def old_supply(self):
+        if self.comparator_stock()==None:
+            return -1
+        else:
+            return self.comparator_stock().supply
+
+
 class IndustryStock(Stock):
     industry_FK = models.ForeignKey("Industry", verbose_name="Industry", on_delete=models.CASCADE, null=True)
     production_requirement = models.FloatField(verbose_name="Production Requirement", default=0)

@@ -28,23 +28,13 @@ urlpatterns = [
     url('tables/industry-stocks', views.IndustryStockView.as_view(), name='industry-stocks'),
     url('tables/social-stocks', views.SocialStockView.as_view(), name='social-stocks'),
     url('tables/all-stocks', views.AllStocksView.as_view(), name='all-stocks'),
-
-    url('exchange/demand', exchange.calculate_demand, name='calculate-demand'),
-    url('exchange/supply', exchange.calculate_supply, name='calculate-supply'),
-    url('exchange/allocate', exchange.allocate_supply, name='allocate'),
-    url('exchange/trade', exchange.trade, name='trade'),
-
     url('control/sandbox', views.sandbox, name='sandbox'),
     url('control/move-one-stamp', control.move_one_stamp, name='move-one-stamp'),
+    url('control/all_exchange', exchange.all_exchange, name='all-exchange'),
     url('control/initialize', control.initialize, name='initialize'),
-
-    url('production/produce', produce.produce_all, name='produce'),
-    url('production/prices', produce.prices, name='prices'),
-    url('production/reproduce', produce.reproduce, name='reproduce'),
-
-    url('distribution/revenue', distribution.revenue,name='revenue'),
-    url('distribution/accumulate', distribution.revenue,name='accumulate'),
-
+    url(r'stage/(?P<act>[\w-]+)/$', control.stage, name='stage'),
+    url(r'execute/(?P<act>[\w-]+)/$',control.execute, name='execute'),
+ 
 ]
 
 urlpatterns += [

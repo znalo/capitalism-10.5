@@ -29,6 +29,7 @@ class ControlSuperState(models.Model):
     name=models.CharField(max_length=20,choices=CONTROL_SUPER_STATES,default=UNDEFINED)
     first_substate_name=models.CharField(max_length=20,choices=CONTROL_SUB_STATES,default=UNDEFINED)
     next_superstate_name=models.CharField(max_length=20,choices=CONTROL_SUPER_STATES,default=UNDEFINED)
+    URL=models.CharField(max_length=50,choices=CONTROL_SUB_STATES,default=UNDEFINED)
     owner = models.ForeignKey('auth.User',  on_delete=models.CASCADE, default=1)
 
 class ControlSubState(models.Model):

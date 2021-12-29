@@ -4,7 +4,7 @@ from ..models.states import ControlSuperState, ControlSubState
 
 register = template.Library()
 
-@register.inclusion_tag('economy/control_states.html')
+@register.inclusion_tag('partials/control_states.html')
 def control_states():
       super_states = ControlSuperState.objects.all()
       sub_states= ControlSubState.objects.all()
