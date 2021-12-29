@@ -32,12 +32,31 @@ class ControlSuperState(models.Model):
     URL=models.CharField(max_length=50,choices=CONTROL_SUB_STATES,default=UNDEFINED)
     owner = models.ForeignKey('auth.User',  on_delete=models.CASCADE, default=1)
 
+    #!move to the next state
+    #!may not be needed
+    @staticmethod
+    def advance_state():
+        pass
+
 class ControlSubState(models.Model):
     name=models.CharField(max_length=20,choices=CONTROL_SUB_STATES)
     super_state_name=models.CharField(max_length=20,choices=CONTROL_SUPER_STATES,default=UNDEFINED)
+    next_super_state_name=models.CharField(max_length=20,choices=CONTROL_SUPER_STATES,default=UNDEFINED)
     next_substate_name=models.CharField(max_length=20,choices=CONTROL_SUB_STATES,default=UNDEFINED)
     URL=models.CharField(max_length=50,choices=CONTROL_SUB_STATES,default=UNDEFINED)
     owner = models.ForeignKey('auth.User', on_delete=models.CASCADE, default=1)
+
+    def next_sub_state(self):
+        potential_next_substates=ControlSubState.objects.filter(name=self.next_substate_name)
+        if potential_next_substates.count()!=1:
+            raise Exception("Control state improperly configured. This is a Programming error. Sorry, cannot continue.")
+        return potential_next_substates.get()
+
+    def next_super_state(self):
+        potential_next_superstates=ControlSuperState.objects.filter(name=self.next_super_state_name)
+        if potential_next_superstates.count()!=1:
+            raise Exception("Control state improperly configured. This is a Programming error. Sorry, cannot continue.")
+        return potential_next_superstates.get()
 
 class Project(models.Model):
     number=models.IntegerField(verbose_name="Project",null=False, default=0)
@@ -95,7 +114,6 @@ class State(models.Model):
     #! get the current time_stamp object
     @staticmethod
     def get_current_time_stamp():
-    # ! there's always only one record in this queryset
         current_time_stamp = State.current_state().time_stamp_FK
         this_project = current_time_stamp.project_FK
         time_stamp = TimeStamp.objects.filter(
@@ -106,26 +124,42 @@ class State(models.Model):
         return self.name
 
     @staticmethod
+    def current_control_substate():
+        return State.get_current_time_stamp().sub_state_FK
+
+    @staticmethod
+    def current_control_superstate():
+        return State.get_current_time_stamp().super_state_FK
+
+    # @staticmethod
+    # def current_control_substate():
+    #     try:
+    #         state=State.current_state()
+    #         time_stamp=state.time_stamp_FK
+    #         substate=time_stamp.sub_state_FK
+    #         return substate.name        
+    #     except:
+    #         return "Initial"
+
+    @staticmethod
     def create_stamp():
         Log.enter(0, "MOVING ONE TIME STAMP FORWARD")
-        # ! there's always only one record in this queryset
         current_state = State.current_state()
         current_time_stamp = State.get_current_time_stamp()
         this_project = current_time_stamp.project_FK
         old_time_stamp = TimeStamp.objects.filter(
             project_FK=this_project).order_by('time_stamp').last()
-        #! create a new timestamp object by saving with pk=None. Forces Django to create a new database object
         remember_where_we_parked=old_time_stamp.id
         new_time_stamp = old_time_stamp
+        #! create a new timestamp object by saving with pk=None. Forces Django to create a new database object
         new_time_stamp.pk = None
         new_time_stamp.time_stamp += 1
-        new_time_stamp.description = State.current_control_substate()
+        new_time_stamp.description = State.current_control_substate().name
         remembered_time_stamp=TimeStamp.objects.get(id=remember_where_we_parked)
         new_time_stamp.save()
         new_time_stamp.comparator_time_stamp_FK=remembered_time_stamp
         new_time_stamp.save()
-
-    #! reset the current state
+        #! reset the current state
         current_state.time_stamp_FK = new_time_stamp
         current_state.save()
         Log.enter(
@@ -191,7 +225,7 @@ class State(models.Model):
                 1, f"Created a new Industry Stock record {industry_stock} with time stamp {industry_stock.time_stamp_FK}")
         return
 
- #! this method works with create_stamp (and should perhaps be integrated into it)
+    #! this method works with create_stamp (and should perhaps be integrated into it)
     #! when a new stamp is created (by 'move_one_stamp'), it first creates the stamp and then clones every object 
     #! so that the time_stamp and the objects together constitute a new 'state' of the simulation
     #! Therefore, once the new objects have been created, all their foreign keys must be linked to their correct parents
@@ -259,60 +293,27 @@ class State(models.Model):
             social_stock.save()
             new_social_class.save()
 
-   
-
-    #! Create a complete copy of all obects together with a new time stamp and connect their FKs, thus making a complete new state of the simulation    
-    @staticmethod
-    def move_one_stamp():
-        old_time_stamp = State.get_current_time_stamp()
-        new_time_stamp = State.create_stamp()
-        Log.enter(0, f"Moving simulation state one stamp forward from {old_time_stamp} to {new_time_stamp}")
-        State.clone(old_time_stamp, new_time_stamp)
-        State.connect_stamp(new_time_stamp)
-
-    #! Tell us what the current (proposed) action is
-    @staticmethod
-    def current_control_substate():
-        #! right at the beginning, there is no current state
-        try:
-            state=State.current_state()
-            time_stamp=state.time_stamp_FK
-            substate=time_stamp.sub_state_FK
-            return substate.name        
-        except:
-            return "Initial"
-
     #! Create a new state by moving forward one time stamp (see 'move_one_stamp')
-    #! Then perform the next action, so that the state represents the results of this action
     #! States are divided into superstates and substates and this affects the logic
     #! The user decides whether they wants to execute a single sub-step, or all the steps in a bunch
     #! We may arrive at this decision either 
     #*  because we're only processing superstates (user not interested in the detail), or
     #*  because user is halfway through a superstate and wants to skip to the next superstate
-    # TODO First, we merely arrange progression from substate to substate.
-    # TODO when this is working, we'll put in the superstate logic
     @staticmethod
-    def perform_next_action():
-        #! The State 'knows' the time_stamp
-        #! The time_stamp 'knows' the control substate and the control superstate
-        State.move_one_stamp()
-        state=State.current_state()
-        time_stamp=state.time_stamp_FK
+    def move_one_substep():
+        #! The State 'knows' the time_stamp 
+        old_time_stamp = State.get_current_time_stamp()
+        new_time_stamp = State.create_stamp()
+        Log.enter(0, f"Moving simulation state one stamp forward from {old_time_stamp} to {new_time_stamp}")
+        State.clone(old_time_stamp, new_time_stamp)
+        State.connect_stamp(new_time_stamp)
+        time_stamp=State.get_current_time_stamp() #! probably redundant - the time_stamp should be remembered in new_time_stamp
         substate=time_stamp.sub_state_FK
-        superstate=time_stamp.super_state_FK
-        Log.enter(1,f"Current Substate is {substate.name} and its URL is {substate.URL}. Current SuperState is {superstate.name}")
-        Log.enter(1,f"Current Superstate was {superstate.name} ")
-        #! Move the control state forward
-        potential_next_substates=ControlSubState.objects.filter(name=substate.next_substate_name)
-        if potential_next_substates.count()!=1:
-            raise Exception("Control state improperly configured. This is a Programming error. Sorry, cannot continue.")
-        next_substate=potential_next_substates.get()
-        time_stamp.sub_state_FK=next_substate
+        Log.enter(1,f"Current Substate is {substate.name} and its URL is {substate.URL}")
+        #! Move the control substate and superstate forward. The simulation then knows permissible sub-action and super-actions
+        #! once the current action (undertaken elsewhere) is complete
+        time_stamp.sub_state_FK=substate.next_sub_state()
+        time_stamp.super_state_FK=substate.next_super_state()
         time_stamp.save()
-        #! The receiver will perform the action specified by the URL
-        return substate.URL
-        #! We'll be back :-)
-
-
-
-
+        #! The receiver will perform the action specified by substate
+        return substate

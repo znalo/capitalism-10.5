@@ -136,6 +136,12 @@ def reproduce():
             Log.enter(1,f"{social_class} now owns {cs.size} in consumption goods and has {sales_stock.size} to sell")
 
 def all_production():
-    #TODO complete this
     print ("Produce all")
+    new_substate=State.move_one_substep()
+    producers()
+    new_substate=State.move_one_substep()
+    prices()
+    new_substate=State.move_one_substep()
+    reproduce()
+    
 

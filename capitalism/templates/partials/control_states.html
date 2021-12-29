@@ -1,3 +1,4 @@
+{% load app_filters %}
 <div class="btn-group">
   <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuClickable" data-bs-toggle="dropdown"
     data-bs-auto-close="false" aria-expanded="false">
@@ -5,6 +6,10 @@
   </button>
   <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuClickable">
     {% for state in superstates %}
-    <li> <a href= "{{ state.URL }}" class="dropdown-item" method="get">{{ state.name }} </a> </li>
+    {% if state == active_superstate %}
+    <li> <a href= "{{ "A String"|current_control_super_state }}" class="dropdown-item active " method="get">{{ state.name }} </a> </li>
+    {% else %}
+    <li> <div class="dropdown-item" method="get">{{ state.name }} </div> </li>
+    {% endif %}
     {% endfor %}
   </ul>

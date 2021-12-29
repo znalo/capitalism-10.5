@@ -177,5 +177,13 @@ def trade():
     set_total_value_and_price()
 
 def all_exchange():
-    #TODO complete this
     print ("Exchange all")
+    new_substate=State.move_one_substep()
+    calculate_demand()
+    new_substate=State.move_one_substep()
+    calculate_supply()
+    new_substate=State.move_one_substep()
+    allocate_supply()
+    new_substate=State.move_one_substep()
+    trade()
+

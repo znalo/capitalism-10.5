@@ -1,6 +1,8 @@
 from ..helpers import get_economy_view_context
 from django.http import HttpResponse
 from django.template import loader
+from ..models.states import State
+
 def revenue():
     #TODO complete this
     print("Revenue")
@@ -10,5 +12,9 @@ def accumulate():
     print("Moses and the Prophets")
 
 def all_distribution():
-    #TODO complete this
-    print ("Distribute all")
+     print ("Distribute all")
+     new_substate=State.move_one_substep()
+     revenue()
+     new_substate=State.move_one_substep()
+     accumulate()
+     

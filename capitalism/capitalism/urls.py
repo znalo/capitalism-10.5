@@ -29,11 +29,10 @@ urlpatterns = [
     url('tables/social-stocks', views.SocialStockView.as_view(), name='social-stocks'),
     url('tables/all-stocks', views.AllStocksView.as_view(), name='all-stocks'),
     url('control/sandbox', views.sandbox, name='sandbox'),
-    url('control/move-one-stamp', control.move_one_stamp, name='move-one-stamp'),
     url('control/all_exchange', exchange.all_exchange, name='all-exchange'),
     url('control/initialize', control.initialize, name='initialize'),
-    url(r'stage/(?P<act>[\w-]+)/$', control.stage, name='stage'),
-    url(r'execute/(?P<act>[\w-]+)/$',control.execute, name='execute'),
+    url(r'super/(?P<act>[\w-]+)/$', control.super_step_execute, name='stage'),
+    url(r'sub/(?P<act>[\w-]+)/$',control.sub_step_execute, name='execute'),
  
 ]
 

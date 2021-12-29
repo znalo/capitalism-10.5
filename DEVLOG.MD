@@ -74,7 +74,8 @@ TODO 29/12
 * Commodity totals for quantity price and value either incomplete or incorrect
 * Revenue and Accumulate steps
 * De-activate disallowed action choices
-* Amalgamate Demand and Supply Project selection
+* Amalgamate Demand and Supply 
+* Project selection
 * Full initialise vs one project initialise
 
 NOTE the control database either has to be initialized at startup, or we have to assume it is in place.
@@ -82,7 +83,9 @@ TODO better to initialize the control database at startup.
 
 ## Commit stepping framework in place
 
+## Commit stepping framework working,tested for sequencing but not for timestamp management
 
+TODO rationalise it a bit: the whole thing should be data-driven and DRY
 
 
 

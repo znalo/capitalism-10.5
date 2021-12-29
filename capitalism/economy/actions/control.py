@@ -17,34 +17,36 @@ from .produce import producers, prices, reproduce, all_production
 from .distribution import revenue, accumulate, all_distribution
 
 action_list={
-    'demand':calculate_demand,
-    'supply':calculate_supply,
-    'allocate':allocate_supply,
-    'trade':trade,
-    'produce':producers,
-    'prices':prices,
-    'reproduce':reproduce,
-    'revenue': revenue,
-    'accumulate':accumulate,
-    'all_exchange':all_exchange,
-    'all_production': all_production,
-    'all_distribution': all_distribution
+    'Demand':calculate_demand,
+    'Supply':calculate_supply,
+    'Allocate':allocate_supply,
+    'Trade':trade,
+    'Produce':producers,
+    'Prices':prices,
+    'Reproduce':reproduce,
+    'Revenue': revenue,
+    'Accumulate':accumulate,
+    'All_exchange':all_exchange,
+    'All_production': all_production,
+    'All_distribution': all_distribution
     }
 
-def execute(request,act):
+def sub_step_execute(request,act):
     print (f"action {act} requested")
     action=action_list[act]
     print(f"this will execute {action} ")
-    action()
+    new_substate=State.move_one_substep()#! creates new timestamp, ready for the action
+    action()#! perform the action in the new timestamp
     template = loader.get_template('economy/economy.html')
     context = get_economy_view_context({})
     return HttpResponse(template.render(context, request))    
 
-def stage(request,act):
+def super_step_execute(request,act):
     print (f"superstate {act} requested")
     action=action_list[act]
     print(f"this will execute {action} ")
     action()
+
     template = loader.get_template('economy/economy.html')
     context = get_economy_view_context({})
     return HttpResponse(template.render(context, request))    
@@ -63,30 +65,30 @@ def initialize(request):
     Project.objects.all().delete()
     TimeStamp.objects.all().delete()
 
-    mc=ControlSuperState(name=M_C, first_substate_name=DEMAND, next_superstate_name=C_P, URL="stage/all_exchange")
+    mc=ControlSuperState(name=M_C, first_substate_name=DEMAND, next_superstate_name=C_P, URL="All_exchange")
     mc.save()
-    cp=ControlSuperState(name=C_P,first_substate_name=PRODUCE,URL="stage/all_production")
+    cp=ControlSuperState(name=C_P,first_substate_name=PRODUCE,next_superstate_name=C_M, URL="All_production")
     cp.save()
-    cm=ControlSuperState(name=C_M, first_substate_name=REVENUE, URL="stage/all_distribution")
+    cm=ControlSuperState(name=C_M, first_substate_name=REVENUE, next_superstate_name=M_C, URL="All_distribution")
     cm.save()
 
-    demand=ControlSubState(name=DEMAND,super_state_name=M_C, next_substate_name=SUPPLY, URL="execute/demand")
+    demand=ControlSubState(name=DEMAND,super_state_name=M_C, next_substate_name=SUPPLY, next_super_state_name=M_C, URL="execute/demand")
     demand.save()
-    supply=ControlSubState(name=SUPPLY,super_state_name=M_C, next_substate_name=ALLOCATE, URL="execute/supply")
+    supply=ControlSubState(name=SUPPLY,super_state_name=M_C, next_substate_name=ALLOCATE, next_super_state_name=M_C, URL="execute/supply")
     supply.save()
-    allocate=ControlSubState(name=ALLOCATE,super_state_name=M_C, next_substate_name=TRADE, URL="execute/allocate")
+    allocate=ControlSubState(name=ALLOCATE,super_state_name=M_C, next_substate_name=TRADE, next_super_state_name=M_C, URL="execute/allocate")
     allocate.save()
-    trade=ControlSubState(name=TRADE,super_state_name=M_C,next_substate_name=PRODUCE, URL="execute/trade")
+    trade=ControlSubState(name=TRADE,super_state_name=M_C,next_substate_name=PRODUCE, next_super_state_name=C_P, URL="execute/trade")
     trade.save()
-    produce=ControlSubState(name=PRODUCE,super_state_name=C_P, next_substate_name=PRICES, URL="execute/produce")
+    produce=ControlSubState(name=PRODUCE,super_state_name=C_P, next_substate_name=PRICES, next_super_state_name=C_P, URL="execute/produce")
     produce.save()
-    prices=ControlSubState(name=PRICES,super_state_name=C_P, next_substate_name=REPRODUCE, URL="execute/prices")
+    prices=ControlSubState(name=PRICES,super_state_name=C_P, next_substate_name=REPRODUCE, next_super_state_name=C_P, URL="execute/prices")
     prices.save()
-    reproduce=ControlSubState(name=REPRODUCE,super_state_name=C_P, next_substate_name=REVENUE, URL="execute/reproduce")
+    reproduce=ControlSubState(name=REPRODUCE,super_state_name=C_P, next_substate_name=REVENUE, next_super_state_name=C_M, URL="execute/reproduce")
     reproduce.save()
-    revenue=ControlSubState(name=REVENUE,super_state_name=C_M,next_substate_name=ACCUMULATE, URL="execute/revenue")
+    revenue=ControlSubState(name=REVENUE,super_state_name=C_M,next_substate_name=ACCUMULATE, next_super_state_name=C_M, URL="execute/revenue")
     revenue.save()
-    accumulate=ControlSubState(name=ACCUMULATE,super_state_name=C_M, next_substate_name=DEMAND, URL="execute/accumulate")
+    accumulate=ControlSubState(name=ACCUMULATE,super_state_name=C_M, next_substate_name=DEMAND, next_super_state_name=M_C, URL="execute/accumulate")
     accumulate.save()
 
     Log.enter(1, f"Reading projects from {file_name}")
@@ -103,7 +105,7 @@ def initialize(request):
     df = pd.read_csv(file_name)
 
     for row in df.itertuples(index=False, name='Pandas'):
-        initial_super_state=ControlSuperState.objects.get(name=C_P)
+        initial_super_state=ControlSuperState.objects.get(name=M_C)
         initial_sub_state=ControlSubState.objects.get(name=DEMAND)
         time_stamp = TimeStamp(
             project_FK=Project.objects.get(number=row.project_FK),
@@ -271,12 +273,3 @@ def initialize(request):
     context['social_stocks'] = SocialStock.objects.all()
     return HttpResponse(template.render(context, request))
 
-#! For development purposes, moving one stamp is available as a separate user action
-#TODO remove this for deployment
-def move_one_stamp(request):
-    URL=State.perform_next_action()
-    print("Moving one stamp - just letting you know")
-    return redirect(URL)
-    # template = loader.get_template('landing.html')
-    # context = get_economy_view_context({})
-    # return HttpResponse(template.render(context, request))
