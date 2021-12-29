@@ -6,42 +6,34 @@ from django.utils.safestring import mark_safe
 
 register = template.Library()
 
-# @register.filter(name='commodity_name')
-# def commodity_name(value):
-#     return value.type
+def stock_compare(usage_type, value):
+    stocks=value.filter(usage_type=usage_type)
+    if stocks.count()>1:
+        return f"DUPLICATE {usage_type} STOCKS"
+    elif stocks.count()<1:
+        return F"NO {usage_type} STOCK"
+    else:
+        current_stock=stocks.get()
+        comparator_stock=current_stock.comparator_stock()
+        new=current_stock.size
+        old=comparator_stock.size
+        if old==new:
+            return new
+        else:
+            return mark_safe("<span style=\"color:red\">"+str(new)+"</span>")    
+
 
 @register.filter(name='money_filter')
 def money_filter(value):
-    stocks=value.filter(usage_type=MONEY)
-    if stocks.count()>1:
-        return "DUPLICATE MONEY STOCKS "
-    elif stocks.count()<1:
-        return "NO MONEY STOCK"
-    else:
-        stock=stocks.get()
-        return stock.size
+    return stock_compare(MONEY, value)
 
 @register.filter(name='sales_filter')
 def sales_filter(value):
-    stocks=value.filter(usage_type=SALES)
-    if stocks.count()>1:
-        return "DUPLICATE SALES STOCKS"
-    elif stocks.count()<1:
-        return "NO SALES STOCK"
-    else:
-        stock=stocks.get()
-        return stock.size
+    return stock_compare(SALES, value)
 
 @register.filter(name='consumption_filter')
 def consumption_filter(value):
-    stocks=value.filter(usage_type=CONSUMPTION)
-    if stocks.count()>1:
-        return "DUPLICATE CONSUMPTION STOCKS"
-    elif stocks.count()<1:
-        return "NO CONSUMPTION STOCK"
-    else:
-        stock=stocks.get()
-        return stock.size
+    return stock_compare(CONSUMPTION, value)
 
 @register.filter
 def multiply(value, arg):
@@ -54,7 +46,6 @@ def current_control_state(value):
 
 @register.filter
 def has_changed(new,old):
-    print(f"old was {new} new is {old}")
     if old==new:
         return new
     else:

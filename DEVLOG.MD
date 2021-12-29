@@ -52,3 +52,20 @@ Stepping is now implemented (but for substates only)
 Time Comparison Color change (method works, has to be extended to all magnitudes)
 
 ## Commit Time comparison Color Changes working; to be extended to all magnitudes
+
+Time comparison extended to sales, money, consumption and production goods
+
+TODO revenue step - need to transfer profit to the capitalists
+TODO accumulation step - need to use the profit to expand
+TODO time comparison for other magnitudes
+* Supply, demand, etc
+TODO superstates
+TODO double header
+TODO project selection
+TODO history clickable selection of comparator
+TODO choice of displaying value, quantity, price
+
+## Commit rest and be thankful
+
+
+

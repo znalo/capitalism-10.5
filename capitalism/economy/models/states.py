@@ -22,7 +22,6 @@ class Log(models.Model):
             project_id=current_state.time_stamp_FK.project_FK.number
 
         indent= " "*level
-        # print(f"{indent}{message}")
         this_entry=Log(project_id=project_id,time_stamp_id=time_stamp_id,level=level,message=message)
         this_entry.save()
 
@@ -120,13 +119,10 @@ class State(models.Model):
         new_time_stamp.pk = None
         new_time_stamp.time_stamp += 1
         new_time_stamp.description = State.current_control_substate()
-        print(f"old time stamp id before save is {old_time_stamp.id} and new time stamp id is {new_time_stamp.id}")
         remembered_time_stamp=TimeStamp.objects.get(id=remember_where_we_parked)
         new_time_stamp.save()
-        print(f"old time stamp id after save is {old_time_stamp.id}, new time stamp id is {new_time_stamp.id}, remembered is {remembered_time_stamp.id}")
         new_time_stamp.comparator_time_stamp_FK=remembered_time_stamp
         new_time_stamp.save()
-        print(f"old time stamp id after save is {old_time_stamp.id}, new time stamp id is {new_time_stamp.id}, remembered is {remembered_time_stamp.id}")
 
     #! reset the current state
         current_state.time_stamp_FK = new_time_stamp
@@ -155,7 +151,6 @@ class State(models.Model):
             industry.save()
             Log.enter(
                 1, f"Created a new Industry record {industry} with time stamp {industry.time_stamp_FK.time_stamp}")
-            print(f"There are now {Industry.objects.all().count()} industry records")
 
         commodities = Commodity.objects.filter(time_stamp_FK=old_time_stamp)
         for commodity in commodities:
@@ -165,7 +160,6 @@ class State(models.Model):
             commodity.save()
             Log.enter(
                 1, f"Created a new Commodity record {commodity} with time stamp {commodity.time_stamp_FK.time_stamp}")
-            print(f"There are now {Commodity.objects.all().count()} commodity records")
 
         social_classes = SocialClass.objects.filter(time_stamp_FK=old_time_stamp)
         for social_class in social_classes:
@@ -175,7 +169,6 @@ class State(models.Model):
             social_class.save()
             Log.enter(
                 1, f"Created a new Social Class record {social_class} with time stamp {social_class.time_stamp_FK.time_stamp}")
-            print(f"There are now {SocialClass.objects.all().count()} social class records")
 
         social_stocks = SocialStock.objects.filter(time_stamp_FK=old_time_stamp)
         for social_stock in social_stocks:
@@ -185,7 +178,6 @@ class State(models.Model):
             social_stock.save()
             Log.enter(
                 1, f"Created a new Social Stock record {social_stock} with time stamp {social_stock.time_stamp_FK}")
-            print(f"There are now {SocialStock.objects.all().count()} social stock records")
 
         industry_stocks = IndustryStock.objects.filter(
             time_stamp_FK=old_time_stamp)
@@ -196,7 +188,6 @@ class State(models.Model):
             industry_stock.save()
             Log.enter(
                 1, f"Created a new Industry Stock record {industry_stock} with time stamp {industry_stock.time_stamp_FK}")
-            print(f"There are now {IndustryStock.objects.all().count()} industry stock records")
         return
 
  #! this method works with create_stamp (and should perhaps be integrated into it)
