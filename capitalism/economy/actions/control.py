@@ -33,6 +33,10 @@ ACTION_LIST={
     }
 
 def sub_step_execute(request,act):
+    substep_execute_without_display(act)
+    return get_economy_view_context(request)
+
+def substep_execute_without_display(act):
     print (f"action {act} requested")
     action=ACTION_LIST[act]
     print(f"this will execute {action} ")
@@ -45,17 +49,13 @@ def sub_step_execute(request,act):
     current_time_stamp.save()
     print(f"moving from action {act} to {next_substate_name}")
     print(f"time stamp registers this as {current_time_stamp.substate_name}")
-    return get_economy_view_context(request)
 
 def super_step_execute(request,act):
-    print (f"superstate {act} requested")
-    action=ACTION_LIST[act]
-    print(f"this will execute {action} ")
-    action()
+    print (f"superstate {act} requested. We will now execute all remaining substates in this superstate")
+    while State.superstate()==act:
+        substep_execute_without_display(State.substate())
+    return get_economy_view_context(request)
 
-    template = loader.get_template('economy/economy.html')
-    context = get_economy_view_context({})
-    return HttpResponse(template.render(context, request))    
 
 #! Gets the whole thing going from CSV static files
 # TODO EITHER: Loads of error checking

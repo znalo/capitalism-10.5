@@ -5,11 +5,11 @@
     Controls
   </button>
   <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuClickable">
-    {% for state in superstates %}
-    {% if state == active_superstate %}
-    <li> <a href= "{{ "A String"|current_control_super_state }}" class="dropdown-item active " method="get">{{ state.name }} </a> </li>
+    {% for key, value in superstates.items %}
+    {% if key == active_superstate %}
+    <li> <a href= "/super/{{ key }}" class="dropdown-item active " method="get">{{ value }} </a> </li>
     {% else %}
-    <li> <div class="dropdown-item" method="get">{{ state.name }} </div> </li>
+    <li> <div class="dropdown-item" method="get">{{ value }} </div> </li>
     {% endif %}
     {% endfor %}
   </ul>

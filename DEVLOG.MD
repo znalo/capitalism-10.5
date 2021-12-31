@@ -70,7 +70,7 @@ TODO choice of displaying value, quantity, price
 TODO 29/12
 * Extend the display DONE but some TBAs
 * Finish comparisons IN PROGRESS
-* Superstate stepper FRAMEWORK ESTABLISHED (ALL TABLE-DRIVEN NOW) BUT REMAINS TO CODE THE SUPERSTATE STEPS
+* Superstate stepper DONE
 * Commodity totals for quantity price and value either incomplete or incorrect
 * Revenue and Accumulate steps
 * De-activate disallowed action choices
@@ -102,3 +102,8 @@ Data-driven stepping mechanism in place - substates only
 
 ## Commit data-driven stepping mechanism in place
 
+Stepping now works, or seems to at a first run through
+
+## Commit data-driven stepping now works
+
+TODO move single control group for substep and superstep

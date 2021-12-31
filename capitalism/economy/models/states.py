@@ -85,6 +85,14 @@ class State(models.Model):
             project_FK=this_project).order_by('time_stamp').last()
         return time_stamp
 
+    @staticmethod
+    def substate():
+        return State.get_current_time_stamp().description
+
+    @staticmethod
+    def superstate():
+        return SUBSTATES[State.substate()].superstate_name
+
     def __str__(self):
         return self.name
 

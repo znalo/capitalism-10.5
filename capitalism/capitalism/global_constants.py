@@ -41,14 +41,6 @@ M_C = "M-C (exchange)"
 C_P = "C-P-C' (produce)"
 C_M = "C'-M' (distribute)"
 
-CONTROL_SUPER_STATES = [
-    (M_C, "M-C (exchange)"),
-    (C_P, "C-P-C' (produce)"),
-    (C_M, "C'-M' (distribute)"),
-    (UNDEFINED, "###")
-]
-
-
 DEMAND = "demand"
 SUPPLY = "supply"
 ALLOCATE = "allocate"
@@ -71,18 +63,6 @@ CONTROL_SUB_STATES = [
     (ACCUMULATE, "Accumulate"),
     (UNDEFINED, "###")
 ]
-CONTROL_SUB_STATES = [
-    (DEMAND, "Demand"),
-    (SUPPLY, "Supply"),
-    (ALLOCATE, "Allocate"),
-    (TRADE, "Trade"),
-    (PRODUCE, "Produce"),
-    (PRICES, "Prices"),
-    (REPRODUCE, "Reproduce"),
-    (REVENUE, "Revenue"),
-    (ACCUMULATE, "Accumulate"),
-    (UNDEFINED, "###")
-]
 
 class SubState:
     def __init__(self,name, superstate_name, next_substate_name):
@@ -92,15 +72,25 @@ class SubState:
 
 
 SUBSTATES={
-  "demand":SubState(name=DEMAND,superstate_name=M_C, next_substate_name=SUPPLY),
-  "supply":SubState(name=SUPPLY,superstate_name=M_C, next_substate_name=ALLOCATE),
-  "allocate":SubState(name=ALLOCATE,superstate_name=M_C, next_substate_name=TRADE),
-  "trade":SubState(name=TRADE,superstate_name=M_C,next_substate_name=PRODUCE),
-  "produce":SubState(name=PRODUCE,superstate_name=C_P, next_substate_name=PRICES),
-  "prices":SubState(name=PRICES,superstate_name=C_P, next_substate_name=REPRODUCE),
-  "reproduce":SubState(name=REPRODUCE,superstate_name=C_P, next_substate_name=REVENUE),
-  "revenue":SubState(name=REVENUE,superstate_name=C_M,next_substate_name=ACCUMULATE),
-  "accumulate":SubState(name=ACCUMULATE,superstate_name=C_M, next_substate_name=DEMAND),
-  "UNDEFINED":SubState(name=UNDEFINED,superstate_name=C_M, next_substate_name=UNDEFINED)
+  "demand":SubState(name=DEMAND,superstate_name="M_C", next_substate_name=SUPPLY),
+  "supply":SubState(name=SUPPLY,superstate_name="M_C", next_substate_name=ALLOCATE),
+  "allocate":SubState(name=ALLOCATE,superstate_name="M_C", next_substate_name=TRADE),
+  "trade":SubState(name=TRADE,superstate_name="M_C",next_substate_name=PRODUCE),
+  "produce":SubState(name=PRODUCE,superstate_name="C_P", next_substate_name=PRICES),
+  "prices":SubState(name=PRICES,superstate_name="C_P", next_substate_name=REPRODUCE),
+  "reproduce":SubState(name=REPRODUCE,superstate_name="C_P", next_substate_name=REVENUE),
+  "revenue":SubState(name=REVENUE,superstate_name="C_M",next_substate_name=ACCUMULATE),
+  "accumulate":SubState(name=ACCUMULATE,superstate_name="C_M", next_substate_name=DEMAND),
+  "UNDEFINED":SubState(name=UNDEFINED,superstate_name="C_M", next_substate_name=UNDEFINED)
 }
+
+SUPERSTATES={
+    "M_C":M_C,
+    "C_P":C_P,
+    "C_M":C_M
+}
+
+SUPERSTATE_NAMES=[ 
+    M_C,C_P,C_M
+]
 

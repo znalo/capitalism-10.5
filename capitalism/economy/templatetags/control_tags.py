@@ -7,10 +7,12 @@ register = template.Library()
 
 @register.inclusion_tag('partials/control_states.html')
 def control_states():
-      super_states = CONTROL_SUPER_STATES
       context={}
-      context['active_superstate']=M_C #!very temporary
-      context['superstates']=super_states
+      current_substate=State.get_current_time_stamp().description
+      current_superstate=SUBSTATES[current_substate].superstate_name
+      context['active_superstate']=current_superstate
+      print (f"passing in substate {current_substate} active superstate {current_superstate}")
+      context['superstates']=SUPERSTATES
       return context
 
 @register.inclusion_tag('partials/current_substate.html')
