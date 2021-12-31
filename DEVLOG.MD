@@ -87,6 +87,10 @@ TODO better to initialize the control database at startup.
 
 TODO rationalise it a bit: the whole thing should be data-driven and DRY
 
+Created a simple dictionary for control substate
+Minor tweak to 'next step' logic that does not yet use the dictionary
+First commit the current working version
 
+## Commit new dictionary for controlsubstate, not yet in use, but system works
 
 
