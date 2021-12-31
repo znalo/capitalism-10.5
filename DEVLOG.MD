@@ -98,3 +98,7 @@ This logic is now only called from substate.
 
 ## Commit moved logic for economy display back into views
 
+Data-driven stepping mechanism in place - substates only
+
+## Commit data-driven stepping mechanism in place
+

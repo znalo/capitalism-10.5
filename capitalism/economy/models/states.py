@@ -25,39 +25,6 @@ class Log(models.Model):
         this_entry=Log(project_id=project_id,time_stamp_id=time_stamp_id,level=level,message=message)
         this_entry.save()
 
-class ControlSuperState(models.Model):
-    name=models.CharField(max_length=20,choices=CONTROL_SUPER_STATES,default=UNDEFINED)
-    first_substate_name=models.CharField(max_length=20,choices=CONTROL_SUB_STATES,default=UNDEFINED)
-    next_superstate_name=models.CharField(max_length=20,choices=CONTROL_SUPER_STATES,default=UNDEFINED)
-    URL=models.CharField(max_length=50,choices=CONTROL_SUB_STATES,default=UNDEFINED)
-    owner = models.ForeignKey('auth.User',  on_delete=models.CASCADE, default=1)
-
-    #!move to the next state
-    #!may not be needed
-    @staticmethod
-    def advance_state():
-        pass
-
-class ControlSubState(models.Model):
-    name=models.CharField(max_length=20,choices=CONTROL_SUB_STATES)
-    super_state_name=models.CharField(max_length=20,choices=CONTROL_SUPER_STATES,default=UNDEFINED)
-    next_super_state_name=models.CharField(max_length=20,choices=CONTROL_SUPER_STATES,default=UNDEFINED)
-    next_substate_name=models.CharField(max_length=20,choices=CONTROL_SUB_STATES,default=UNDEFINED)
-    URL=models.CharField(max_length=50,choices=CONTROL_SUB_STATES,default=UNDEFINED)
-    owner = models.ForeignKey('auth.User', on_delete=models.CASCADE, default=1)
-
-    def next_sub_state(self):
-        potential_next_substates=ControlSubState.objects.filter(name=self.next_substate_name)
-        if potential_next_substates.count()!=1:
-            raise Exception("Control state improperly configured. This is a Programming error. Sorry, cannot continue.")
-        return potential_next_substates.get()
-
-    def next_super_state(self):
-        potential_next_superstates=ControlSuperState.objects.filter(name=self.next_super_state_name)
-        if potential_next_superstates.count()!=1:
-            raise Exception("Control state improperly configured. This is a Programming error. Sorry, cannot continue.")
-        return potential_next_superstates.get()
-
 class Project(models.Model):
     number=models.IntegerField(verbose_name="Project",null=False, default=0)
     description = models.CharField(verbose_name="Project Description", max_length=50, default="###")
@@ -75,8 +42,6 @@ class TimeStamp(models.Model):
     time_stamp = models.IntegerField(verbose_name="Time Stamp", default=1)
     description = models.CharField(verbose_name="Description", max_length=50, default=UNDEFINED)
     period = models.IntegerField(verbose_name="Period", default=1)
-    super_state_FK = models.ForeignKey(ControlSuperState, max_length=20, on_delete=models.CASCADE, default=1)
-    sub_state_FK = models.ForeignKey(ControlSubState, max_length=20, on_delete=models.CASCADE, default=1)
     comparator_time_stamp_FK = models.ForeignKey("TimeStamp", on_delete=models.DO_NOTHING, null=True)
     melt = models.CharField(verbose_name="MELT", max_length=50, default=UNDEFINED)
     population_growth_rate = models.IntegerField(verbose_name="Population Growth Rate", default=1)
@@ -124,24 +89,6 @@ class State(models.Model):
         return self.name
 
     @staticmethod
-    def current_control_substate():
-        return State.get_current_time_stamp().sub_state_FK
-
-    @staticmethod
-    def current_control_superstate():
-        return State.get_current_time_stamp().super_state_FK
-
-    # @staticmethod
-    # def current_control_substate():
-    #     try:
-    #         state=State.current_state()
-    #         time_stamp=state.time_stamp_FK
-    #         substate=time_stamp.sub_state_FK
-    #         return substate.name        
-    #     except:
-    #         return "Initial"
-
-    @staticmethod
     def create_stamp():
         Log.enter(0, "MOVING ONE TIME STAMP FORWARD")
         current_state = State.current_state()
@@ -154,7 +101,7 @@ class State(models.Model):
         #! create a new timestamp object by saving with pk=None. Forces Django to create a new database object
         new_time_stamp.pk = None
         new_time_stamp.time_stamp += 1
-        new_time_stamp.description = State.current_control_substate().name
+        new_time_stamp.description = "Temporary"#! TODO this should be set to the current action
         remembered_time_stamp=TimeStamp.objects.get(id=remember_where_we_parked)
         new_time_stamp.save()
         new_time_stamp.comparator_time_stamp_FK=remembered_time_stamp
@@ -308,12 +255,5 @@ class State(models.Model):
         State.clone(old_time_stamp, new_time_stamp)
         State.connect_stamp(new_time_stamp)
         time_stamp=State.get_current_time_stamp() #! probably redundant - the time_stamp should be remembered in new_time_stamp
-        substate=time_stamp.sub_state_FK
-        Log.enter(1,f"Current Substate is {substate.name} and its URL is {substate.URL}")
-        #! Move the control substate and superstate forward. The simulation then knows permissible sub-action and super-actions
-        #! once the current action (undertaken elsewhere) is complete
-        time_stamp.sub_state_FK=substate.next_sub_state()
-        time_stamp.super_state_FK=substate.next_super_state()
         time_stamp.save()
         #! The receiver will perform the action specified by substate
-        return substate

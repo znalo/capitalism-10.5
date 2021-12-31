@@ -1,5 +1,5 @@
 from datetime import time
-from ..models.states import (ControlSubState, ControlSuperState, Project, TimeStamp, State, Log)
+from ..models.states import (Project, TimeStamp, State, Log)
 from ..models.commodity import Commodity
 from ..models.owners import Industry, SocialClass
 from ..models.stocks import IndustryStock, SocialStock
@@ -16,32 +16,40 @@ from .exchange import calculate_demand,calculate_supply, allocate_supply, trade,
 from .produce import producers, prices, reproduce, all_production
 from .distribution import revenue, accumulate, all_distribution
 
-action_list={
-    'Demand':calculate_demand,
-    'Supply':calculate_supply,
-    'Allocate':allocate_supply,
-    'Trade':trade,
-    'Produce':producers,
-    'Prices':prices,
-    'Reproduce':reproduce,
-    'Revenue': revenue,
-    'Accumulate':accumulate,
-    'All_exchange':all_exchange,
-    'All_production': all_production,
-    'All_distribution': all_distribution
+#!TODO move this list to the constants file
+ACTION_LIST={
+    'demand':calculate_demand,
+    'supply':calculate_supply,
+    'allocate':allocate_supply,
+    'trade':trade,
+    'produce':producers,
+    'prices':prices,
+    'reproduce':reproduce,
+    'revenue': revenue,
+    'accumulate':accumulate,
+    'all_exchange':all_exchange,
+    'all_production': all_production,
+    'all_distribution': all_distribution
     }
 
 def sub_step_execute(request,act):
     print (f"action {act} requested")
-    action=action_list[act]
+    action=ACTION_LIST[act]
     print(f"this will execute {action} ")
-    new_substate=State.move_one_substep()#! creates new timestamp, ready for the action
+    State.move_one_substep()#! creates new timestamp, ready for the action
     action()#! perform the action in the new timestamp
+    current_time_stamp=State.get_current_time_stamp()
+    next_substate_name=SUBSTATES[act].next_substate_name
+    current_time_stamp.substate_name=next_substate_name
+    current_time_stamp.description=next_substate_name 
+    current_time_stamp.save()
+    print(f"moving from action {act} to {next_substate_name}")
+    print(f"time stamp registers this as {current_time_stamp.substate_name}")
     return get_economy_view_context(request)
 
 def super_step_execute(request,act):
     print (f"superstate {act} requested")
-    action=action_list[act]
+    action=ACTION_LIST[act]
     print(f"this will execute {action} ")
     action()
 
@@ -58,36 +66,8 @@ def initialize(request):
     file_name = os.path.join(settings.BASE_DIR, "static\projects.csv")
     Log.enter(0, "+++REDO FROM START+++")
 
-    ControlSuperState.objects.all().delete()
-    ControlSubState.objects.all().delete()
     Project.objects.all().delete()
     TimeStamp.objects.all().delete()
-
-    mc=ControlSuperState(name=M_C, first_substate_name=DEMAND, next_superstate_name=C_P, URL="All_exchange")
-    mc.save()
-    cp=ControlSuperState(name=C_P,first_substate_name=PRODUCE,next_superstate_name=C_M, URL="All_production")
-    cp.save()
-    cm=ControlSuperState(name=C_M, first_substate_name=REVENUE, next_superstate_name=M_C, URL="All_distribution")
-    cm.save()
-
-    demand=ControlSubState(name=DEMAND,super_state_name=M_C, next_substate_name=SUPPLY, next_super_state_name=M_C, URL="execute/demand")
-    demand.save()
-    supply=ControlSubState(name=SUPPLY,super_state_name=M_C, next_substate_name=ALLOCATE, next_super_state_name=M_C, URL="execute/supply")
-    supply.save()
-    allocate=ControlSubState(name=ALLOCATE,super_state_name=M_C, next_substate_name=TRADE, next_super_state_name=M_C, URL="execute/allocate")
-    allocate.save()
-    trade=ControlSubState(name=TRADE,super_state_name=M_C,next_substate_name=PRODUCE, next_super_state_name=C_P, URL="execute/trade")
-    trade.save()
-    produce=ControlSubState(name=PRODUCE,super_state_name=C_P, next_substate_name=PRICES, next_super_state_name=C_P, URL="execute/produce")
-    produce.save()
-    prices=ControlSubState(name=PRICES,super_state_name=C_P, next_substate_name=REPRODUCE, next_super_state_name=C_P, URL="execute/prices")
-    prices.save()
-    reproduce=ControlSubState(name=REPRODUCE,super_state_name=C_P, next_substate_name=REVENUE, next_super_state_name=C_M, URL="execute/reproduce")
-    reproduce.save()
-    revenue=ControlSubState(name=REVENUE,super_state_name=C_M,next_substate_name=ACCUMULATE, next_super_state_name=C_M, URL="execute/revenue")
-    revenue.save()
-    accumulate=ControlSubState(name=ACCUMULATE,super_state_name=C_M, next_substate_name=DEMAND, next_super_state_name=M_C, URL="execute/accumulate")
-    accumulate.save()
 
     Log.enter(1, f"Reading projects from {file_name}")
     df = pd.read_csv(file_name)
@@ -103,13 +83,9 @@ def initialize(request):
     df = pd.read_csv(file_name)
 
     for row in df.itertuples(index=False, name='Pandas'):
-        initial_super_state=ControlSuperState.objects.get(name=M_C)
-        initial_sub_state=ControlSubState.objects.get(name=DEMAND)
         time_stamp = TimeStamp(
             project_FK=Project.objects.get(number=row.project_FK),
             period=row.period,
-            super_state_FK=initial_super_state,
-            sub_state_FK=initial_sub_state,
             description=row.description,
             melt=row.MELT,
             population_growth_rate=row.population_growth_rate,

@@ -49,15 +49,15 @@ CONTROL_SUPER_STATES = [
 ]
 
 
-DEMAND = "Demand"
-SUPPLY = "Supply"
-ALLOCATE = "Allocate"
-TRADE = "Trade"
-PRODUCE = "Produce"
-PRICES = "Prices"
-REPRODUCE = "Reproduce"
-REVENUE="Revenue"
-ACCUMULATE="Accumulate"
+DEMAND = "demand"
+SUPPLY = "supply"
+ALLOCATE = "allocate"
+TRADE = "trade"
+PRODUCE = "produce"
+PRICES = "prices"
+REPRODUCE = "reproduce"
+REVENUE="revenue"
+ACCUMULATE="accumulate"
 
 CONTROL_SUB_STATES = [
     (DEMAND, "Demand"),
@@ -90,6 +90,7 @@ class SubState:
         self.superstate_name=superstate_name
         self.next_substate_name=next_substate_name
 
+
 SUBSTATES={
   "demand":SubState(name=DEMAND,superstate_name=M_C, next_substate_name=SUPPLY),
   "supply":SubState(name=SUPPLY,superstate_name=M_C, next_substate_name=ALLOCATE),
@@ -100,4 +101,6 @@ SUBSTATES={
   "reproduce":SubState(name=REPRODUCE,superstate_name=C_P, next_substate_name=REVENUE),
   "revenue":SubState(name=REVENUE,superstate_name=C_M,next_substate_name=ACCUMULATE),
   "accumulate":SubState(name=ACCUMULATE,superstate_name=C_M, next_substate_name=DEMAND),
+  "UNDEFINED":SubState(name=UNDEFINED,superstate_name=C_M, next_substate_name=UNDEFINED)
 }
+

@@ -11,7 +11,7 @@
       <a href="{% url 'admin:index' %}" class="btn btn-light btn-sm" role="button">Admin</a>
       <a href="{% url 'api-views' %}" class="btn btn-light btn-sm" role="button">API views</a>
       <a href="{% url 'initialize' %}" class="btn btn-light btn-sm" role="button" method="get">Initialize</a>
-      <a href="/sub/{{ "A String"|current_control_sub_state }}" class="btn btn-light btn-sm" role="button" method="get">Step ({{ "A String"|current_control_sub_state }})</a>
+      <a href="/sub/{% current_substate %}" class="btn btn-light btn-sm" role="button" method="get">Step ({% current_substate %})</a>
     </div> <!-- btn-group -->
 
     {% control_states %} 

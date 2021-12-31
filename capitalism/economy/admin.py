@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models.states import Log, Project, TimeStamp, ControlSuperState,ControlSubState
+from .models.states import Log, Project, TimeStamp
 from .models.commodity import Commodity
 from .models.owners import StockOwner, Industry, SocialClass
 from .models.stocks import SocialStock, State, IndustryStock
@@ -69,19 +69,6 @@ class LogResource(resources.ModelResource):
 class LogAdmin(ImportExportModelAdmin):
    resource_class=LogResource
 
-class ControlSuperStateResource(resources.ModelResource):
-   class Meta:
-      model=ControlSuperState
-
-class ControlSubStateResource(resources.ModelResource):
-   class Meta:
-      model=ControlSubState
-
-class ControlSuperStateAdmin(ImportExportModelAdmin):
-   resource_class=ControlSuperState
-
-class ControlSubStateAdmin(ImportExportModelAdmin):
-   resource_class=ControlSubState
 
 admin.site.register(Commodity,CommodityAdmin)
 admin.site.register(Project,ProjectAdmin)
@@ -92,5 +79,3 @@ admin.site.register(SocialStock,SocialStockAdmin)
 admin.site.register(IndustryStock,IndustryStockAdmin)
 admin.site.register(State,StateAdmin)
 admin.site.register(Log,LogAdmin)
-admin.site.register(ControlSuperState,ControlSuperStateAdmin)
-admin.site.register(ControlSubState,ControlSubStateAdmin)
