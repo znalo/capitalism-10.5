@@ -7,7 +7,6 @@ from .models.states import TimeStamp, Log
 from .models.commodity import Commodity
 from .models.owners import Industry, SocialClass, StockOwner
 from .models.stocks import IndustryStock, SocialStock, Stock
-from .helpers import get_economy_view_context
 from rest_framework import permissions
 from .permissions import IsOwnerOrReadOnly
 from rest_framework.decorators import api_view
@@ -15,6 +14,28 @@ from rest_framework.reverse import reverse
 from django.http import HttpResponse
 from django.template import loader
 from django.views.generic import ListView
+from .models.states import State
+from capitalism.global_constants import *
+
+def get_economy_view_context(request):
+        current_time_stamp=State.get_current_time_stamp()
+        industry_stocks = IndustryStock.objects.filter(time_stamp_FK=current_time_stamp)
+        industries=Industry.objects.filter(time_stamp_FK=current_time_stamp)
+        productive_stocks=industry_stocks.filter(usage_type=PRODUCTION)
+        industry_headers=productive_stocks.filter(industry_FK=industries.first()) #!all industries have same choice of productive stocks, even if usage is zero
+        social_classes=SocialClass.objects.filter(time_stamp_FK=current_time_stamp)
+        social_stocks=SocialStock.objects.filter(time_stamp_FK=current_time_stamp)
+        commodities=Commodity.objects.filter(time_stamp_FK=current_time_stamp)
+
+        context={}
+        context["productive_stocks"]=productive_stocks
+        context["industries"]=industries
+        context["industry_headers"]=industry_headers
+        context["social_classes"]=social_classes
+        context["social_stocks"]=social_stocks
+        context["commodities"]= commodities
+        template = loader.get_template('economy/economy.html')
+        return HttpResponse(template.render(context, request))
 
 
 def sandbox(request):

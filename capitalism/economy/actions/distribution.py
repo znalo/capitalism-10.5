@@ -1,4 +1,3 @@
-from ..helpers import get_economy_view_context
 from django.http import HttpResponse
 from django.template import loader
 from ..models.states import State

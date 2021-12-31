@@ -2,7 +2,6 @@ from ..models.states import State, Log
 from ..models.commodity import Commodity
 from ..models.owners import Industry, SocialClass, StockOwner
 from ..models.stocks import Stock, IndustryStock, SocialStock
-from ..helpers import get_economy_view_context
 from django.http import HttpResponse
 from django.template import loader
 from capitalism.global_constants import *

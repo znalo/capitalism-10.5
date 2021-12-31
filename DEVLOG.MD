@@ -93,4 +93,8 @@ First commit the current working version
 
 ## Commit new dictionary for controlsubstate, not yet in use, but system works
 
+Moved the logic to display the economy view into 'Views' and deleted 'helpers.py'
+This logic is now only called from substate.
+
+## Commit moved logic for economy display back into views
 

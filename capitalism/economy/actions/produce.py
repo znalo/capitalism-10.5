@@ -4,9 +4,6 @@ from ..models.states import (Project, TimeStamp, State, Log)
 from ..models.commodity import Commodity
 from ..models.owners import Industry, SocialClass
 from ..models.stocks import Stock, IndustryStock, SocialStock
-from ..helpers import get_economy_view_context
-from django.http import HttpResponse
-from django.template import loader
 
 #! Actions for the 'production' phase
 # TODO write them

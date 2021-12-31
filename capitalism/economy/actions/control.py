@@ -3,7 +3,7 @@ from ..models.states import (ControlSubState, ControlSuperState, Project, TimeSt
 from ..models.commodity import Commodity
 from ..models.owners import Industry, SocialClass
 from ..models.stocks import IndustryStock, SocialStock
-from ..helpers import get_economy_view_context
+from ..views import get_economy_view_context
 from django.http import HttpResponse
 from django.template import loader
 from django.conf import settings
@@ -37,9 +37,7 @@ def sub_step_execute(request,act):
     print(f"this will execute {action} ")
     new_substate=State.move_one_substep()#! creates new timestamp, ready for the action
     action()#! perform the action in the new timestamp
-    template = loader.get_template('economy/economy.html')
-    context = get_economy_view_context({})
-    return HttpResponse(template.render(context, request))    
+    return get_economy_view_context(request)
 
 def super_step_execute(request,act):
     print (f"superstate {act} requested")
