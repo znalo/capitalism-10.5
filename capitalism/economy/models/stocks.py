@@ -57,7 +57,7 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
 
 
 class IndustryStock(Stock):
-    industry_FK = models.ForeignKey("Industry", verbose_name="Industry", on_delete=models.CASCADE, null=True)
+    industry_FK = models.ForeignKey("Industry", verbose_name="Industry", on_delete=models.CASCADE, null=True)#TODO redundant? the base class has stock_owner_FK
     production_requirement = models.FloatField(verbose_name="Production Requirement", default=0)
 
     class Meta:

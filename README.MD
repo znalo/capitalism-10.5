@@ -1,4 +1,4 @@
-# Capitalism 10.4
+# Capitalism 10.5
 Simulation project
 
 A port of Capitalism 9.0 which was written in JavaFX

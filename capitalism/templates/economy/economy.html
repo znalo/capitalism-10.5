@@ -77,10 +77,10 @@
         {% for industry in industries %}
         <tr>
           <td>{{industry.name}}</td>
-          <td>TBA</td>
-          <td>TBA</td>
-          <td>{{ industry.industrystock_set.all|sales_filter}}</td>
-          <td>{{ industry.industrystock_set.all|money_filter }}</td>
+          <td>${{industry.initial_capital}}</td>
+          <td>${{industry.work_in_progress}}</td>
+          <td>${{ industry.industrystock_set.all|sales_filter}}</td>
+          <td>${{ industry.industrystock_set.all|money_filter }}</td>
           <td>TBA</td>
           <td>TBA</td>
           <td>TBA</td>

@@ -102,8 +102,16 @@ Data-driven stepping mechanism in place - substates only
 
 ## Commit data-driven stepping mechanism in place
 
+Changed folder name to 'capitalism 10.5' after discarding a branch
 Stepping now works, or seems to at a first run through
+
 
 ## Commit data-driven stepping now works
 
 TODO move single control group for substep and superstep
+TODO we need to switch between quantity, value and price display
+
+Initial capital introduced
+TODO all stocks in the second table should be denominated in currency
+
+## Commit Initial Capital calculated

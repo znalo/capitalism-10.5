@@ -12,7 +12,7 @@ import pandas as pd
 from capitalism.global_constants import *
 from django.shortcuts import redirect
 from django.urls import reverse
-from .exchange import calculate_demand,calculate_supply, allocate_supply, trade, all_exchange
+from .exchange import calculate_demand,calculate_supply, allocate_supply, trade
 from .produce import producers, prices, reproduce, all_production
 from .distribution import revenue, accumulate, all_distribution
 
@@ -27,9 +27,6 @@ ACTION_LIST={
     'reproduce':reproduce,
     'revenue': revenue,
     'accumulate':accumulate,
-    'all_exchange':all_exchange,
-    'all_production': all_production,
-    'all_distribution': all_distribution
     }
 
 def sub_step_execute(request,act):
@@ -143,11 +140,12 @@ def initialize(request):
         industry = Industry(
             time_stamp_FK=this_time_stamp,
             name=row.industry_name,
-            commodity_FK=Commodity.objects.get(
-                time_stamp_FK=this_time_stamp, name=row.commodity_name),
+            commodity_FK=Commodity.objects.get(time_stamp_FK=this_time_stamp, name=row.commodity_name),
             output_scale=row.output,
             output_growth_rate=row.growth_rate,
-            stock_owner_type=INDUSTRY            
+            stock_owner_type=INDUSTRY,
+            initial_capital=0,
+            work_in_progress=0
         )
         # TODO fix owner
         industry.save()

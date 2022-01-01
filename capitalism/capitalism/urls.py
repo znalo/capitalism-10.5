@@ -19,7 +19,7 @@ urlpatterns = [
     url('log/collapsible', views.log_collapsible, name='log-collapsible'),
     url('log/table', views.LogView.as_view(), name='log'),
 
-    url('tables/economy', views.EconomyView.as_view(), name='economy'),
+    url('tables/economy', views.get_economy_view_context, name='economy'),
     url('tables/time-stamps', views.TimeStampView.as_view(), name='time-stamps'),
     url('tables/industries', views.IndustryView.as_view(), name='industries'),
     url('tables/commodities', views.CommodityView.as_view(), name='commodities'),
@@ -29,7 +29,6 @@ urlpatterns = [
     url('tables/social-stocks', views.SocialStockView.as_view(), name='social-stocks'),
     url('tables/all-stocks', views.AllStocksView.as_view(), name='all-stocks'),
     url('control/sandbox', views.sandbox, name='sandbox'),
-    url('control/all_exchange', exchange.all_exchange, name='all-exchange'),
     url('control/initialize', control.initialize, name='initialize'),
     url(r'super/(?P<act>[\w-]+)/$', control.super_step_execute, name='stage'),
     url(r'sub/(?P<act>[\w-]+)/$',control.sub_step_execute, name='execute'),

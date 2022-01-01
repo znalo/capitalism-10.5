@@ -41,6 +41,8 @@ class StockOwner(models.Model): # Base class for Industry and Social Class
 class Industry(StockOwner):
     output_scale = models.IntegerField(verbose_name="Output", default=1)
     output_growth_rate = models.IntegerField(verbose_name="Growth Rate", default=1)
+    initial_capital=models.FloatField(default=0)
+    work_in_progress=models.FloatField(default=0)
 
     class Meta:
         verbose_name = 'Industry'

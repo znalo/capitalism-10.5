@@ -109,7 +109,7 @@ class State(models.Model):
         #! create a new timestamp object by saving with pk=None. Forces Django to create a new database object
         new_time_stamp.pk = None
         new_time_stamp.time_stamp += 1
-        new_time_stamp.description = "Temporary"#! TODO this should be set to the current action
+        # new_time_stamp.description = "Temporary"#! TODO this should be set to the current action
         remembered_time_stamp=TimeStamp.objects.get(id=remember_where_we_parked)
         new_time_stamp.save()
         new_time_stamp.comparator_time_stamp_FK=remembered_time_stamp

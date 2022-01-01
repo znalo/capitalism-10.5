@@ -17,7 +17,7 @@ from django.views.generic import ListView
 from .models.states import State
 from capitalism.global_constants import *
 
-def get_economy_view_context(request):
+def get_economy_view_context(request):#TODO change name - this function now not only creates the context but also displays is, so the naming is wrong
         current_time_stamp=State.get_current_time_stamp()
         industry_stocks = IndustryStock.objects.filter(time_stamp_FK=current_time_stamp)
         industries=Industry.objects.filter(time_stamp_FK=current_time_stamp)
