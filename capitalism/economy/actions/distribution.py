@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.template import loader
 from ..models.states import State
+from ..actions.exchange import set_initial_capital
 
 def revenue():
     #TODO complete this
@@ -9,11 +10,5 @@ def revenue():
 def accumulate():
     #TODO complete this
     print("Moses and the Prophets")
-
-def all_distribution():
-     print ("Distribute all")
-     new_substate=State.move_one_substep()
-     revenue()
-     new_substate=State.move_one_substep()
-     accumulate()
+    set_initial_capital() #! as soon as we are ready for the next circuit, we should reset the initial capital
      

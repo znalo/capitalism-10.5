@@ -115,3 +115,8 @@ Initial capital introduced
 TODO all stocks in the second table should be denominated in currency
 
 ## Commit Initial Capital calculated
+
+Comparators extended
+Main logic for capital in place; some bugs remain
+
+## Commit logic for capital and profit in place but some bugs remain

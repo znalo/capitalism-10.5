@@ -77,7 +77,6 @@ def allocate_supply():
 
         related_stocks = commodity.stock_set.filter(time_stamp_FK=current_state.time_stamp_FK)
         for stock in related_stocks:
-            Log.enter(2,f"Processing stock owned by {stock.stock_owner_name} of type {stock.usage_type} which has demand {stock.demand} and supply {stock.size}")
             if commodity.allocation_ratio>1: # demand is greater than supply, reduce it
                 stock.demand=stock.demand/commodity.allocation_ratio
                 Log.enter(3,f"This stock's demand cannot be satisfied, and is reduced to {stock.demand}")
@@ -152,14 +151,12 @@ def set_total_value_and_price():
         commodity.save()
     #! Now we have to revalue and reprice all stocks
     for stock in Stock.objects.filter(time_stamp_FK=current_time_stamp):
-        Log.enter(2,f"Revaluing stock of {stock.commodity_FK.name} owned by {stock.stock_owner_name}")
-        Log.enter(2,f"size is {stock.size}, present value is {stock.value}, present price is {stock.price}")
         unit_price=stock.commodity_FK.unit_price
         unit_value=stock.commodity_FK.unit_value
-        Log.enter(2,f"unit value is now {unit_value}, unit price is now {unit_price}")
+        Log.enter(2,f"Size of {stock.commodity_FK.name} owned by {stock.stock_owner_name} is {stock.size}. Value is {stock.value} and price is {stock.price}")
         new_value=stock.size*unit_value
         new_price=stock.size*unit_price
-        Log.enter(2,f"value will now be set to {new_value} and price will be set to {new_price}")
+        Log.enter(2,f"Unit value is now {unit_value} and unit price is now {unit_price} so value will now be set to {new_value} and price to {new_price}")
         stock.value=new_value
         stock.price=new_price
         stock.save()
@@ -215,25 +212,27 @@ def trade():
     #* the value of these assets will - as a result of unequal exchange
     #* So we make this calculation both before and after production
     set_total_value_and_price()
-    #! Now we know the value and price of all stocks, we can calculate the initial capital of each industry
+    set_current_capital()
+ 
+def set_initial_capital():
+    #! Calculate the initial capital of each industry
     #! After production, we will then be able to calculate the profit
-    for industry in Industry.objects.filter(time_stamp_FK=current_time_stamp):
-        industry.initial_capital=0 #! no need to save, because we are going to recalculate it first
+    current_time_stamp=State.get_current_time_stamp()
 
     #! THE BELOW DOES NOT WORK. FIND OUT WHY
-    for stock in IndustryStock.objects.filter(time_stamp_FK=current_time_stamp):
-        #!everybody owns somebody
-        this_owner=stock.industry_FK
-        Log.enter(1,f"trying to revalue capital of {this_owner.name} from stock of type {stock.usage_type} with price {stock.price}")
-        if stock.price==0:
-            Log.enter(1,f"Stock has zero price; will not add it because of weird django error that resets initial capital to zero if zero is added to it")
-        else:
-            this_owner.initial_capital=this_owner.initial_capital+stock.price
-            Log.enter(2,f"Adding {stock.price} from stock of type {stock.usage_type} to the initial capital of {this_owner.name} whose total capital is now {this_owner.initial_capital}")
-    #! once we've recalculated the initial capitals, we have to save them.
-    for industry in Industry.objects.filter(time_stamp_FK=current_time_stamp):
-        Log.enter(1, f"saving industry {industry.name} whose capital is {industry.initial_capital}" )
-        industry.save()
+    # for stock in IndustryStock.objects.filter(time_stamp_FK=current_time_stamp):
+    #     #!everybody owns somebody
+    #     this_owner=stock.industry_FK
+    #     Log.enter(1,f"trying to revalue capital of {this_owner.name} from stock of type {stock.usage_type} with price {stock.price}")
+    #     if stock.price==0:
+    #         Log.enter(1,f"Stock has zero price; will not add it because of weird django error that resets initial capital to zero if zero is added to it")
+    #     else:
+    #         this_owner.initial_capital=this_owner.initial_capital+stock.price
+    #         Log.enter(2,f"Adding {stock.price} from stock of type {stock.usage_type} to the initial capital of {this_owner.name} whose total capital is now {this_owner.initial_capital}")
+    # #! once we've recalculated the initial capitals, we have to save them.
+    # for industry in Industry.objects.filter(time_stamp_FK=current_time_stamp):
+    #     Log.enter(1, f"saving industry {industry.name} whose capital is {industry.initial_capital}" )
+    #     industry.save()
     
     for industry in Industry.objects.filter(time_stamp_FK=current_time_stamp):
         Log.enter(1,f"calculating the initial capital of industry {industry.name}")
@@ -246,7 +245,23 @@ def trade():
                 work_in_progress+=stock.price
         Log.enter(1,f"capital is now {capital} and work in progress is now {work_in_progress}")
         industry.initial_capital=capital
+        industry.current_capital=capital
+        industry.work_in_progress=work_in_progress
+        industry.save() 
+
+
+def set_current_capital():
+    #! Calculate the current capital of each industry
+    current_time_stamp=State.get_current_time_stamp()
+    for industry in Industry.objects.filter(time_stamp_FK=current_time_stamp):
+        Log.enter(1,f"calculating the initial capital of industry {industry.name}")
+        capital=0
+        work_in_progress=0
+        for stock in industry.stock_set.filter(time_stamp_FK=current_time_stamp):
+            Log.enter(1,f"Adding the price {stock.price} of the stock of type {stock.usage_type}. Work in progress so far is {work_in_progress} and Capital {capital} ")
+            capital+=stock.price
+            if stock.usage_type==PRODUCTION:
+                work_in_progress+=stock.price
+        industry.initial_capital=capital
         industry.work_in_progress=work_in_progress
         industry.save()
-
-

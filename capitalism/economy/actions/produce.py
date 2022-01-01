@@ -1,12 +1,11 @@
 from capitalism.global_constants import *
-from .exchange import set_total_value_and_price
-from ..models.states import (Project, TimeStamp, State, Log)
+from .exchange import set_total_value_and_price, set_current_capital
+from ..models.states import State, Log
 from ..models.commodity import Commodity
 from ..models.owners import Industry, SocialClass
 from ..models.stocks import Stock, IndustryStock, SocialStock
 
 #! Actions for the 'production' phase
-# TODO write them
 
 def set_commodity_size(commodity):
     Log.enter(1,f"Recaculating the size of commodity {commodity.name}; currently this is {commodity.size} ")
@@ -24,7 +23,6 @@ def set_commodity_sizes():
     commodities=Commodity.objects.filter(time_stamp_FK=current_state.time_stamp_FK)
     for commodity in commodities:
         set_commodity_size(commodity)
-
 
     #! scale output down if constrained by stock size. Normally should not happen, but we have to catch this to ensure stocks don't go negative
 def scale_output(industry):
@@ -81,15 +79,17 @@ def producers():
         industry.save()
 #TODO Recalculate commodity size on the fly, and use the below only as a double check
     set_commodity_sizes()
+    set_current_capital()    
+
+def prices():
+    set_total_value_and_price()
+
 
 #! Production determines output values and prices
 #! Once we have a sophisticated pricing model, prices will change as a result of reproduction (in response to demand, etc)
 #! In any case, we suppose for simplicity a quantity-response model of social demand
 #! So in the next stage (reproduction) classes set levels of consumption dependent on what they can afford
 #! Then, in the sophisticated model, prices will respond to the changes in stocks. If stocks have fallen, prices will fall and vice versa.
-
-def prices():
-    set_total_value_and_price()
 
 #! Social Consumption
 def reproduce():
@@ -132,13 +132,5 @@ def reproduce():
             Log.enter(1,f"Social Class {social_class} has consumed {quantity_consumed} and created {sales_amount} of sales stocks")
             Log.enter(1,f"{social_class} now owns {cs.size} in consumption goods and has {sales_stock.size} to sell")
 
-def all_production():
-    print ("Produce all")
-    new_substate=State.move_one_substep()
-    producers()
-    new_substate=State.move_one_substep()
-    prices()
-    new_substate=State.move_one_substep()
-    reproduce()
     
 

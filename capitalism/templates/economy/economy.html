@@ -77,12 +77,12 @@
         {% for industry in industries %}
         <tr>
           <td>{{industry.name}}</td>
-          <td>${{industry.initial_capital}}</td>
-          <td>${{industry.work_in_progress}}</td>
-          <td>${{ industry.industrystock_set.all|sales_filter}}</td>
+          <td>${{industry.initial_capital|has_changed:industry.comparator_initial_capital}}</td>
+          <td>${{industry.work_in_progress|has_changed:industry.comparator_work_in_progress}}</td>
+          <td>${{ industry.industrystock_set.all|sales_filter }}</td>
           <td>${{ industry.industrystock_set.all|money_filter }}</td>
-          <td>TBA</td>
-          <td>TBA</td>
+          <td>${{ industry.current_capital|has_changed:industry.comparator_current_capital }}</td>
+          <td>${{ industry.profit }} (Coming soon)</td>
           <td>TBA</td>
         </tr>
         {% endfor %}
@@ -162,8 +162,8 @@
           <td>{{commodity.size }}</td>
           <td>{{commodity.total_value }}</td>
           <td>{{commodity.total_price }}</td>
-          <td>{{commodity.demand }}</td>
-          <td>{{commodity.supply }}</td>
+          <td>{{commodity.demand|has_changed:commodity.comparator_demand }}  </td>
+          <td>{{commodity.supply|has_changed:commodity.comparator_supply }}  </td>
           <td>{{commodity.allocation_ratio }}</td>
         </tr>
         {% endfor %}

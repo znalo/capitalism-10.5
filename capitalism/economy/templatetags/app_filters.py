@@ -55,3 +55,4 @@ def has_changed(new,old):
         return new
     else:
         return mark_safe("<span style=\"color:red\">"+str(new)+"</span>")
+

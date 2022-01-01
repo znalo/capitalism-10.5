@@ -43,6 +43,9 @@ class Industry(StockOwner):
     output_growth_rate = models.IntegerField(verbose_name="Growth Rate", default=1)
     initial_capital=models.FloatField(default=0)
     work_in_progress=models.FloatField(default=0)
+    current_capital=models.FloatField(default=0)
+    profit=models.FloatField(default=0)
+    profit_rate =models.FloatField(default=0)
 
     class Meta:
         verbose_name = 'Industry'
@@ -57,6 +60,36 @@ class Industry(StockOwner):
         current_state=State.objects.get()
         qs=IndustryStock.objects.industrystock_set.filter(time_stamp_FK=current_state.time_stamp_FK,usage_type=PRODUCTION,industry_FK=self)
         return qs
+
+    def comparator(self):
+        comparator_time_stamp=self.time_stamp_FK.comparator_time_stamp_FK
+       
+        comparator=Industry.objects.filter(
+            time_stamp_FK=comparator_time_stamp,
+            name=self.name
+            )
+        if comparator.count()>1:
+            return self
+        elif comparator.count()<1:
+            return None
+        else:
+            return comparator.first()    
+
+    @property
+    def comparator_initial_capital(self):
+        return self.comparator().initial_capital
+
+    @property
+    def comparator_work_in_progress(self):
+        return self.comparator().work_in_progress
+
+    @property
+    def comparator_current_capital(self):
+        return self.comparator().current_capital
+
+    @property
+    def comparator_profit(self):
+        return self.comparator().profit
 
     def __str__(self):
         return f"[Project {self.time_stamp_FK.project_FK.number}] {self.name}"

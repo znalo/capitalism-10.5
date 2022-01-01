@@ -12,9 +12,9 @@ import pandas as pd
 from capitalism.global_constants import *
 from django.shortcuts import redirect
 from django.urls import reverse
-from .exchange import calculate_demand,calculate_supply, allocate_supply, trade
-from .produce import producers, prices, reproduce, all_production
-from .distribution import revenue, accumulate, all_distribution
+from .exchange import calculate_demand,calculate_supply, allocate_supply, set_initial_capital, set_total_value_and_price, trade
+from .produce import producers, prices, reproduce
+from .distribution import revenue, accumulate
 
 #!TODO move this list to the constants file
 ACTION_LIST={
@@ -34,9 +34,7 @@ def sub_step_execute(request,act):
     return get_economy_view_context(request)
 
 def substep_execute_without_display(act):
-    print (f"action {act} requested")
     action=ACTION_LIST[act]
-    print(f"this will execute {action} ")
     State.move_one_substep()#! creates new timestamp, ready for the action
     action()#! perform the action in the new timestamp
     current_time_stamp=State.get_current_time_stamp()
@@ -44,11 +42,9 @@ def substep_execute_without_display(act):
     current_time_stamp.substate_name=next_substate_name
     current_time_stamp.description=next_substate_name 
     current_time_stamp.save()
-    print(f"moving from action {act} to {next_substate_name}")
-    print(f"time stamp registers this as {current_time_stamp.substate_name}")
+    Log.enter(1,f"Initiate action {act} in {current_time_stamp.substate_name}")
 
 def super_step_execute(request,act):
-    print (f"superstate {act} requested. We will now execute all remaining substates in this superstate")
     while State.superstate()==act:
         substep_execute_without_display(State.substate())
     return get_economy_view_context(request)
@@ -230,6 +226,8 @@ def initialize(request):
                 2, f"Created {row.stock_type} stock of commodity {industry_stock.commodity_FK.name} for industry {industry_stock.industry_FK.name}")
         else:
             Log.enter(0, f"++++UNKNOWN OWNER TYPE++++ {row.owner_type}")
+    set_total_value_and_price()
+    set_initial_capital()
 
     #! temporary for development purposes - quick and dirty visual report on what was done. 
     # TODO the logging system should replace this report

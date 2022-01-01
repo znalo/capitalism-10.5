@@ -31,6 +31,30 @@ class Commodity(models.Model):
         qs=Commodity.objects.filter(time_stamp_FK=current_state.time_stamp_FK)
         return qs
 
+    def comparator_commodity(self):
+        comparator_time_stamp=self.time_stamp_FK.comparator_time_stamp_FK
+        comparator_qs=Commodity.objects.filter(
+            time_stamp_FK=comparator_time_stamp,
+            name=self.name,
+            )
+        if comparator_qs.count()>1:
+            return self
+        elif comparator_qs.count()<1:
+            return None
+        else:
+            return comparator_qs.first()
+    
+    @property
+    def comparator_demand(self):
+        return self.comparator_commodity().demand
+
+    @property
+    def comparator_supply(self):
+        return self.comparator_commodity().supply
+
+
     def __str__(self):
-        return f"[Project {self.time_stamp_FK.project_FK.number}] {self.name}"
+        return f"[Time Stamp {self.time_stamp_FK.time_stamp}] {self.name}"
+
+
 

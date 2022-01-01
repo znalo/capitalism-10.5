@@ -11,7 +11,6 @@ def control_states():
       current_substate=State.get_current_time_stamp().description
       current_superstate=SUBSTATES[current_substate].superstate_name
       context['active_superstate']=current_superstate
-      print (f"passing in substate {current_substate} active superstate {current_superstate}")
       context['superstates']=SUPERSTATES
       return context
 
