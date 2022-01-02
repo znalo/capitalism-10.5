@@ -12,9 +12,10 @@
       <thead>
         <tr>
           <th>Id</th>
+          <th>Level</th>
           <th>Time Stamp</th>
           <th>Project</th>
-          <th>Level</th>
+          <th>Substate</th>
           <th>Message</th>
         </tr>
       </thead>
@@ -22,9 +23,10 @@
         {% for log in log_list %}
         <tr class="toggle-level{{log.level}}">
           <td>{{ log.id}} </td>
+          <td>{{ log.level}} </td>
           <td>{{ log.time_stamp_id}} </td>
           <td>{{ log.project_id}} </td>
-          <td>{{ log.level}} </td>
+          <td>{{ log.substate }}</td>
           <td class="pl-{{log.level}}"><span class="log-level{{log.level}}">{{log.message|mark_as_safe }}</span> </td>
         </tr>
         {% endfor %}

@@ -26,7 +26,7 @@ def calculate_demand():
         stock.save()
         commodity = stock.commodity_FK
         commodity.demand += stock.demand
-        Log.enter(2,f"{stock.stock_owner_name}'s stock of {stock.commodity_FK.name} is {stock.size}; production requirement is {stock.production_requirement} and turnover time is {turnover_time}. Demand is increased by {stock.demand} to {commodity.demand}")
+        Log.enter(2,f"{Log.sim_object(stock.stock_owner_name)}'s stock of {Log.sim_object(stock.commodity_FK.name)} is {Log.sim_quantity(stock.size)}; production requirement is {Log.sim_quantity(stock.production_requirement)} and turnover time is {Log.sim_quantity(turnover_time)}. Demand is increased by {Log.sim_quantity(stock.demand)} to {Log.sim_quantity(commodity.demand)}")
         commodity.save()
 
     for stock in social_stocks:
@@ -36,7 +36,7 @@ def calculate_demand():
         commodity = stock.commodity_FK
         stock.save()
         commodity.demand += stock.demand
-        Log.enter(2,f"{stock.social_class_FK.name}'s  demand for {stock.commodity_FK.name} is increased by {stock.demand} and is now {commodity.demand}")
+        Log.enter(2,f"{Log.sim_object(stock.social_class_FK.name)}'s  demand for {Log.sim_object(stock.commodity_FK.name)} is increased by {Log.sim_quantity(stock.demand)} and is now {Log.sim_quantity(commodity.demand)}")
         commodity.save()
 
 # TODO abstract the rendering into a single function
@@ -57,19 +57,22 @@ def calculate_supply():
         stock.supply = stock.size
         stock.save()
         commodity.supply += stock.supply
-        Log.enter(2,f" Supply of {commodity.name} from the industry {stock.stock_owner_name} is {stock.size}. Total supply is now {commodity.supply}")
+        Log.enter(2,f" Supply of {Log.sim_object(commodity.name)} from the industry {Log.sim_object(stock.stock_owner_name)} is {Log.sim_quantity(stock.size)}. Total supply is now {Log.sim_quantity(commodity.supply)}")
         commodity.save()
+def calculate_demand_and_supply():
+    calculate_demand()
+    calculate_supply()
 
 def allocate_supply():
     Log.enter(1,"Allocate demand depending on supply")
     current_state = State.objects.get(name="Initial")
     commodities = Commodity.objects.filter(time_stamp_FK=current_state.time_stamp_FK).exclude(usage=MONEY)
     for commodity in commodities:
-        Log.enter(2,f" Allocating supply for commodity {commodity.name} whose supply is {commodity.supply} and demand is {commodity.demand}")
+        Log.enter(2,f" Allocating supply for commodity {Log.sim_object(commodity.name)} whose supply is {Log.sim_quantity(commodity.supply)} and demand is {Log.sim_quantity(commodity.demand)}")
         if commodity.supply > 0:
         #! round to avoid silly float errors
             commodity.allocation_ratio = round(commodity.demand/commodity.supply, 4)
-            Log.enter(3,f" Allocation ratio is {commodity.allocation_ratio}")
+            Log.enter(3,f" Allocation ratio is {Log.sim_object(commodity.allocation_ratio)}")
         if commodity.demand>commodity.supply: # demand is greater than supply, reduce it
             commodity.demand=commodity.supply
             Log.enter(3,f" Demand was greater than supply and is reduced to commodity.demand")
@@ -79,7 +82,7 @@ def allocate_supply():
         for stock in related_stocks:
             if commodity.allocation_ratio>1: # demand is greater than supply, reduce it
                 stock.demand=stock.demand/commodity.allocation_ratio
-                Log.enter(3,f"This stock's demand cannot be satisfied, and is reduced to {stock.demand}")
+                Log.enter(3,f"This stock's demand cannot be satisfied, and is reduced to {Log.sim_quantity(stock.demand)}")
                 stock.save()
             else:
                 Log.enter(3,"The demand for this commodity is equal to its supply, so this stock's demand is unchanged")
@@ -170,17 +173,10 @@ def trade():
     for buyer_stock in buyer_stocks:
         buyer=buyer_stock.stock_owner_FK
         buyer_commodity=buyer_stock.commodity_FK
-        Log.enter(2,f"{Log.sim_object(buyer.name)} seeks to purchase {Log.sim_quantity(buyer_stock.demand)} of {Log.sim_object(buyer_commodity.name)} for stock of usage type {Log.object(buyer_commodity.usage)} whose origin is {Log.object(buyer_commodity.origin)}")
+        Log.enter(2,f"{Log.sim_object(buyer.name)} seeks to purchase {Log.sim_quantity(buyer_stock.demand)} of {Log.sim_object(buyer_commodity.name)} for stock of usage type {Log.sim_object(buyer_commodity.usage)} whose origin is {Log.sim_object(buyer_commodity.origin)}")
         buyer_money_stock=buyer.money_stock()
         Log.enter(2,f"The buyer has {Log.sim_quantity(buyer_money_stock.size)} in money and the unit price is {Log.sim_quantity(buyer_commodity.unit_price)}. Looking for sellers")
         
-        if buyer_commodity.origin=="SOCIAL":
-            Log.enter(3,"This is a social stock")
-        elif buyer_commodity.origin=="INDUSTRIAL":
-            Log.enter(3,"This is an industrial stock")
-        else:
-            Log.enter(0,"+++UNKNOWN ORIGIN TYPE+++")
-
         #! iterate over all potential sellers of this commodity
         potential_sellers=StockOwner.objects.filter(time_stamp_FK=current_time_stamp)
 
@@ -188,7 +184,7 @@ def trade():
             seller_name=seller.name
             seller_stock=seller.sales_stock()
             seller_commodity=seller_stock.commodity_FK
-            Log.enter(1,f"{Log.sim_object(seller_name)} can offer {Log.sim_quantity(seller_stock.supply)} of {Log.sim_object(seller_commodity)} for sale to {Log.sim_object(buyer)} who wants {Log.sim_object(buyer_commodity)}")
+            Log.enter(2,f"{Log.sim_object(seller_name)} can offer {Log.sim_quantity(seller_stock.supply)} of {Log.sim_object(seller_commodity.name)} for sale to {Log.sim_object(buyer.name)} who wants {Log.sim_object(buyer_commodity.name)}")
             if seller_commodity==buyer_commodity:
                 sale(seller_stock,buyer_stock,seller,buyer)
 
@@ -238,11 +234,11 @@ def set_initial_capital():
         capital=0
         work_in_progress=0
         for stock in industry.stock_set.filter(time_stamp_FK=current_time_stamp):
-            Log.enter(1,f"Adding the price {Log.sim_quantity(stock.price)} of the stock of type {Log.sim_object(stock.usage_type)}")
+            Log.enter(2,f"Adding the price {Log.sim_quantity(stock.price)} of the stock of {Log.sim_object(stock.commodity_FK.name)}, type {Log.sim_object(stock.usage_type)}")
             capital+=stock.price
             if stock.usage_type==PRODUCTION:
                 work_in_progress+=stock.price
-        Log.enter(1,f"capital is now {Log.sim_quantity(capital)} and work in progress is now {Log.sim_quantity(work_in_progress)}")
+        Log.enter(2,f"capital is now {Log.sim_quantity(capital)} and work in progress is now {Log.sim_quantity(work_in_progress)}")
         industry.initial_capital=capital
         industry.current_capital=capital
         industry.work_in_progress=work_in_progress
@@ -253,11 +249,11 @@ def set_current_capital():
     #! Calculate the current capital of each industry
     current_time_stamp=State.get_current_time_stamp()
     for industry in Industry.objects.filter(time_stamp_FK=current_time_stamp):
-        Log.enter(1,f"calculating the initial capital of industry {industry.name}")
+        Log.enter(1,f"calculating the current capital of industry {industry.name}")
         capital=0
         work_in_progress=0
         for stock in industry.stock_set.filter(time_stamp_FK=current_time_stamp):
-            Log.enter(1,f"Adding the price {Log.sim_quantity(stock.price)} of the stock of type {Log.sim_object(stock.usage_type)}. Work in progress is {Log.sim_quantity(work_in_progress)} and capital is {Log.sim_quantity(capital)} ")
+            Log.enter(2,f"Adding the price {Log.sim_quantity(stock.price)} of stock of {Log.sim_object(stock.commodity_FK.name)}, type {Log.sim_object(stock.usage_type)}. Work in progress is {Log.sim_quantity(work_in_progress)} and capital is {Log.sim_quantity(capital)} ")
             capital+=stock.price
             if stock.usage_type==PRODUCTION:
                 work_in_progress+=stock.price

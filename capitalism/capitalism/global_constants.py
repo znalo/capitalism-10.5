@@ -41,8 +41,7 @@ M_C = "M-C (exchange)"
 C_P = "C-P-C' (produce)"
 C_M = "C'-M' (distribute)"
 
-DEMAND = "demand"
-SUPPLY = "supply"
+DEMAND = "demand and supply"
 ALLOCATE = "allocate"
 TRADE = "trade"
 PRODUCE = "produce"
@@ -53,8 +52,7 @@ ACCUMULATE="accumulate"
 
 CONTROL_SUB_STATES = [
     (DEMAND, "Demand"),
-    (SUPPLY, "Supply"),
-    (ALLOCATE, "Allocate"),
+    (ALLOCATE, "Allocate Supply"),
     (TRADE, "Trade"),
     (PRODUCE, "Produce"),
     (PRICES, "Prices"),
@@ -72,8 +70,7 @@ class SubState:
 
 
 SUBSTATES={
-  "demand":SubState(name=DEMAND,superstate_name="M_C", next_substate_name=SUPPLY),
-  "supply":SubState(name=SUPPLY,superstate_name="M_C", next_substate_name=ALLOCATE),
+  "demand":SubState(name=DEMAND,superstate_name="M_C", next_substate_name=ALLOCATE),
   "allocate":SubState(name=ALLOCATE,superstate_name="M_C", next_substate_name=TRADE),
   "trade":SubState(name=TRADE,superstate_name="M_C",next_substate_name=PRODUCE),
   "produce":SubState(name=PRODUCE,superstate_name="C_P", next_substate_name=PRICES),

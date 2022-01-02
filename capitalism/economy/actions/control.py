@@ -1,4 +1,6 @@
 from datetime import time
+
+from django.http.response import HttpResponseRedirect
 from ..models.states import (Project, TimeStamp, State, Log)
 from ..models.commodity import Commodity
 from ..models.owners import Industry, SocialClass
@@ -12,14 +14,13 @@ import pandas as pd
 from capitalism.global_constants import *
 from django.shortcuts import redirect
 from django.urls import reverse
-from .exchange import calculate_demand,calculate_supply, allocate_supply, set_initial_capital, set_total_value_and_price, trade
+from .exchange import calculate_demand_and_supply, allocate_supply, set_initial_capital, set_total_value_and_price, trade
 from .produce import producers, prices, reproduce
 from .distribution import revenue, accumulate
 
 #!TODO move this list to the constants file
 ACTION_LIST={
-    'demand':calculate_demand,
-    'supply':calculate_supply,
+    'demand':calculate_demand_and_supply,
     'allocate':allocate_supply,
     'trade':trade,
     'produce':producers,
@@ -47,7 +48,7 @@ def substep_execute_without_display(act):
 def super_step_execute(request,act):
     while State.superstate()==act:
         substep_execute_without_display(State.substate())
-    return get_economy_view_context(request)
+    return HttpResponseRedirect(reverse("economy"))
 
 
 #! Gets the whole thing going from CSV static files
@@ -139,6 +140,7 @@ def initialize(request):
             commodity_FK=Commodity.objects.get(time_stamp_FK=this_time_stamp, name=row.commodity_name),
             output_scale=row.output,
             output_growth_rate=row.growth_rate,
+            current_capital=0,
             stock_owner_type=INDUSTRY,
             initial_capital=0,
             work_in_progress=0

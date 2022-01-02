@@ -125,3 +125,11 @@ Log table spruced up with styling for object names and quantities, plus elementa
 TODO complete collapse functionality
 
 ## Commit spruced up Log table
+
+TODO complete circuit debug
+TODO Refresh should not repeat the action, only refresh the display
+
+Tracking down bug in trade
+Log display approaching the usable
+
+## Commit Log display nearly usable
