@@ -57,7 +57,7 @@ def super_step_execute(request,act):
 def initialize(request):
     #! Basic setup: projects, timestamps and state
     Log.objects.all().delete()
-    file_name = os.path.join(settings.BASE_DIR, "static\projects.csv")
+    file_name = os.path.join(settings.BASE_DIR, "static\\data\\projects.csv")
     Log.enter(0, "+++REDO FROM START+++")
     Log.enter(1,"Read in setup files")
     Project.objects.all().delete()
@@ -72,7 +72,7 @@ def initialize(request):
     # TODO project.owner (currently defaults messily to superuser)
 
     # TimeStamp.objects.all().delete() (moved to start of this method)
-    file_name = os.path.join(settings.BASE_DIR, "static\\timestamps.csv")
+    file_name = os.path.join(settings.BASE_DIR, "static\\data\\timestamps.csv")
     Log.enter(2, f"Reading time stamps from {file_name}")
     df = pd.read_csv(file_name)
 
@@ -101,7 +101,7 @@ def initialize(request):
     #! Basic setup complete, now read the data files
     #! Commodities
     Commodity.objects.all().delete()
-    file_name = os.path.join(settings.BASE_DIR, "static\\commodities.csv")
+    file_name = os.path.join(settings.BASE_DIR, "static\\data\\commodities.csv")
     Log.enter(2, f"Reading commodities from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
@@ -131,7 +131,7 @@ def initialize(request):
     
     #!Industries
     Industry.objects.all().delete()
-    file_name = os.path.join(settings.BASE_DIR, "static\\industries.csv")
+    file_name = os.path.join(settings.BASE_DIR, "static\\data\\industries.csv")
     Log.enter(2, f"Reading industries from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
@@ -154,7 +154,7 @@ def initialize(request):
 
     #! Social Classes
     SocialClass.objects.all().delete()
-    file_name = os.path.join(settings.BASE_DIR, "static\\social_classes.csv")
+    file_name = os.path.join(settings.BASE_DIR, "static\\data\\social_classes.csv")
     Log.enter(2, f"Reading social classes from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
@@ -183,7 +183,7 @@ def initialize(request):
     IndustryStock.objects.all().delete()
     SocialStock.objects.all().delete()
 
-    file_name = os.path.join(settings.BASE_DIR, "static\\stocks.csv")
+    file_name = os.path.join(settings.BASE_DIR, "static\\data\\stocks.csv")
     Log.enter(2, f"Reading stocks from {file_name}")
     df = pd.read_csv(file_name)
 

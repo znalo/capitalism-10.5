@@ -137,3 +137,8 @@ Log display approaching the usable
 Some debugging
 
 ## Commit current capital, profit and profit rate now working, tested on Project 1
+
+Rationalised static folder
+
+## Commit reorganised static folder
+
