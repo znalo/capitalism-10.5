@@ -45,6 +45,7 @@ def produce(industry):
     if sales_stocks.count()!=1:
         Log (0,f"+++industry with no sales Stock+++")
     sales_stock=sales_stocks.get()
+    unit_price_of_output=industry.commodity_FK.unit_price
     added_value=0
     for ps in IndustryStock.objects.all().filter(industry_FK=industry,usage_type=PRODUCTION):
         commodity=ps.commodity_FK
@@ -62,6 +63,7 @@ def produce(industry):
         Log.enter(2,f"Total social stock of {commodity.name}  has been reduced by {used_up_quantity} to {commodity.size}")
     sales_stock.size+=industry.output_scale
     sales_stock.value+=added_value
+    sales_stock.price=sales_stock.size*unit_price_of_output
     sales_stock.save()
     Log.enter(1,f"{industry.name}'s sales stock has increased by {industry.output_scale} to {sales_stock.size} and its value has risen to {sales_stock.value}" )
 

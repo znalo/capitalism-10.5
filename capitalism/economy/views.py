@@ -21,8 +21,8 @@ def get_economy_view_context(request):#TODO change name - this function now not 
         current_time_stamp=State.get_current_time_stamp()
         industry_stocks = IndustryStock.objects.filter(time_stamp_FK=current_time_stamp)
         industries=Industry.objects.filter(time_stamp_FK=current_time_stamp)
-        productive_stocks=industry_stocks.filter(usage_type=PRODUCTION)
-        industry_headers=productive_stocks.filter(industry_FK=industries.first()) #!all industries have same choice of productive stocks, even if usage is zero
+        productive_stocks=industry_stocks.filter(usage_type=PRODUCTION).order_by("commodity_FK__display_order")
+        industry_headers=productive_stocks.filter(industry_FK=industries.first()).order_by("commodity_FK__display_order") #!all industries have same choice of productive stocks, even if usage is zero
         social_classes=SocialClass.objects.filter(time_stamp_FK=current_time_stamp)
         social_stocks=SocialStock.objects.filter(time_stamp_FK=current_time_stamp)
         commodities=Commodity.objects.filter(time_stamp_FK=current_time_stamp)

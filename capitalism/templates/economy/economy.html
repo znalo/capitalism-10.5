@@ -82,8 +82,8 @@
           <td>${{ industry.industrystock_set.all|sales_filter }}</td>
           <td>${{ industry.industrystock_set.all|money_filter }}</td>
           <td>${{ industry.current_capital|has_changed:industry.comparator_current_capital }}</td>
-          <td>${{ industry.profit }} (Coming soon)</td>
-          <td>TBA</td>
+          <td>${{ industry.profit|has_changed:industry.comparator_profit }}</td>
+          <td>%{{ industry.profit_rate|has_changed:industry.comparator_profit_rate }}</td>
         </tr>
         {% endfor %}
       </tbody>

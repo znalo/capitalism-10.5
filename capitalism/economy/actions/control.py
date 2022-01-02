@@ -59,11 +59,11 @@ def initialize(request):
     Log.objects.all().delete()
     file_name = os.path.join(settings.BASE_DIR, "static\projects.csv")
     Log.enter(0, "+++REDO FROM START+++")
-
+    Log.enter(1,"Read in setup files")
     Project.objects.all().delete()
     TimeStamp.objects.all().delete()
 
-    Log.enter(1, f"Reading projects from {file_name}")
+    Log.enter(2, f"Reading projects from {file_name}")
     df = pd.read_csv(file_name)
     # Project.objects.all().delete() (moved to start of this method)
     for row in df.itertuples(index=False, name='Pandas'):
@@ -73,7 +73,7 @@ def initialize(request):
 
     # TimeStamp.objects.all().delete() (moved to start of this method)
     file_name = os.path.join(settings.BASE_DIR, "static\\timestamps.csv")
-    Log.enter(1, f"Reading time stamps from {file_name}")
+    Log.enter(2, f"Reading time stamps from {file_name}")
     df = pd.read_csv(file_name)
 
     for row in df.itertuples(index=False, name='Pandas'):
@@ -102,13 +102,14 @@ def initialize(request):
     #! Commodities
     Commodity.objects.all().delete()
     file_name = os.path.join(settings.BASE_DIR, "static\\commodities.csv")
-    Log.enter(1, f"Reading commodities from {file_name}")
+    Log.enter(2, f"Reading commodities from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
         Log.enter(2, f"Creating commodity <span class='simulation-object'>{row.name}</span>")
         commodity = Commodity(
             time_stamp_FK=TimeStamp.objects.get(
-                time_stamp=1, project_FK__number=row.project),
+            time_stamp=1,
+            project_FK__number=row.project),
             name=row.name,
             origin=row.origin_type,
             unit_value=row.unit_value,
@@ -123,17 +124,20 @@ def initialize(request):
             tooltip=row.tooltip
         )
         # TODO fix owner
+        if row.name=="Labour Power":
+            print(f"Unit Price is {row.unit_price}")
+            print(f"recorded as {commodity.unit_price}")
         commodity.save()
     
     #!Industries
     Industry.objects.all().delete()
     file_name = os.path.join(settings.BASE_DIR, "static\\industries.csv")
-    Log.enter(1, f"Reading industries from {file_name}")
+    Log.enter(2, f"Reading industries from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
         this_time_stamp = TimeStamp.objects.get(
             time_stamp=1, project_FK__number=row.project)
-        Log.enter(2, f"Creating Industry {Log.sim_object(row.industry_name)}")
+        Log.enter(3, f"Creating Industry {Log.sim_object(row.industry_name)}")
         industry = Industry(
             time_stamp_FK=this_time_stamp,
             name=row.industry_name,
@@ -151,12 +155,12 @@ def initialize(request):
     #! Social Classes
     SocialClass.objects.all().delete()
     file_name = os.path.join(settings.BASE_DIR, "static\\social_classes.csv")
-    Log.enter(1, f"Reading social classes from {file_name}")
+    Log.enter(2, f"Reading social classes from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
         this_time_stamp = TimeStamp.objects.get(
             time_stamp=1, project_FK__number=row.project)
-        Log.enter(2, f"Creating Social Class {Log.sim_object(row.social_class_name)}")
+        Log.enter(3, f"Creating Social Class {Log.sim_object(row.social_class_name)}")
         social_class = SocialClass(
             time_stamp_FK=this_time_stamp,
             name=row.social_class_name,
@@ -180,7 +184,7 @@ def initialize(request):
     SocialStock.objects.all().delete()
 
     file_name = os.path.join(settings.BASE_DIR, "static\\stocks.csv")
-    Log.enter(1, f"Reading stocks from {file_name}")
+    Log.enter(2, f"Reading stocks from {file_name}")
     df = pd.read_csv(file_name)
 
     # TODO can the below be done more efficiently?
@@ -205,7 +209,7 @@ def initialize(request):
             # TODO fix owner
             social_stock.save()
             Log.enter(
-                2, f"Created a stock of commodity {Log.sim_object(social_stock.commodity_FK.name)} of usage type {row.stock_type} for class {Log.sim_object(social_stock.social_class_FK.name)} ")
+                3, f"Created a stock of commodity {Log.sim_object(social_stock.commodity_FK.name)} of usage type {row.stock_type} for class {Log.sim_object(social_stock.social_class_FK.name)} ")
         elif row.owner_type == "INDUSTRY":
             industry=Industry.objects.get(time_stamp_FK=this_time_stamp, name=row.name)
             commodity=Commodity.objects.get(time_stamp_FK=this_time_stamp, name=row.commodity)
@@ -225,7 +229,7 @@ def initialize(request):
             # TODO fix owner
             industry_stock.save()
             Log.enter(
-                2, f"Created a stock of {Log.sim_object(industry_stock.commodity_FK.name)} of usage type {row.stock_type} for industry {Log.sim_object(industry_stock.industry_FK.name)}")
+                3, f"Created a stock of {Log.sim_object(industry_stock.commodity_FK.name)} of usage type {row.stock_type} for industry {Log.sim_object(industry_stock.industry_FK.name)}")
         else:
             Log.enter(0, f"++++UNKNOWN OWNER TYPE++++ {row.owner_type}")
     set_total_value_and_price()

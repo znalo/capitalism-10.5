@@ -133,3 +133,7 @@ Tracking down bug in trade
 Log display approaching the usable
 
 ## Commit Log display nearly usable
+
+Some debugging
+
+## Commit current capital, profit and profit rate now working, tested on Project 1

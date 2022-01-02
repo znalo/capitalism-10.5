@@ -91,6 +91,13 @@ class Industry(StockOwner):
     def comparator_profit(self):
         return self.comparator().profit
 
+    @property
+    def comparator_profit_rate(self):
+        profit_rate=self.comparator().profit_rate
+        print (f"profit rate is {profit_rate}")
+        return profit_rate
+
+
     def __str__(self):
         return f"[Project {self.time_stamp_FK.project_FK.number}] {self.name}"
 

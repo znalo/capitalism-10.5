@@ -95,18 +95,22 @@ def sale(seller_stock, buyer_stock, seller, buyer):
     cost=transferred_stock*commodity.unit_price
     seller_stock.size-=transferred_stock
     buyer_stock.size+=transferred_stock
-    seller_stock.demand+=transferred_stock
-    buyer_stock.supply-=transferred_stock
     seller_money_stock=seller.money_stock()
     buyer_money_stock=buyer.money_stock()
-    seller_money_stock.size+=cost
-    buyer_money_stock.size-=cost
+    Log.enter(1,f"Sale: {Log.sim_object(buyer.name)} is buying {Log.sim_quantity(transferred_stock)} of {Log.sim_object(seller_stock.commodity_FK.name)} from {Log.sim_object(seller.name)} at a cost of {Log.sim_quantity(cost)}")
+    Log.enter(1,f"The seller has ${Log.sim_quantity(seller_money_stock.size)} and the buyer has ${Log.sim_quantity(buyer_money_stock.size)}")
+    seller_stock.demand+=transferred_stock
+    buyer_stock.supply-=transferred_stock
     seller_stock.save()
     buyer_stock.save()
-    seller_money_stock.save()
-    buyer_money_stock.save()    
-    Log.enter(3,f"Sale of {transferred_stock} at a cost of {cost} has taken place")
-
+    print(f"seller money stock {seller_money_stock.id}, buyer money stock {buyer_money_stock.id}")
+    print(f"seller {seller.id} buyer {buyer.id}")
+    if buyer.id!=seller.id: #!Bizarrely, the code below does not work if the seller and buyer are the same
+        buyer_money_stock.size-=cost
+        buyer_money_stock.save()    
+        seller_money_stock.size+=cost
+        seller_money_stock.save()
+    Log.enter(1,f"After trade, the seller now has ${Log.sim_quantity(seller_money_stock.size)} and the buyer ${Log.sim_quantity(buyer_money_stock.size)}")
 #! helper function to set the total value and price of all stocks and commodities from their sizes
 #! and to set the initial capital of each industry.
 #! rather than trying to keep track on the fly.
@@ -124,16 +128,18 @@ def set_total_value_and_price():
         stock.price=size*unit_price
         owner_name=stock.stock_owner_name
         stock.save()
-        Log.enter(2,f"Value of the stock of {Log.sim_object(stock.commodity_FK.name)} owned by {Log.sim_object(owner_name)} is {Log.sim_quantity(stock.value)} and its price is {Log.sim_quantity(stock.price)}")
+        Log.enter(2,f"Size of the stock of {Log.sim_object(stock.commodity_FK.name)} owned by {Log.sim_object(owner_name)} is {Log.sim_quantity(stock.size)}. Its value is {Log.sim_quantity(stock.value)} and its price is {Log.sim_quantity(stock.price)}")
     for commodity in Commodity.objects.filter(time_stamp_FK=current_time_stamp):
         commodity.total_value=0
         commodity.total_price=0
+        commodity.size=0
         stocks=Stock.objects.filter(time_stamp_FK=current_time_stamp,commodity_FK=commodity)
         for stock in stocks:
             commodity.total_value+=stock.value
             commodity.total_price+=stock.price
+            commodity.size+=stock.size
         commodity.save()
-        Log.enter(2,f"Total value of the stock of {Log.sim_object(stock.commodity_FK.name)} is {Log.sim_quantity(commodity.total_value)} and its total price is {Log.sim_quantity(commodity.total_price)}")
+        Log.enter(2,f"Total size of the stock of {Log.sim_object(stock.commodity_FK.name)} is {Log.sim_quantity(commodity.size)}. Its value is {Log.sim_quantity(commodity.total_value)} and its price is {Log.sim_quantity(commodity.total_price)}")
     #! BOTH unit price and unit value may now have changed
     #! Therefore we:
     #* calculate these unit values and prices
@@ -158,7 +164,7 @@ def set_total_value_and_price():
         Log.enter(2,f"Size of {Log.sim_object(stock.commodity_FK.name)} owned by {Log.sim_object(stock.stock_owner_name)} is {Log.sim_quantity(stock.size)}, with value {Log.sim_quantity(stock.value)} and price {Log.sim_quantity(stock.price)}")
         new_value=stock.size*unit_value
         new_price=stock.size*unit_price
-        Log.enter(2,f"Unit value is now {Log.sim_quantity(unit_value)} and will be reset to {Log.sim_quantity(new_value)}; Unit price {Log.sim_quantity(unit_price)} will be reset to {Log.sim_quantity(new_price)}")
+        Log.enter(2,f"Unit value is now {Log.sim_quantity(unit_value)} so total value be reset to {Log.sim_quantity(new_value)}; Unit price {Log.sim_quantity(unit_price)} so total price will be reset to {Log.sim_quantity(new_price)}")
         stock.value=new_value
         stock.price=new_price
         stock.save()
@@ -253,10 +259,13 @@ def set_current_capital():
         capital=0
         work_in_progress=0
         for stock in industry.stock_set.filter(time_stamp_FK=current_time_stamp):
-            Log.enter(2,f"Adding the price {Log.sim_quantity(stock.price)} of stock of {Log.sim_object(stock.commodity_FK.name)}, type {Log.sim_object(stock.usage_type)}. Work in progress is {Log.sim_quantity(work_in_progress)} and capital is {Log.sim_quantity(capital)} ")
             capital+=stock.price
             if stock.usage_type==PRODUCTION:
                 work_in_progress+=stock.price
-        industry.initial_capital=capital
+            Log.enter(2,f"Adding the price {Log.sim_quantity(stock.price)} of stock of {Log.sim_object(stock.commodity_FK.name)}, type {Log.sim_object(stock.usage_type)}. Work in progress is {Log.sim_quantity(work_in_progress)} and capital is {Log.sim_quantity(capital)} ")
+        industry.current_capital=capital
+        industry.profit=capital-industry.initial_capital
+        industry.profit_rate=(industry.profit/industry.initial_capital)*100
+        Log.enter(1,f"Current capital is {Log.sim_quantity(industry.current_capital)}; initial capital is {Log.sim_quantity(industry.initial_capital)}; profit is {Log.sim_quantity(industry.profit)}")
         industry.work_in_progress=work_in_progress
         industry.save()
