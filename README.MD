@@ -23,4 +23,8 @@ DEVLOG.MD contains a record of what I did to create this version (10.4)
 
 Every time I make a commit, I record this in DEVLOG, or at least, that's the discipline I try to self-impose
 
-
+Current state (1/1/2022):
+  display and stepping framework basically in place, needs completion and styling improvements
+  project 1 works up to the 'revenue/accumulate' step
+  revenue needs to take the profit and allocate it to the capitalists
+  accumulate needs to decide what portion of this profit to consume, which to re-invest in production, and which to simply retain
