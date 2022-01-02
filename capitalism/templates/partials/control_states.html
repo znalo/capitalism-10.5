@@ -1,8 +1,9 @@
 {% load app_filters %}
+{% load control_tags %}
 <div class="btn-group">
-  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuClickable" data-bs-toggle="dropdown"
+  <button class="btn btn-secondary btn-sm dropdown-toggle mx-2" type="button" id="dropdownMenuClickable" data-bs-toggle="dropdown"
     data-bs-auto-close="false" aria-expanded="false">
-    Controls
+    Circuits
   </button>
   <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuClickable">
     {% for key, value in superstates.items %}
@@ -13,3 +14,4 @@
     {% endif %}
     {% endfor %}
   </ul>
+  <a href="/sub/{% current_substate %}" class="btn btn-secondary btn-sm mx-2" role="button" method="get">Single Step({% current_substate %})</a>

@@ -42,10 +42,24 @@ ul {
 
 .log-level3 {
    color: red;
-   margin-left:3em
+   margin-left:3em;
 }
 
 .log-level4 {
-  margin-left:4em
+  margin-left:4em;
 }
 
+.simulation-object{
+  color:purple;
+}
+
+.quantity-object{
+  font-weight:600;
+}
+table.dataTable tr td {
+  height: 12px;
+}
+
+table.dataTable tbody th, table.dataTable tbody td {
+  padding: 2px 10px;
+}

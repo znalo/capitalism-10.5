@@ -4,14 +4,12 @@
   <div class="container-md">
     <div class="btn-group" role="group" aria-label="Main Navigation Bar">
       <a href="{% url 'landing-page' %}" class="btn btn-light btn-sm" role="button">Home</a>
-      <a href="{% url 'log' %}" class="btn btn-light btn-sm" role="button">Log (Table)</a>
-      <a href="{% url 'log-collapsible' %}" class="btn btn-light btn-sm" role="button">Log (List)</a>
+      <a href="{% url 'log' %}" class="btn btn-light btn-sm" role="button">Log</a>
       <a href="{% url 'sandbox' %}" class="btn btn-light btn-sm" role="button">Sandbox</a>
       <a href="{% url 'economy' %}" class="btn btn-light btn-sm" role="button">Economy</a>
       <a href="{% url 'admin:index' %}" class="btn btn-light btn-sm" role="button">Admin</a>
       <a href="{% url 'api-views' %}" class="btn btn-light btn-sm" role="button">API views</a>
       <a href="{% url 'initialize' %}" class="btn btn-light btn-sm" role="button" method="get">Initialize</a>
-      <a href="/sub/{% current_substate %}" class="btn btn-light btn-sm" role="button" method="get">Step ({% current_substate %})</a>
     </div> <!-- btn-group -->
 
     {% control_states %} 

@@ -104,7 +104,7 @@ def initialize(request):
     Log.enter(1, f"Reading commodities from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
-        Log.enter(2, f"Creating Commodity {row.name}")
+        Log.enter(2, f"Creating commodity <span class='simulation-object'>{row.name}</span>")
         commodity = Commodity(
             time_stamp_FK=TimeStamp.objects.get(
                 time_stamp=1, project_FK__number=row.project),
@@ -132,7 +132,7 @@ def initialize(request):
     for row in df.itertuples(index=False, name='Pandas'):
         this_time_stamp = TimeStamp.objects.get(
             time_stamp=1, project_FK__number=row.project)
-        Log.enter(2, f"Creating Industry {row.industry_name}")
+        Log.enter(2, f"Creating Industry {Log.sim_object(row.industry_name)}")
         industry = Industry(
             time_stamp_FK=this_time_stamp,
             name=row.industry_name,
@@ -154,7 +154,7 @@ def initialize(request):
     for row in df.itertuples(index=False, name='Pandas'):
         this_time_stamp = TimeStamp.objects.get(
             time_stamp=1, project_FK__number=row.project)
-        Log.enter(2, f"Creating Social Class {row.social_class_name}")
+        Log.enter(2, f"Creating Social Class {Log.sim_object(row.social_class_name)}")
         social_class = SocialClass(
             time_stamp_FK=this_time_stamp,
             name=row.social_class_name,
@@ -203,7 +203,7 @@ def initialize(request):
             # TODO fix owner
             social_stock.save()
             Log.enter(
-                2, f"Created {row.stock_type} stock of commodity {social_stock.commodity_FK.name} for class {social_stock.social_class_FK.name}")
+                2, f"Created a stock of commodity {Log.sim_object(social_stock.commodity_FK.name)} of usage type {row.stock_type} for class {Log.sim_object(social_stock.social_class_FK.name)} ")
         elif row.owner_type == "INDUSTRY":
             industry=Industry.objects.get(time_stamp_FK=this_time_stamp, name=row.name)
             commodity=Commodity.objects.get(time_stamp_FK=this_time_stamp, name=row.commodity)
@@ -223,7 +223,7 @@ def initialize(request):
             # TODO fix owner
             industry_stock.save()
             Log.enter(
-                2, f"Created {row.stock_type} stock of commodity {industry_stock.commodity_FK.name} for industry {industry_stock.industry_FK.name}")
+                2, f"Created a stock of {Log.sim_object(industry_stock.commodity_FK.name)} of usage type {row.stock_type} for industry {Log.sim_object(industry_stock.industry_FK.name)}")
         else:
             Log.enter(0, f"++++UNKNOWN OWNER TYPE++++ {row.owner_type}")
     set_total_value_and_price()

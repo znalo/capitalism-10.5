@@ -1,9 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
+{% load app_filters %}
 
 <div class="row">
+  <p> <button class="btn btn-secondary" type="button" data-bs-toggle="collapse"
+      data-bs-target=".toggle-level2" aria-expanded=" false"
+      aria-controls="toggle-level2">Switch off level 2</button>
+  </p>
   <div class="col-sm-12">
-    <table id="log" class="table-sm cell-border" style="width:100%">
+    <table id="log" class="table-sm" style="width:100%">
       <thead>
         <tr>
           <th>Id</th>
@@ -15,12 +20,12 @@
       </thead>
       <tbody>
         {% for log in log_list %}
-        <tr>
+        <tr class="toggle-level{{log.level}}">
           <td>{{ log.id}} </td>
           <td>{{ log.time_stamp_id}} </td>
           <td>{{ log.project_id}} </td>
           <td>{{ log.level}} </td>
-          <td class="pl-{{log.level}}">{{log.message}} </td>
+          <td class="pl-{{log.level}}"><span class="log-level{{log.level}}">{{log.message|mark_as_safe }}</span> </td>
         </tr>
         {% endfor %}
       </tbody>
@@ -35,8 +40,17 @@
   $(document).ready(function () {
     $('#log').DataTable(
       {
+        "columns": [
+          { "width": "3%" },
+          { "width": "2%" },
+          { "width": "2%" },
+          { "width": "2%" },
+          { "width": "91%" },
+        ],
         "paging": false,
-        "info": false
+        "info": false,
+        "borders": false,
+        "searching": false
       }
     );
   });

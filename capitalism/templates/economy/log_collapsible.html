@@ -17,7 +17,7 @@
 <ul>
   {% for entry in log_iterator %}
   <div class="log{{entry.level}}">
-    [Project {{entry.project_id}}] [Time Stamp {{entry.time_stamp_id}}]<span class="log-level{{entry.level}}">{{ entry.message }}</span>
+    [Project {{entry.project_id}}] [Time Stamp {{entry.time_stamp_id}}]<span class="log-level{{entry.level}}">{{ entry.message|mark_as_safe }}</span>
   </div>
   {% endfor %}
 </ul>

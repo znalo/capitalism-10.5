@@ -1,8 +1,8 @@
-from datetime import time
 from django.db import models
 from django.db.models.base import Model
-from django.db.models.fields import IntegerField
 from capitalism.global_constants import *
+from django.utils.safestring import mark_safe
+from django.utils.html import escape
 
 class Log(models.Model):
     time_stamp_id=models.IntegerField(default=0, null=False)
@@ -21,9 +21,16 @@ class Log(models.Model):
             time_stamp_id=current_state.time_stamp_FK.time_stamp
             project_id=current_state.time_stamp_FK.project_FK.number
 
-        indent= " "*level
-        this_entry=Log(project_id=project_id,time_stamp_id=time_stamp_id,level=level,message=message)
+        this_entry=Log(project_id=project_id,time_stamp_id=time_stamp_id,level=level,message=(message))
         this_entry.save()
+
+    @staticmethod
+    def sim_object(value):
+        return f"<span class = 'simulation-object'>{value}</span>"
+
+    @staticmethod
+    def sim_quantity(value):
+        return f"<span class = 'quantity-object'>{value}</span>"
 
 class Project(models.Model):
     number=models.IntegerField(verbose_name="Project",null=False, default=0)
@@ -61,6 +68,8 @@ class TimeStamp(models.Model):
     def __str__(self):
         return f"[Time {self.time_stamp}(id:{self.id}) description: {self.description}] [Project {self.project_FK.number}] "
 
+#TODO since there is only one state at any given time, can we make this a 'standard' class
+#! the only difficulty I can see is that there is one state per owner, so a database entry would seem to be required
 class State(models.Model):
     name = models.CharField(primary_key=True, default="Initial", max_length=50)
     time_stamp_FK = models.OneToOneField(TimeStamp, related_name='state', on_delete=models.CASCADE, default=1)
@@ -77,6 +86,7 @@ class State(models.Model):
         return states.get()
 
     #! get the current time_stamp object
+    
     @staticmethod
     def get_current_time_stamp():
         current_time_stamp = State.current_state().time_stamp_FK
@@ -84,6 +94,17 @@ class State(models.Model):
         time_stamp = TimeStamp.objects.filter(
             project_FK=this_project).order_by('time_stamp').last()
         return time_stamp
+
+    @property
+    @staticmethod
+    def current_time_stamp():
+        current_time_stamp = State.current_state().time_stamp_FK
+        this_project = current_time_stamp.project_FK
+        time_stamp = TimeStamp.objects.filter(
+            project_FK=this_project).order_by('time_stamp').last()
+        return time_stamp
+
+    
 
     @staticmethod
     def substate():

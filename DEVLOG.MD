@@ -120,3 +120,8 @@ Comparators extended
 Main logic for capital in place; some bugs remain
 
 ## Commit logic for capital and profit in place but some bugs remain
+
+Log table spruced up with styling for object names and quantities, plus elementary collapse functionality
+TODO complete collapse functionality
+
+## Commit spruced up Log table
