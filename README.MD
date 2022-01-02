@@ -1,9 +1,11 @@
 # Capitalism 10.5
-Simulation project
+Simulation project based on the [General Theory of Value](https://www.academia.edu/49503297/A_General_Theory_of_Value_and_Money_part_1)
 
-A port of Capitalism 9.0 which was written in JavaFX
+General platform for simulating period circuit representations of a capitalist economy such as Marx's Schemas of reproduction, circuitist approaches, physiocracy or plain old circular flow of income.
 
-This is written in Django with various extensions including
+A port of [Capitalism 9.0](https://github.com/axfreeman/capitalism-9.0) which was written in JavaFX. Details of the rationale and features are still hosted in the README file of that project
+
+This version written in Django with various extensions including
 
 * Bootstrap (v5)
 * Datatables
@@ -11,20 +13,24 @@ This is written in Django with various extensions including
 * Djangorestframework (not used but included as a possible avenue for styling tables, serving other apps, etc)
 * Postgres (available as an option for when we deploy, but currently using SQLite for speed purposes)
 
-Since the project was also a learning process, there have been several versions where various features were tested out
+Since the project was also a learning process, there have been several versions where various features were tested out. To remember what was done, for each of these I've created a file called DEVLOG where I record what was done as a kind of memo. The earlier versions are still on github but as private projects (happy to give access as a collaborator if interested, but I can't think of any special benefits)
 
-To remember what was done, for each of these I've created a file called DEVLOG where I record what was done as a kind of memo
-
-The earlier versions are still on github but as private projects (happy to give access as a collaborator if interested, but I can't think of any special benefits)
+DEVLOG.MD contains a record of what I did to create this version (10.5)
 
 In the DEVLOGS folder I put all the old DEVLOGS
 
-DEVLOG.MD contains a record of what I did to create this version (10.4)
-
 Every time I make a commit, I record this in DEVLOG, or at least, that's the discipline I try to self-impose
 
-Current state (1/1/2022):
-  display and stepping framework basically in place, needs completion and styling improvements
-  project 1 works up to the 'revenue/accumulate' step
-  revenue needs to take the profit and allocate it to the capitalists
-  accumulate needs to decide what portion of this profit to consume, which to re-invest in production, and which to simply retain
+## to fork this project
+
+You'll need to create a virtual environment.
+You can then use Pip to install all the packages (pip freeze - r requirements.txt)
+The css and script files are all imported via CDNs in base.html but this should not require action but it could be a bad idea to override them
+
+Should then work out of the box, but I haven't tested this. 
+
+To contact me use alan.freeman@umanitoba.ca: I haven't been able to add this to my github profile, for reasons I don't understand.
+
+
+
+
