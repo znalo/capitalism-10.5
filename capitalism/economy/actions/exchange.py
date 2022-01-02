@@ -95,16 +95,14 @@ def sale(seller_stock, buyer_stock, seller, buyer):
     cost=transferred_stock*commodity.unit_price
     seller_stock.size-=transferred_stock
     buyer_stock.size+=transferred_stock
-    seller_money_stock=seller.money_stock()
-    buyer_money_stock=buyer.money_stock()
+    seller_money_stock=seller.money_stock
+    buyer_money_stock=buyer.money_stock
     Log.enter(1,f"Sale: {Log.sim_object(buyer.name)} is buying {Log.sim_quantity(transferred_stock)} of {Log.sim_object(seller_stock.commodity_FK.name)} from {Log.sim_object(seller.name)} at a cost of {Log.sim_quantity(cost)}")
     Log.enter(1,f"The seller has ${Log.sim_quantity(seller_money_stock.size)} and the buyer has ${Log.sim_quantity(buyer_money_stock.size)}")
     seller_stock.demand+=transferred_stock
     buyer_stock.supply-=transferred_stock
     seller_stock.save()
     buyer_stock.save()
-    print(f"seller money stock {seller_money_stock.id}, buyer money stock {buyer_money_stock.id}")
-    print(f"seller {seller.id} buyer {buyer.id}")
     if buyer.id!=seller.id: #!Bizarrely, the code below does not work if the seller and buyer are the same
         buyer_money_stock.size-=cost
         buyer_money_stock.save()    
@@ -180,7 +178,7 @@ def trade():
         buyer=buyer_stock.stock_owner_FK
         buyer_commodity=buyer_stock.commodity_FK
         Log.enter(2,f"{Log.sim_object(buyer.name)} seeks to purchase {Log.sim_quantity(buyer_stock.demand)} of {Log.sim_object(buyer_commodity.name)} for stock of usage type {Log.sim_object(buyer_commodity.usage)} whose origin is {Log.sim_object(buyer_commodity.origin)}")
-        buyer_money_stock=buyer.money_stock()
+        buyer_money_stock=buyer.money_stock
         Log.enter(2,f"The buyer has {Log.sim_quantity(buyer_money_stock.size)} in money and the unit price is {Log.sim_quantity(buyer_commodity.unit_price)}. Looking for sellers")
         
         #! iterate over all potential sellers of this commodity

@@ -1,3 +1,4 @@
+from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -58,6 +59,15 @@ class EconomyView(ListView):
         context = super().get_context_data(**kwargs)
         context = get_economy_view_context(context)
         return context
+
+#! toggle logging mode between verbose and clean
+def switch_log_mode(request):
+    if Log.logging_mode=="verbose":
+        Log.logging_mode="clean"
+    else:
+        Log.logging_mode="verbose"
+    return HttpResponseRedirect(reverse("economy"))
+
 
 class IndustryView(ListView):
     model=Industry

@@ -142,3 +142,15 @@ Rationalised static folder
 
 ## Commit reorganised static folder
 
+Trimmed logging with "verbose/clean" setting
+TODO rationalise what information is given to the user in clean mode
+TODO fix the Logging Table control buttons
+TODO make the table button group sticky
+
+Very crude investment mechanism sketched out
+Very last hurdle (to allocate the money) still to be done
+But note that since we haven't introduced any money constraints, actually, the circuit can just proceed - if the money allocation is wrong, the industry will just go into debt
+TODO impose some kind of monetary constraint
+
+## Commit preparing to implement the investment action
+

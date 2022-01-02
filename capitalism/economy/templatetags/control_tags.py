@@ -28,3 +28,13 @@ def current_substate():
       context={}
       context['substate']=substate
       return context
+
+@register.inclusion_tag('partials/current_logging_mode.html')
+def logging_mode():
+      logging_mode=Log.logging_mode
+      #! The toggle button says what we want to switch to - so it's the opposite of the actual logging state
+      toggle_to="clean" if logging_mode=="verbose" else "verbose" 
+      context={}
+      context['toggle_to']=toggle_to
+      print(f"passed {toggle_to} to current_logging_mode.html")
+      return context

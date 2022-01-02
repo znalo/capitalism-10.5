@@ -18,6 +18,7 @@ urlpatterns = [
 
     url('log/collapsible', views.log_collapsible, name='log-collapsible'),
     url('log/table', views.LogView.as_view(), name='log'),
+    url('log/mode', views.switch_log_mode, name='mode'),
 
     url('tables/economy', views.get_economy_view_context, name='economy'),
     url('tables/time-stamps', views.TimeStampView.as_view(), name='time-stamps'),

@@ -20,6 +20,8 @@ class Commodity(models.Model):
     image_name = models.CharField(max_length=25, default="###")
     tooltip = models.CharField(max_length=50, default="###")
     owner = models.ForeignKey('auth.User', related_name='commodities', on_delete=models.CASCADE, default=1)
+    monetarily_effective_demand=models.FloatField(default=0)
+    investment_proportion=models.FloatField(default=0)
 
     class Meta:
         verbose_name = 'Commodity'

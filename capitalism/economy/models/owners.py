@@ -14,7 +14,8 @@ class StockOwner(models.Model): # Base class for Industry and Social Class
 
     class meta:
         ordering = ['time_stamp_FK.time_stamp']
-
+    
+    @property
     def money_stock(self):
         current_state = State.objects.get(name="Initial")
         stocks = Stock.objects.filter(time_stamp_FK=current_state.time_stamp_FK, usage_type=MONEY, stock_owner_FK=self)
@@ -36,6 +37,18 @@ class StockOwner(models.Model): # Base class for Industry and Social Class
             Log(-1,f"+++{self.name} has no sales stock") #! TODO Log to raise an exception if entry is -1
             return None
         return stocks.get()
+    #! unique method because it hardwires the name of the class.
+    #TODO generalise this so it is not hardwired
+
+    @staticmethod
+    def capitalists():
+        current_ts=State.current_ts()
+        capitalists_qs=SocialClass.objects.filter(time_stamp_FK=current_ts, name="Capitalists")
+        try:
+            capitalists=capitalists_qs.get()
+        except:
+            raise Exception("Too many capitalists. Cannot continue. This is either a data error or a programming error")
+        return capitalists
 
 # TODO subclass this properly see https://stackoverflow.com/questions/13347287/django-filter-base-class-by-child-class-names
 class Industry(StockOwner):
@@ -94,7 +107,6 @@ class Industry(StockOwner):
     @property
     def comparator_profit_rate(self):
         profit_rate=self.comparator().profit_rate
-        print (f"profit rate is {profit_rate}")
         return profit_rate
 
 

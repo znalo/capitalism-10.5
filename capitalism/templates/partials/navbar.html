@@ -11,7 +11,11 @@
       <a href="{% url 'api-views' %}" class="btn btn-light btn-sm" role="button">API views</a>
       <a href="{% url 'initialize' %}" class="btn btn-light btn-sm" role="button" method="get">Initialize</a>
     </div> <!-- btn-group -->
-
+    <div class="btn-group">
+      <div>
+        <a href="{% url 'mode' %}" class="btn btn-light btn-sm" role="button">{% logging_mode %}</a>
+      </div>
+    </div>
     {% control_states %} 
 
   </div>

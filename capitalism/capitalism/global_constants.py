@@ -41,14 +41,14 @@ M_C = "M-C (exchange)"
 C_P = "C-P-C' (produce)"
 C_M = "C'-M' (distribute)"
 
-DEMAND = "demand and supply"
+DEMAND = "demand"
 ALLOCATE = "allocate"
 TRADE = "trade"
 PRODUCE = "produce"
 PRICES = "prices"
 REPRODUCE = "reproduce"
 REVENUE="revenue"
-ACCUMULATE="accumulate"
+INVEST="invest"
 
 CONTROL_SUB_STATES = [
     (DEMAND, "Demand"),
@@ -58,7 +58,7 @@ CONTROL_SUB_STATES = [
     (PRICES, "Prices"),
     (REPRODUCE, "Reproduce"),
     (REVENUE, "Revenue"),
-    (ACCUMULATE, "Accumulate"),
+    (INVEST, "Invest"),
     (UNDEFINED, "###")
 ]
 
@@ -76,8 +76,8 @@ SUBSTATES={
   "produce":SubState(name=PRODUCE,superstate_name="C_P", next_substate_name=PRICES),
   "prices":SubState(name=PRICES,superstate_name="C_P", next_substate_name=REPRODUCE),
   "reproduce":SubState(name=REPRODUCE,superstate_name="C_P", next_substate_name=REVENUE),
-  "revenue":SubState(name=REVENUE,superstate_name="C_M",next_substate_name=ACCUMULATE),
-  "accumulate":SubState(name=ACCUMULATE,superstate_name="C_M", next_substate_name=DEMAND),
+  "revenue":SubState(name=REVENUE,superstate_name="C_M",next_substate_name=INVEST),
+  "invest":SubState(name=INVEST,superstate_name="C_M", next_substate_name=DEMAND),
   "UNDEFINED":SubState(name=UNDEFINED,superstate_name="C_M", next_substate_name=UNDEFINED)
 }
 
