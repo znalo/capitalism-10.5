@@ -9,7 +9,7 @@ register = template.Library()
 def control_states():
       context={}
       try:
-            current_substate=State.get_current_time_stamp().description
+            current_substate=State.current_stamp().description
             current_superstate=SUBSTATES[current_substate].superstate_name
       except: #! if anything goes wrong just start at the beginning...
             print("Corrupt initial state encountered {current_substate}; set to start at the beginning of a circuit")
@@ -22,7 +22,7 @@ def control_states():
 @register.inclusion_tag('partials/current_substate.html')
 def current_substate():
       try:
-            substate=State.get_current_time_stamp().description
+            substate=State.current_stamp().description
       except:
             substate="corrupted"
       context={}

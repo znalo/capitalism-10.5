@@ -154,3 +154,9 @@ TODO impose some kind of monetary constraint
 
 ## Commit preparing to implement the investment action
 
+Prior to implementation, some tidying up to try and create consistent naming for the various methods
+and see if we can reduce the database hits. Since I'm not very familiar with Django internals, I'll 
+use SILK to try and profile what's going on.
+
+
+

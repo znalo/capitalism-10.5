@@ -16,7 +16,7 @@ class Log(models.Model):
     @staticmethod
     def enter(level,message):
         try:
-            current_substate=State.get_current_time_stamp().description        
+            current_substate=State.current_stamp().description        
             
             state=State.objects.all()
             if state.count()==0:
@@ -81,8 +81,6 @@ class TimeStamp(models.Model):
     def __str__(self):
         return f"[Time {self.time_stamp}(id:{self.id}) description: {self.description}] [Project {self.project_FK.number}] "
 
-#TODO since there is only one state at any given time, can we make this a 'standard' class
-#! the only difficulty I can see is that there is one state per owner, so a database entry would seem to be required
 class State(models.Model):
     name = models.CharField(primary_key=True, default="Initial", max_length=50)
     time_stamp_FK = models.OneToOneField(TimeStamp, related_name='state', on_delete=models.CASCADE, default=1)
@@ -101,32 +99,12 @@ class State(models.Model):
     #! get the current time_stamp object
     
     @staticmethod
-    def get_current_time_stamp():
-        try:
-            current_time_stamp = State.current_state().time_stamp_FK
-            this_project = current_time_stamp.project_FK
-        except:
-            raise Exception("No current time stamp as yet")
-        time_stamp = TimeStamp.objects.filter(
-            project_FK=this_project).order_by('time_stamp').last()
-        return time_stamp
-
-    @staticmethod
-    def current_time_stamp():
-        current_time_stamp = State.current_state().time_stamp_FK
-        this_project = current_time_stamp.project_FK
-        time_stamp = TimeStamp.objects.filter(
-            project_FK=this_project).order_by('time_stamp').last()
-        return time_stamp
-
-    #TODO gradually deploy this in place of current_time_stamp - makes for cleaner code
-    @staticmethod    
-    def current_ts():
-        return State.objects.get().time_stamp_FK
+    def current_stamp():
+        return State.current_state().time_stamp_FK
 
     @staticmethod
     def substate():
-        return State.get_current_time_stamp().description
+        return State.current_stamp().description
 
     @staticmethod
     def superstate():
@@ -139,7 +117,7 @@ class State(models.Model):
     def create_stamp():
         Log.enter(1, "MOVING ONE TIME STAMP FORWARD")
         current_state = State.current_state()
-        current_time_stamp = State.get_current_time_stamp()
+        current_time_stamp = State.current_stamp()
         this_project = current_time_stamp.project_FK
         old_time_stamp = TimeStamp.objects.filter(
             project_FK=this_project).order_by('time_stamp').last()
@@ -294,12 +272,12 @@ class State(models.Model):
     #*  because we're only processing superstates (user not interested in the detail), or
     #*  because user is halfway through a superstate and wants to skip to the next superstate
     @staticmethod
-    def move_one_substep():
+    def substep():
         #! The State 'knows' the time_stamp 
-        old_time_stamp = State.get_current_time_stamp()
+        old_time_stamp = State.current_stamp()
         new_time_stamp = State.create_stamp()
         State.clone(old_time_stamp, new_time_stamp)
         State.connect_stamp(new_time_stamp)
-        time_stamp=State.get_current_time_stamp() #! probably redundant - the time_stamp should be remembered in new_time_stamp
+        time_stamp=State.current_stamp() #! probably redundant - the time_stamp should be remembered in new_time_stamp
         time_stamp.save()
         #! The receiver will perform the action specified by substate

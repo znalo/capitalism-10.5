@@ -29,8 +29,7 @@ class Commodity(models.Model):
         ordering = ['time_stamp_FK']
 
     def time_stamped_queryset():
-        current_state=State.objects.get()
-        qs=Commodity.objects.filter(time_stamp_FK=current_state.time_stamp_FK)
+        qs=Commodity.objects.filter(time_stamp_FK=State.current_stamp())
         return qs
 
     def comparator_commodity(self):

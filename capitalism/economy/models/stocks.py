@@ -65,8 +65,7 @@ class IndustryStock(Stock):
         verbose_name_plural = 'Industry Stocks'
 
     def time_stamped_queryset():
-        current_state=State.objects.get()
-        qs=IndustryStock.objects.filter(time_stamp_FK=current_state.time_stamp_FK)
+        qs=IndustryStock.objects.filter(time_stamp_FK=State.current_stamp())
         return qs
 
     def __str__(self):

@@ -65,12 +65,12 @@ def invest():
     for commodity in Commodity.time_stamped_queryset():
         commodity.monetarily_effective_demand=commodity.demand*commodity.unit_price
         Log.enter(1,f"Evaluating money demand from {commodity.name} of origin {commodity.origin}; demand ={commodity.monetarily_effective_demand}")
-        if commodity.origin=="INDUSTRIAL": #! filter didn't work, TODO find out why
+        if commodity.origin=="INDUSTRIAL": #! filter didn't work, TODO we found out why, change the code
             total_monetarily_effective_demand+=commodity.monetarily_effective_demand
             commodity.save()
     Log.enter(1,f"Total money demand is {Log.sim_object(total_monetarily_effective_demand)}")
     for commodity in Commodity.time_stamped_queryset():
-        if commodity.origin=="INDUSTRIAL": #! filter didn't work, TODO find out why
+        if commodity.origin=="INDUSTRIAL": #! filter didn't work, TODO we found out why, change the code
             commodity.investment_proportion=commodity.monetarily_effective_demand/total_monetarily_effective_demand
             Log.enter(2,f"Investment proportion for {Log.sim_object(commodity.name)} is {Log.sim_quantity(commodity.investment_proportion)}")
             commodity.save()

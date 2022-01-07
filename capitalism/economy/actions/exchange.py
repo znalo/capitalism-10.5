@@ -116,7 +116,7 @@ def sale(seller_stock, buyer_stock, seller, buyer):
 #TODO ideally we should do both, as a check.
 def set_total_value_and_price():
     Log.enter(1,"Calculate Total Values, Prices and initial capital")
-    current_time_stamp = State.get_current_time_stamp()
+    current_time_stamp = State.current_stamp()
     stocks=Stock.objects.filter(time_stamp_FK=current_time_stamp)
     for stock in stocks:
         unit_price=stock.commodity_FK.unit_price
@@ -170,7 +170,7 @@ def set_total_value_and_price():
 def trade():
     Log.enter(0,"TRADE")
     Log.enter(1,"Industries")
-    current_time_stamp = State.get_current_time_stamp()
+    current_time_stamp = State.current_stamp()
 
     #! iterate over all stocks that want to buy something
     buyer_stocks=Stock.objects.filter(time_stamp_FK=current_time_stamp).exclude(usage_type=MONEY).exclude(usage_type=SALES)
@@ -216,7 +216,7 @@ def trade():
 def set_initial_capital():
     #! Calculate the initial capital of each industry
     #! After production, we will then be able to calculate the profit
-    current_time_stamp=State.get_current_time_stamp()
+    current_time_stamp=State.current_stamp()
 
     #! THE BELOW DOES NOT WORK. FIND OUT WHY
     # for stock in IndustryStock.objects.filter(time_stamp_FK=current_time_stamp):
@@ -251,7 +251,7 @@ def set_initial_capital():
 
 def set_current_capital():
     #! Calculate the current capital of each industry
-    current_time_stamp=State.get_current_time_stamp()
+    current_time_stamp=State.current_stamp()
     for industry in Industry.objects.filter(time_stamp_FK=current_time_stamp):
         Log.enter(1,f"calculating the current capital of industry {industry.name}")
         capital=0

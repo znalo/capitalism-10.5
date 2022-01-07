@@ -41,7 +41,7 @@ def multiply(value, arg):
 
 @register.filter(name='current_control_sub_state')
 def current_control_sub_state(value):
-    sub_state= State.get_current_time_stamp().sub_state_name
+    sub_state= State.current_stamp().sub_state_name
     return sub_state
 
 @register.filter(name='current_control_super_state')

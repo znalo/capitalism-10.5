@@ -12,13 +12,12 @@ from django.conf import settings
 import os
 import pandas as pd
 from capitalism.global_constants import *
-from django.shortcuts import redirect
 from django.urls import reverse
 from .exchange import calculate_demand_and_supply, allocate_supply, set_initial_capital, set_total_value_and_price, trade
 from .produce import producers, prices, reproduce
 from .distribution import revenue, invest
 
-#!TODO move this list to the constants file
+#!TODO move this list to the constants file?
 ACTION_LIST={
     'demand':calculate_demand_and_supply,
     'allocate':allocate_supply,
@@ -36,9 +35,9 @@ def sub_step_execute(request,act):
 
 def substep_execute_without_display(act):
     action=ACTION_LIST[act]
-    State.move_one_substep()#! creates new timestamp, ready for the action
+    State.substep()#! creates new timestamp, ready for the action
     action()#! perform the action in the new timestamp
-    current_time_stamp=State.get_current_time_stamp()
+    current_time_stamp=State.current_stamp()
     next_substate_name=SUBSTATES[act].next_substate_name
     current_time_stamp.substate_name=next_substate_name
     current_time_stamp.description=next_substate_name 

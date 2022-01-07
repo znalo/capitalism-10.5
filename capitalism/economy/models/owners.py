@@ -17,8 +17,8 @@ class StockOwner(models.Model): # Base class for Industry and Social Class
     
     @property
     def money_stock(self):
-        current_state = State.objects.get(name="Initial")
-        stocks = Stock.objects.filter(time_stamp_FK=current_state.time_stamp_FK, usage_type=MONEY, stock_owner_FK=self)
+        current_state = State.current_state()
+        stocks = Stock.objects.filter(time_stamp_FK=State.current_stamp(), usage_type=MONEY, stock_owner_FK=self)
         if stocks.count()>1:
             Log(-1,f"+++{self.name} has duplicate money stock") #! TODO Log to raise an exception if entry is -1
             return None
@@ -29,7 +29,7 @@ class StockOwner(models.Model): # Base class for Industry and Social Class
 
     def sales_stock(self):
         current_state = State.objects.get(name="Initial")
-        stocks = Stock.objects.filter(time_stamp_FK=current_state.time_stamp_FK, usage_type=SALES, stock_owner_FK=self)
+        stocks = Stock.objects.filter(time_stamp_FK=State.current_stamp(), usage_type=SALES, stock_owner_FK=self)
         if stocks.count()>1:
             Log(-1,f"+++{self.name} has duplicate sales stock") #! TODO Log to raise an exception if entry is -1
             return None
@@ -42,8 +42,7 @@ class StockOwner(models.Model): # Base class for Industry and Social Class
 
     @staticmethod
     def capitalists():
-        current_ts=State.current_ts()
-        capitalists_qs=SocialClass.objects.filter(time_stamp_FK=current_ts, name="Capitalists")
+        capitalists_qs=SocialClass.objects.filter(time_stamp_FK=State.current_stamp(), name="Capitalists")
         try:
             capitalists=capitalists_qs.get()
         except:
@@ -65,13 +64,11 @@ class Industry(StockOwner):
         verbose_name_plural = 'Industries'
 
     def time_stamped_queryset():
-        current_state=State.objects.get()
-        qs=Industry.objects.filter(time_stamp_FK=current_state.time_stamp_FK)
+        qs=Industry.objects.filter(time_stamp_FK=State.current_stamp())
         return qs
 
     def productive_stocks(self):
-        current_state=State.objects.get()
-        qs=IndustryStock.objects.industrystock_set.filter(time_stamp_FK=current_state.time_stamp_FK,usage_type=PRODUCTION,industry_FK=self)
+        qs=IndustryStock.objects.industrystock_set.filter(time_stamp_FK=State.current_stamp(),usage_type=PRODUCTION,industry_FK=self)
         return qs
 
     def comparator(self):
@@ -125,13 +122,11 @@ class SocialClass(StockOwner):
         verbose_name_plural = 'Social Classes'
 
     def time_stamped_queryset():
-        current_state=State.objects.get()
-        qs=SocialClass.objects.filter(time_stamp_FK=current_state.time_stamp_FK)
+        qs=SocialClass.objects.filter(time_stamp_FK=State.current_stamp())
         return qs
 
     def consumption_stocks(self):
-        current_state=State.objects.get()
-        qs=SocialStock.objects.socialstock_set.filter(time_stamp_FK=current_state.time_stamp_FK,usage_type=CONSUMPTION,industry_FK=self)
+        qs=SocialStock.objects.socialstock_set.filter(time_stamp_FK=State.current_stamp(),usage_type=CONSUMPTION,industry_FK=self)
         return qs
 
     def __str__(self):
