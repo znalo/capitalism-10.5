@@ -1,0 +1,5 @@
+project,time_stamp,name,origin_type,unit_value,unit_price,turnover_time,function_type,display_order,image_name,tooltip
+1,1,Consumption,INDUSTRIAL,1,1,1,CONSUMPTION,3,necessities.png,Necessities
+1,1,Labour Power,SOCIAL,0.5,0.5,1,PRODUCTIVE,2,labourPower.png,Waged labour
+1,1,Means of Production,INDUSTRIAL,1,1,1,PRODUCTIVE,1,Means of Production.png,Anything used during production
+1,1,Money,MONEY,1,1,0,MONEY,4,,Money

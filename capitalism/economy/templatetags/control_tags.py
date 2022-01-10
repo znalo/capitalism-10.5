@@ -36,5 +36,4 @@ def logging_mode():
       toggle_to="clean" if logging_mode=="verbose" else "verbose" 
       context={}
       context['toggle_to']=toggle_to
-      print(f"passed {toggle_to} to current_logging_mode.html")
       return context

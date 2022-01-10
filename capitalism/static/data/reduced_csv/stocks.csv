@@ -1,0 +1,15 @@
+project,time_stamp,name,owner_type,commodity,stock_type,quantity,production_quantity,consumption_quantity
+1,1,Department II,INDUSTRY,Means of Production,Production,0,2000,0
+1,1,Capitalists,CLASS,Consumption,Consumption,0,0,1500
+1,1,Capitalists,CLASS,Money,Money,1500,0,0
+1,1,Department II,INDUSTRY,Labour Power,Production,0,1000,0
+1,1,Department I,INDUSTRY,Means of Production,Sales,6000,0,0
+1,1,Department I,INDUSTRY,Money,Money,6000,0,0
+1,1,Department II,INDUSTRY,Money,Money,3000,0,0
+1,1,Department I,INDUSTRY,Labour Power,Production,0,2000,0
+1,1,Department I,INDUSTRY,Means of Production,Production,0,4000,0
+1,1,Department II,INDUSTRY,Consumption,Sales,3000,0,0
+1,1,Workers,CLASS,Consumption,Consumption,0,0,3000
+1,1,Workers,CLASS,Money,Money,1500,0,0
+1,1,Workers,CLASS,Labour Power,Sales,3000,0,0
+1,1,Capitalists,CLASS,Labour Power,Sales,0,0,0

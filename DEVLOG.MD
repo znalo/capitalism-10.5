@@ -55,12 +55,12 @@ Time Comparison Color change (method works, has to be extended to all magnitudes
 
 Time comparison extended to sales, money, consumption and production goods
 
-TODO revenue step - need to transfer profit to the capitalists
+TODO revenue step - need to transfer profit to the capitalists DONE
 TODO accumulation step - need to use the profit to expand
 TODO time comparison for other magnitudes
 * Supply, demand, etc
-TODO superstates
-TODO double header
+TODO superstates DONE
+TODO double header DONE but needs improvement
 TODO project selection
 TODO history clickable selection of comparator
 TODO choice of displaying value, quantity, price
@@ -71,10 +71,10 @@ TODO 29/12
 * Extend the display DONE but some TBAs
 * Finish comparisons IN PROGRESS
 * Superstate stepper DONE
-* Commodity totals for quantity price and value either incomplete or incorrect
-* Revenue and Accumulate steps
-* De-activate disallowed action choices
-* Amalgamate Demand and Supply 
+* Commodity totals for quantity price and value either incomplete or incorrect DONE
+* Revenue and Accumulate steps DONE exept for last step
+* De-activate disallowed action choices DONE
+* Amalgamate Demand and Supply DONE
 * Project selection
 * Full initialise vs one project initialise
 
@@ -108,11 +108,11 @@ Stepping now works, or seems to at a first run through
 
 ## Commit data-driven stepping now works
 
-TODO move single control group for substep and superstep
+TODO move single control group for substep and superstep DONE
 TODO we need to switch between quantity, value and price display
 
 Initial capital introduced
-TODO all stocks in the second table should be denominated in currency
+TODO all stocks in the second table should be denominated in currency DONE
 
 ## Commit Initial Capital calculated
 
@@ -122,11 +122,11 @@ Main logic for capital in place; some bugs remain
 ## Commit logic for capital and profit in place but some bugs remain
 
 Log table spruced up with styling for object names and quantities, plus elementary collapse functionality
-TODO complete collapse functionality
+TODO complete collapse functionality PARTLY DONE
 
 ## Commit spruced up Log table
 
-TODO complete circuit debug
+TODO complete circuit debug DONE
 TODO Refresh should not repeat the action, only refresh the display
 
 Tracking down bug in trade
@@ -143,8 +143,8 @@ Rationalised static folder
 ## Commit reorganised static folder
 
 Trimmed logging with "verbose/clean" setting
-TODO rationalise what information is given to the user in clean mode
-TODO fix the Logging Table control buttons
+TODO rationalise what information is given to the user in clean mode DONE
+TODO fix the Logging Table control buttons DONE
 TODO make the table button group sticky
 
 Very crude investment mechanism sketched out
@@ -158,5 +158,23 @@ Prior to implementation, some tidying up to try and create consistent naming for
 and see if we can reduce the database hits. Since I'm not very familiar with Django internals, I'll 
 use SILK to try and profile what's going on.
 
+## Some name tidying and a commit
 
 
+TODO Outstanding, in priority order
+* time comparison for other magnitudes
+* project selection
+* history clickable selection of comparator
+* complete collapse functionality 
+* choice of displaying value, quantity, price
+* impose some kind of monetary constraint
+* accumulation step - need to use the profit to expand
+* double header improve readability
+* Session management
+
+
+Created fixtures in case we need to start from scratch somewhere
+Moved the complete set of data files back to the development area so we now load all 8 projects
+Now we want to have a project selector
+
+## Commit full dataset re-instated (all 8 projects, note project 7 never worked)
