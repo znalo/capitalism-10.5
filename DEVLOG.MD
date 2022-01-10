@@ -178,3 +178,10 @@ Moved the complete set of data files back to the development area so we now load
 Now we want to have a project selector
 
 ## Commit full dataset re-instated (all 8 projects, note project 7 never worked)
+
+Removed all the 'verbose_names' from States and tested, including Admin.
+Reason is that we don't use them so they just get in the way
+
+Simplified navbar, basically just to include everything and be sticky at the top
+
+## Commit simplified navbar

@@ -1,6 +1,4 @@
 {% load static %}
-{% load bootstrap %}
-{% load bootstrap_icons %}
 
 <!doctype html>
 <html lang="en">
@@ -19,15 +17,6 @@
 
 <body>
   {% include 'partials/navbar.html' %}
-  <div class="container-md">
-    <div class="d-flex justify-content-center pt-2 pb-2">
-      <nav class="navbar sticky-top navbar-expand-lg navbar-light">
-      <div id="tableButtons">
-        {% include 'partials/tables-navbar.html' %}
-      </div>
-    </nav>
-  </div> <!-- Table Buttons -->
-  </div>
   <div class="container" style="font-size: .6em;">
     {% block content %}{% endblock %}
 

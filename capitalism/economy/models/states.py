@@ -16,21 +16,15 @@ class Log(models.Model):
     @staticmethod
     def enter(level,message):
         try:
-            current_substate=State.current_stamp().description        
-            
-            state=State.objects.all()
-            if state.count()==0:
-                time_stamp_id=0
-                project_id=0
-            else:
-                current_state=State.objects.get()
-                time_stamp_id=current_state.time_stamp_FK.time_stamp
-                project_id=current_state.time_stamp_FK.project_FK.number
+            time_stamp=State.current_stamp()
+            stamp_number=time_stamp.time_stamp #! TODO rename this field to avoid confusion
+            current_substate=time_stamp.description        
+            project_id=time_stamp.project_FK.number
         except:
             project_id = 1
-            time_stamp_id=1
-            current_substate="corrupt"
-        this_entry=Log(project_id=project_id,time_stamp_id=time_stamp_id,substate=current_substate,level=level,message=(message))
+            stamp_number=1
+            current_substate="corrupt" #! TODO figure out how to ensure the project doesn't start in a corrupt state (which happens because the State table doesn't contain anything)
+        this_entry=Log(project_id=project_id,time_stamp_id=stamp_number,substate=current_substate,level=level,message=(message))
         this_entry.save()
 
     def debug_entry(level,message):
@@ -46,37 +40,31 @@ class Log(models.Model):
         return f"<span class = 'quantity-object'>{value}</span>"
 
 class Project(models.Model):
-    number=models.IntegerField(verbose_name="Project",null=False, default=0)
-    description = models.CharField(verbose_name="Project Description", max_length=50, default="###")
+    number=models.IntegerField(null=False, default=0)
+    description = models.CharField(max_length=50, default="###")
     owner = models.ForeignKey('auth.User', on_delete=models.CASCADE, default=1)
-
-    class Meta:
-        verbose_name = 'Project'
-        verbose_name_plural = 'Projects'
 
     def __str__(self):
         return f"Project {self.number}[{self.description}]"
 
 class TimeStamp(models.Model):
     project_FK = models.ForeignKey(Project, related_name='time_stamp', on_delete=models.CASCADE)
-    time_stamp = models.IntegerField(verbose_name="Time Stamp", default=1)
-    description = models.CharField(verbose_name="Description", max_length=50, default=UNDEFINED)
-    period = models.IntegerField(verbose_name="Period", default=1)
+    time_stamp = models.IntegerField(default=1)
+    description = models.CharField(max_length=50, default=UNDEFINED)
+    period = models.IntegerField(default=1)
     comparator_time_stamp_FK = models.ForeignKey("TimeStamp", on_delete=models.DO_NOTHING, null=True)
-    melt = models.CharField(verbose_name="MELT", max_length=50, default=UNDEFINED)
-    population_growth_rate = models.IntegerField(verbose_name="Population Growth Rate", default=1)
-    investment_ratio = models.IntegerField(verbose_name="Investment Ratio", default=1)
-    labour_supply_response = models.CharField(verbose_name="Labour Supply Response", max_length=50, default=UNDEFINED)
-    price_response_type = models.CharField(verbose_name="Price Response Type", max_length=50, default=UNDEFINED)
-    melt_response_type = models.CharField(verbose_name="MELT Response Type", max_length=50, null=True)
-    currency_symbol = models.CharField(verbose_name="Currency Symbol", max_length=2, default="$")
-    quantity_symbol = models.CharField(verbose_name="Quantity Symbol", max_length=2, default="#")
+    melt = models.CharField(max_length=50, default=UNDEFINED)
+    population_growth_rate = models.IntegerField(default=1)
+    investment_ratio = models.IntegerField(default=1)
+    labour_supply_response = models.CharField(max_length=50, default=UNDEFINED)
+    price_response_type = models.CharField(max_length=50, default=UNDEFINED)
+    melt_response_type = models.CharField(max_length=50, null=True)
+    currency_symbol = models.CharField(max_length=2, default="$")
+    quantity_symbol = models.CharField(max_length=2, default="#")
     owner = models.ForeignKey('auth.User', related_name='timestamps', on_delete=models.CASCADE, default=1)
 
     class Meta:
-        verbose_name = 'Time Stamp'
-        verbose_name_plural = 'Time Stamps'
-        ordering=['project_FK__number','time_stamp',]
+         ordering=['project_FK__number','time_stamp',]
 
     def __str__(self):
         return f"[Time {self.time_stamp}(id:{self.id}) description: {self.description}] [Project {self.project_FK.number}] "
@@ -86,18 +74,13 @@ class State(models.Model):
     time_stamp_FK = models.OneToOneField(TimeStamp, related_name='state', on_delete=models.CASCADE, default=1)
     owner = models.ForeignKey('auth.User', on_delete=models.CASCADE, default=1)
 
-    #! localise all the consistency checking in one place here
     @staticmethod
     def current_state():
-        states=State.objects.all()
-        if states.count()>1:
-            raise Exception("There is more than one state of this simulation. This is a programming error. Sorry,cannot continue")
-        elif states.count()<1:
-            raise Exception("There is no current state of this simulation")
-        return states.get()
+        try:
+            return State.objects.get()
+        except:
+            raise Exception ("Corrupted State object: cannot continue. This is most likely a data error. Try re-initialising using loaddata")
 
-    #! get the current time_stamp object
-    
     @staticmethod
     def current_stamp():
         return State.current_state().time_stamp_FK
@@ -109,6 +92,20 @@ class State(models.Model):
     @staticmethod
     def superstate():
         return SUBSTATES[State.substate()].superstate_name
+
+    #TODO the user should also be a selector for the state, since different users will have different states
+    @staticmethod
+    def set_project(project_number):
+        Log.debug_entry(0,f"Setting project to {project_number}")
+        try:
+            new_project=Project.objects.all()
+            time_stamp_FK=TimeStamp.objects.filter(project_FK=new_project).last() 
+            current_state=State.current_state()
+            current_state.time_stamp_FK=time_stamp_FK
+            current_state.save()
+        except:
+            raise Exception (f"Project {project_number} does not exist or is corrupt")
+
 
     def __str__(self):
         return self.name

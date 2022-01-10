@@ -26,8 +26,10 @@ Every time I make a commit, I record this in DEVLOG, or at least, that's the dis
 You'll need to create a virtual environment.
 You can then use Pip to install all the packages (pip freeze - r requirements.txt)
 The css and script files are all imported via CDNs in base.html but this should not require action but it could be a bad idea to override them
-
 Should then work out of the box, but I haven't tested this. 
+
+py manage.py loaddata fixtures.json should create an initial database with no projects in it
+py manage.py loaddata fixtures_full.json should create an initial database with all projects in it
 
 To contact me use alan.freeman@umanitoba.ca: I haven't been able to add this to my github profile, for reasons I don't understand.
 
