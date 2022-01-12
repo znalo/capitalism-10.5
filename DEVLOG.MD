@@ -196,3 +196,6 @@ Image for the landing page and experimented (unsuccessfully) to make it a backgr
 
 ## Commit navbar with dropdowns working; tidied up script and css loading
 
+Project selection seems to be working
+
+## Commit project selection installed (but not fully tested)

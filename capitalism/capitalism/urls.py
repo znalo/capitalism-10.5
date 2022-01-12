@@ -2,8 +2,9 @@ from django.contrib import admin
 from django.conf.urls import url
 from rest_framework import routers
 from economy import views
-from economy.actions import control, exchange, produce, distribution
+from economy.actions import control
 from django.urls import path, include
+from economy.actions.control import select_project
 
 router = routers.DefaultRouter()
 router.register(r'api-commodities', views.CommodityViewSet)
@@ -29,8 +30,11 @@ urlpatterns = [
     url('tables/industry-stocks', views.IndustryStockView.as_view(), name='industry-stocks'),
     url('tables/social-stocks', views.SocialStockView.as_view(), name='social-stocks'),
     url('tables/all-stocks', views.AllStocksView.as_view(), name='all-stocks'),
+
     url('control/sandbox', views.sandbox, name='sandbox'),
     url('control/initialize', control.initialize, name='initialize'),
+    url(r'project/(?P<id>[\d-]+)', select_project, name='project-select'),
+    
     url(r'super/(?P<act>[\w-]+)/$', control.super_step_execute, name='stage'),
     url(r'sub/(?P<act>[\w-]+)/$',control.sub_step_execute, name='execute'),
  

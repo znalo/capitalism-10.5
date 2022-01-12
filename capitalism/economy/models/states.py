@@ -95,16 +95,14 @@ class State(models.Model):
 
     #TODO the user should also be a selector for the state, since different users will have different states
     @staticmethod
-    def set_project(project_number):
-        Log.debug_entry(0,f"Setting project to {project_number}")
+    def set_project(time_stamp):
+        Log.debug_entry(0,f"Setting project to {time_stamp.project_FK.description}")
         try:
-            new_project=Project.objects.all()
-            time_stamp_FK=TimeStamp.objects.filter(project_FK=new_project).last() 
             current_state=State.current_state()
-            current_state.time_stamp_FK=time_stamp_FK
+            current_state.time_stamp_FK=time_stamp
             current_state.save()
         except:
-            raise Exception (f"Project {project_number} does not exist or is corrupt")
+            raise Exception (f"Project or its time stamp either does not exist or is corrupt. This could be a data error, but it might be a programme error. Cannot continue, sorry")
 
 
     def __str__(self):

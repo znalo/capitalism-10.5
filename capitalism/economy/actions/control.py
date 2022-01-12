@@ -245,3 +245,14 @@ def initialize(request):
     context['social_stocks'] = SocialStock.objects.all()
     return HttpResponse(template.render(context, request))
 
+def select_project(request,id):
+    Log.enter(0,f"Switching to project {id}")
+    try:
+        new_project=Project.objects.get(number=id)
+        print (f"found the project and it is {new_project.description}")
+        new_time_stamp=TimeStamp.objects.filter(project_FK=new_project).last()
+        print (f"found the time stamp and it is {new_time_stamp.description}")
+        State.set_project(new_time_stamp)
+    except:
+        raise Exception ("Cannot find this project - this is a data error. Cannot continue")
+    return HttpResponseRedirect(reverse("economy"))
