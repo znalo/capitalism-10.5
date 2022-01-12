@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django import template
-from ..models.states import State, Log
+from ..models.states import State, Log, Project
 from capitalism.global_constants import *
 
 register = template.Library()
@@ -36,4 +36,11 @@ def logging_mode():
       toggle_to="clean" if logging_mode=="verbose" else "verbose" 
       context={}
       context['toggle_to']=toggle_to
+      return context
+
+@register.inclusion_tag('partials/project_list.html')
+def project_list():
+      project_list=Project.objects.all()
+      context={}
+      context['projects']= project_list
       return context

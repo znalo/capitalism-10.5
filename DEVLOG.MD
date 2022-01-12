@@ -182,6 +182,11 @@ Now we want to have a project selector
 Removed all the 'verbose_names' from States and tested, including Admin.
 Reason is that we don't use them so they just get in the way
 
-Simplified navbar, basically just to include everything and be sticky at the top
+Simplified navbar, basically just to include everything and be sticky at the top (so we can fit in the projec change, and worry later about where it should go)
 
 ## Commit simplified navbar
+
+Switch to W3 - much simpler
+
+## Commit switch to W3 before ditching bootstrap
+

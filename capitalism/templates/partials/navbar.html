@@ -1,32 +1,34 @@
-{% load control_tags %}
-{% load app_filters %}
-<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
-  <div class="container-fluid bg-light py-1 ">
-    <div class="btn-group" role="group" aria-label="Main Navigation Bar">
-      <a href="{% url 'landing-page' %}" class="btn btn-light btn-sm" role="button">Home</a>
-      <a href="{% url 'log' %}" class="btn btn-light btn-sm" role="button">Log</a>
-      <a href="{% url 'sandbox' %}" class="btn btn-light btn-sm" role="button">Sandbox</a>
-      <a href="{% url 'admin:index' %}" class="btn btn-light btn-sm" role="button">Admin</a>
-      <!-- <a href="{% url 'api-views' %}" class="btn btn-light btn-sm" role="button">API views</a> -->
+{% load control_tags %} {% load app_filters %}
+<div class="w3-bar w3-light-grey">
+    <div class="w3-right">
+        {% project_list %} {% control_states %}
 
-      <a href="{% url 'initialize' %}" class="btn btn-light btn-sm" role="button" method="get">Initialize</a>
-      <a href="{% url 'economy' %}" class="btn btn-light btn-sm" role="button">Economy</a>
-      <a href="{% url 'mode' %}" class="btn btn-light btn-sm" role="button">{% logging_mode %}</a>
-
-    </div> <!-- btn-group -->
-    <div class="btn-group" role="group" aria-label="Tables navbar">
-      <div class="d-flex justify-content-center" style="font-size: .6em">
-        <a class="btn btn-outline-dark btn-sm me-1 " href="{% url 'commodities' %}" role="button">Commodities</a>
-        <a class="btn btn-outline-dark btn-sm me-1" href="{% url 'industry-stocks' %}" role="button">Industry Stocks</a>
-        <a class="btn btn-outline-dark btn-sm me-1" href="{% url 'social-stocks' %}" role="button">Social Stocks</a>
-        <a class="btn btn-outline-dark btn-sm me-1" href="{% url 'all-stocks' %}" role="button">All Stocks</a>
-        <a class="btn btn-outline-dark btn-sm me-1" href="{% url 'social-classes' %}" role="button">Social Classes</a>
-        <a class="btn btn-outline-dark btn-sm me-1" href="{% url 'industries' %}" role="button">Industries</a>
-        <a class="btn btn-outline-dark btn-sm me-1" href="{% url 'all-owners' %}" role="button">All Owners</a>
-        <a class="btn btn-outline-dark btn-sm me-1" href="{% url 'time-stamps' %}" role="button">Time Stamps</a>
-      </div>
+        <a href="{% url 'mode' %}" class="w3-button w3-small w3-round" role="button">{% logging_mode %}</a>
+        <div class="w3-dropdown-hover">
+            <button class="w3-button w3-small">Tables</button>
+            <div class="w3-dropdown-content w3-bar-block w3-card-4">
+                <a class="w3-bar-item w3-button w3-small  " href="{% url 'commodities' %}" role="button">Commodities</a>
+                <a class="w3-bar-item w3-button w3-small " href="{% url 'industry-stocks' %}" role="button">Industry
+                Stocks</a>
+                <a class="w3-bar-item w3-button w3-small " href="{% url 'social-stocks' %}" role="button">Social
+                Stocks</a>
+                <a class="w3-bar-item w3-button w3-small " href="{% url 'all-stocks' %}" role="button">All Stocks</a>
+                <a class="w3-bar-item w3-button w3-small " href="{% url 'social-classes' %}" role="button">Social
+                Classes</a>
+                <a class="w3-bar-item w3-button w3-small " href="{% url 'industries' %}" role="button">Industries</a>
+                <a class="w3-bar-item w3-button w3-small " href="{% url 'all-owners' %}" role="button">All Owners</a>
+                <a class="w3-bar-item w3-button w3-small " href="{% url 'time-stamps' %}" role="button">Time Stamps</a>
+                <a href="{% url 'sandbox' %}" class="w3-button w3-small w3-round" role="button">Sandbox</a> </div>
+        </div>
     </div>
-    <!-- Button Group -->
-    {% control_states %}
-  </div>
-</nav>
+    <div class="w3-left">
+        <a href="{% url 'landing-page' %}" class="w3-button w3-small w3-round" role="button">Home</a>
+        <a href="{% url 'log' %}" class="w3-button w3-small w3-round" role="button">Log</a>
+
+        <a href="{% url 'admin:index' %}" class="w3-button w3-small w3-round" role="button">Admin</a>
+        <!-- <a href="{% url 'api-views' %}" class="w3-button w3-small w3-round" role="button">API views</a> -->
+        <a href="{% url 'initialize' %}" class="w3-button w3-small w3-round" role="button" method="get">Initialize</a>
+        <a href="{% url 'economy' %}" class="w3-button w3-small w3-round" role="button">Economy</a>
+    </div>
+
+</div>

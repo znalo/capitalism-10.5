@@ -1,51 +1,24 @@
-{% load static %}
-{% load control_tags %}
-{% load app_filters %}
+{% load static %} {% load control_tags %} {% load app_filters %}
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" />
-  <link rel="stylesheet" href="//cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" />
-  <link rel="stylesheet" href="{% static 'css/static.css' %}">
-  <link rel="shortcut icon" href="{% static 'favicon.ico' %}">  
-  <title>Document</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" />
+    <link rel="stylesheet" href="//cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" href="{% static 'css/static.css' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <title>Document</title>
 </head>
+
 <body>
-    <div class="container-md bg-light">
-      <div class="d-flex justify-content-start">
-        <div class="btn-group" role="group" aria-label="Main Navigation Bar">
-          <a href="{% url 'landing-page' %}" class="btn btn-light btn-sm" role="button">Home</a>
-          <a href="{% url 'log' %}" class="btn btn-light btn-sm" role="button">Log</a>
-          <a href="{% url 'sandbox' %}" class="btn btn-light btn-sm" role="button">Sandbox</a>
-          <a href="{% url 'admin:index' %}" class="btn btn-light btn-sm" role="button">Admin</a>
-          <!-- <a href="{% url 'api-views' %}" class="btn btn-light btn-sm" role="button">API views</a> -->
-  
-          <a href="{% url 'initialize' %}" class="btn btn-light btn-sm" role="button" method="get">Initialize</a>
-          <a href="{% url 'economy' %}" class="btn btn-light btn-sm" role="button">Economy</a>
 
-  
-        </div> <!-- btn-group -->
-      </div> <!-- first row -->
+    <h1> try things here</h1>
 
-      <div class="d-flex justify-content-center pb-2">
-        <div class="btn-group" role="group" aria-label="Tables navbar">
-              <a class="btn btn-secondary btn-sm my-0 mx-1" href="{% url 'commodities' %}" role="button">Commodities</a>
-              <a class="btn btn-secondary btn-sm my-0 mx-1" href="{% url 'industry-stocks' %}" role="button">Industry Stocks</a>
-              <a class="btn btn-secondary btn-sm my-0 mx-1" href="{% url 'social-stocks' %}" role="button">Social Stocks</a>
-              <a class="btn btn-secondary btn-sm my-0 mx-1" href="{% url 'all-stocks' %}" role="button">All Stocks</a>
-              <a class="btn btn-secondary btn-sm my-0 mx-1" href="{% url 'social-classes' %}" role="button">Social Classes</a>
-              <a class="btn btn-secondary btn-sm my-0 mx-1" href="{% url 'industries' %}" role="button">Industries</a>
-              <a class="btn btn-secondary btn-sm my-0 mx-1" href="{% url 'all-owners' %}" role="button">All Owners</a>
-              <a class="btn btn-secondary btn-sm my-0 mx-1" href="{% url 'time-stamps' %}" role="button">Time Stamps</a>
-      </div> <!-- second row -->
-      <!-- Button Group -->
-      </div>
-    </div>
 </body>
+
 </html>
