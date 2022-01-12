@@ -199,3 +199,6 @@ Image for the landing page and experimented (unsuccessfully) to make it a backgr
 Project selection seems to be working
 
 ## Commit project selection installed (but not fully tested)
+
+## Commit landing page with logo well-positioned
+

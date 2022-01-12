@@ -1,9 +1,29 @@
 {% extends "base.html" %} {% block content %}
 
+<!-- Still trying to figure out how to do this with CSS -->
 
-<div class="w3-display-middle w3-padding w3-text-white w3-hide-small">
-    <h1>Welcome to capitalism</h1>
+<style>
+    .container {
+        position: relative;
+    }
+    
+    .center {
+        position: fixed;
+        top: 30%;
+        width: 100%;
+        text-align: center;
+        font-size: 18px;
+    }
+</style>
 
+
+
+<div class="container">
+    <img src="/static/img/capitalism.jpg" alt="Capitalism" width="100%">
+    <div class="w3-text-white center">
+        <h1>Welcome to capitalism</h1>
+
+    </div>
 </div>
 
-<img src="/static/img/capitalism.jpg" alt="Capitalism" style="width:100%"> {% endblock %}
+{% endblock %}
