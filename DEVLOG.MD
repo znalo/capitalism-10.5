@@ -190,3 +190,9 @@ Switch to W3 - much simpler
 
 ## Commit switch to W3 before ditching bootstrap
 
+Tidy up the css and js fetching
+Finally created a navbar that sticks and allows dropdowns
+Image for the landing page and experimented (unsuccessfully) to make it a background image with lower opacity (so table headers are visible)
+
+## Commit navbar with dropdowns working; tidied up script and css loading
+

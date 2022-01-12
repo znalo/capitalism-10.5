@@ -10,7 +10,6 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="stylesheet" href="//cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <script src="{% static 'scripts/static.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/static.css' %}">
     <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
 </head>
@@ -21,8 +20,8 @@
         {% block content %}{% endblock %}
     </div>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="//code.jquery.com/jquery-1.12.4.js"></script>
     <script src="//cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
 
     {% block extra_js %} {% endblock %}
 </body>

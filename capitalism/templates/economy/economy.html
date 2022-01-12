@@ -1,7 +1,7 @@
 {% extends "base.html" %} {% block content %} {% load app_filters %}
 <table id="industry" style="width:80%">
     <thead>
-        <tr>
+        <tr class="w3-text-black">
             <th colspan="2">Industry</th>
             {% for stock in industry_headers %}
             <th colspan=2>
@@ -11,7 +11,7 @@
             <th colspan=2>Other Assets</th>
             <th colspan=2>Output</th>
         </tr>
-        <tr>
+        <tr class="w3-text-black">
             <th class="p-0">Name</th>
             <th class="p-0">Product</th>
             {% for stock in industry_headers %}
@@ -52,7 +52,7 @@
 
 <table id="assets" class="table-sm cell-border" style="width:80%">
     <thead>
-        <tr>
+        <tr class="w3-text-black">
             <th>Industry</th>
             <th>Initial Capital</th>
             <th>Work in progress</th>
@@ -81,7 +81,7 @@
 
 <table id="social-class" class="table-sm cell-border" style="width:80%">
     <thead>
-        <tr>
+        <tr class="w3-text-black">
             <th>Social Class</th>
             <th>Population</th>
             <th>Labour Power</th>
@@ -111,12 +111,12 @@
 
 <table id="commodities" class="table-sm cell-border" style="width:80%">
     <thead>
-        <tr>
+        <tr class="w3-text-black">
             <th colspan=4>Basics</th>
             <th colspan=5>Values and Prices</th>
             <th colspan=3>Demand and Supply</th>
         </tr>
-        <tr>
+        <tr class="w3-text-black">
             <th>Commodity</th>
             <th>Usage</th>
             <th>Origin</th>
@@ -151,9 +151,9 @@
     </tbody>
 </table>
 
-<script src="//code.jquery.com/jquery-1.12.4.js"></script>
-<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
-<script src="//cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+
+{% endblock %} {% block extra_js %}
+
 <script>
     $(document).ready(function() {
         $('#industry').DataTable({
@@ -195,5 +195,4 @@
         });
     });
 </script>
-
 {% endblock %}
