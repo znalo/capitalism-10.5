@@ -1,174 +1,155 @@
 {% extends "base.html" %} {% block content %} {% load app_filters %}
-<div class="row">
-    <div class="col-sm-12">
-        <table id="industry" class="table-sm cell-border" style="width:100%">
-            <thead>
-                <tr>
-                    <th colspan="2">Industry</th>
-                    {% for stock in industry_headers %}
-                    <th colspan=2>
-                        {{ stock.commodity_FK.name}}
-                    </th>
-                    {% endfor %}
-                    <th colspan=2>Other Assets</th>
-                    <th colspan=2>Output</th>
-                </tr>
-                <tr>
-                    <th class="p-0">Name</th>
-                    <th class="p-0">Product</th>
-                    {% for stock in industry_headers %}
-                    <th>
-                        Stock
-                    </th>
-                    <th>
-                        Required
-                    </th>
-                    {% endfor %}
-                    <th>Sales Stocks</th>
-                    <th>Money Stocks</th>
-                    <th class="p-0">Scale</th>
-                    <th class="p-0">Growth Rate</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for industry in industries %}
-                <tr>
-                    <td>{{ industry.name }}</td>
-                    <td>{{ industry.commodity_FK.name }}</td>
-                    {% for stock in productive_stocks %} {% if stock.industry_FK.name == industry.name %}
-                    <td>
-                        {{ stock.size|has_changed:stock.old_size}}
-                    </td>
-                    <td>
-                        {{ stock.production_requirement}}
-                    </td>
-                    {% endif %} {% endfor %}
-                    <td> {{ industry.industrystock_set.all|sales_filter}} </td>
-                    <td> {{ industry.industrystock_set.all|money_filter }} </td>
-                    <td>{{ industry.output_scale }}</td>
-                    <td>{{ industry.output_growth_rate}} </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
+<table id="industry" style="width:80%">
+    <thead>
+        <tr>
+            <th colspan="2">Industry</th>
+            {% for stock in industry_headers %}
+            <th colspan=2>
+                {{ stock.commodity_FK.name}}
+            </th>
+            {% endfor %}
+            <th colspan=2>Other Assets</th>
+            <th colspan=2>Output</th>
+        </tr>
+        <tr>
+            <th class="p-0">Name</th>
+            <th class="p-0">Product</th>
+            {% for stock in industry_headers %}
+            <th>
+                Stock
+            </th>
+            <th>
+                Required
+            </th>
+            {% endfor %}
+            <th>Sales Stocks</th>
+            <th>Money Stocks</th>
+            <th class="p-0">Scale</th>
+            <th class="p-0">Growth Rate</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for industry in industries %}
+        <tr>
+            <td>{{ industry.name }}</td>
+            <td>{{ industry.commodity_FK.name }}</td>
+            {% for stock in productive_stocks %} {% if stock.industry_FK.name == industry.name %}
+            <td>
+                {{ stock.size|has_changed:stock.old_size}}
+            </td>
+            <td>
+                {{ stock.production_requirement}}
+            </td>
+            {% endif %} {% endfor %}
+            <td> {{ industry.industrystock_set.all|sales_filter}} </td>
+            <td> {{ industry.industrystock_set.all|money_filter }} </td>
+            <td>{{ industry.output_scale }}</td>
+            <td>{{ industry.output_growth_rate}} </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
-<div class="row">
-    <div class="col-sm-12">
-        <table id="assets" class="table-sm cell-border" style="width:100%">
-            <thead>
-                <tr>
-                    <th>Industry</th>
-                    <th>Initial Capital</th>
-                    <th>Work in progress</th>
-                    <th>Sales Stocks</th>
-                    <th>Money</th>
-                    <th>Current capital</th>
-                    <th>Profit</th>
-                    <th>Profit Rate</th>
-            </thead>
-            </tr>
-            <tbody>
-                {% for industry in industries %}
-                <tr>
-                    <td>{{industry.name}}</td>
-                    <td>${{industry.initial_capital|has_changed:industry.comparator_initial_capital}}</td>
-                    <td>${{industry.work_in_progress|has_changed:industry.comparator_work_in_progress}}</td>
-                    <td>${{ industry.industrystock_set.all|sales_filter }}</td>
-                    <td>${{ industry.industrystock_set.all|money_filter }}</td>
-                    <td>${{ industry.current_capital|has_changed:industry.comparator_current_capital }}</td>
-                    <td>${{ industry.profit|has_changed:industry.comparator_profit }}</td>
-                    <td>%{{ industry.profit_rate|has_changed:industry.comparator_profit_rate }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+<table id="assets" class="table-sm cell-border" style="width:80%">
+    <thead>
+        <tr>
+            <th>Industry</th>
+            <th>Initial Capital</th>
+            <th>Work in progress</th>
+            <th>Sales Stocks</th>
+            <th>Money</th>
+            <th>Current capital</th>
+            <th>Profit</th>
+            <th>Profit Rate</th>
+    </thead>
+    </tr>
+    <tbody>
+        {% for industry in industries %}
+        <tr>
+            <td>{{industry.name}}</td>
+            <td>${{industry.initial_capital|has_changed:industry.comparator_initial_capital}}</td>
+            <td>${{industry.work_in_progress|has_changed:industry.comparator_work_in_progress}}</td>
+            <td>${{ industry.industrystock_set.all|sales_filter }}</td>
+            <td>${{ industry.industrystock_set.all|money_filter }}</td>
+            <td>${{ industry.current_capital|has_changed:industry.comparator_current_capital }}</td>
+            <td>${{ industry.profit|has_changed:industry.comparator_profit }}</td>
+            <td>%{{ industry.profit_rate|has_changed:industry.comparator_profit_rate }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
-</div>
+<table id="social-class" class="table-sm cell-border" style="width:80%">
+    <thead>
+        <tr>
+            <th>Social Class</th>
+            <th>Population</th>
+            <th>Labour Power</th>
+            <th>Consumption Goods</th>
+            <th>Money</th>
+            <th>Consumption Ratio</th>
+            <th>Revenue</th>
+            <th>Assets</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for social_class in social_classes %}
+        <tr>
+            <td>{{social_class.name}}</td>
+            <td>{{social_class.population}}</td>
+            <td> {{ social_class.class_stock.all|sales_filter }}</td>
+            <td> {{ social_class.class_stock.all|consumption_filter }}</td>
+            <td> {{ social_class.class_stock.all|money_filter }}</td>
+            <td> {{social_class.consumption_ratio}}</td>
+            <td>{{social_class.revenue}}</td>
+            <td>{{social_class.assets}}</td>
 
-<div class="row">
-    <div class="col-sm-12">
-        <table id="social-class" class="table-sm cell-border" style="width:100%">
-            <thead>
-                <tr>
-                    <th>Social Class</th>
-                    <th>Population</th>
-                    <th>Labour Power</th>
-                    <th>Consumption Goods</th>
-                    <th>Money</th>
-                    <th>Consumption Ratio</th>
-                    <th>Revenue</th>
-                    <th>Assets</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for social_class in social_classes %}
-                <tr>
-                    <td>{{social_class.name}}</td>
-                    <td>{{social_class.population}}</td>
-                    <td> {{ social_class.class_stock.all|sales_filter }}</td>
-                    <td> {{ social_class.class_stock.all|consumption_filter }}</td>
-                    <td> {{ social_class.class_stock.all|money_filter }}</td>
-                    <td> {{social_class.consumption_ratio}}</td>
-                    <td>{{social_class.revenue}}</td>
-                    <td>{{social_class.assets}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-sm-12">
-        <table id="commodities" class="table-sm cell-border" style="width:100%">
-            <thead>
-                <tr>
-                    <th colspan=4>Basics</th>
-                    <th colspan=5>Values and Prices</th>
-                    <th colspan=3>Demand and Supply</th>
-                </tr>
-                <tr>
-                    <th>Commodity</th>
-                    <th>Usage</th>
-                    <th>Origin</th>
-                    <th>Turnover_time</th>
-                    <th>Unit value</th>
-                    <th>Unit price</th>
-                    <th>Quantity</th>
-                    <th>Total value</th>
-                    <th>Total price</th>
-                    <th>Demand</th>
-                    <th>Supply</th>
-                    <th>Allocation Ratio</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for commodity in commodities %}
-                <tr>
-                    <td>{{commodity.name }}</td>
-                    <td>{{commodity.usage }}</td>
-                    <td>{{commodity.origin}}</td>
-                    <td>{{commodity.turnover_time }}</td>
-                    <td>{{commodity.unit_value }}</td>
-                    <td>{{commodity.unit_price }}</td>
-                    <td>{{commodity.size }}</td>
-                    <td>{{commodity.total_value }}</td>
-                    <td>{{commodity.total_price }}</td>
-                    <td>{{commodity.demand|has_changed:commodity.comparator_demand }} </td>
-                    <td>{{commodity.supply|has_changed:commodity.comparator_supply }} </td>
-                    <td>{{commodity.allocation_ratio }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-
+<table id="commodities" class="table-sm cell-border" style="width:80%">
+    <thead>
+        <tr>
+            <th colspan=4>Basics</th>
+            <th colspan=5>Values and Prices</th>
+            <th colspan=3>Demand and Supply</th>
+        </tr>
+        <tr>
+            <th>Commodity</th>
+            <th>Usage</th>
+            <th>Origin</th>
+            <th>Turnover_time</th>
+            <th>Unit value</th>
+            <th>Unit price</th>
+            <th>Quantity</th>
+            <th>Total value</th>
+            <th>Total price</th>
+            <th>Demand</th>
+            <th>Supply</th>
+            <th>Allocation Ratio</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for commodity in commodities %}
+        <tr>
+            <td>{{commodity.name }}</td>
+            <td>{{commodity.usage }}</td>
+            <td>{{commodity.origin}}</td>
+            <td>{{commodity.turnover_time }}</td>
+            <td>{{commodity.unit_value }}</td>
+            <td>{{commodity.unit_price }}</td>
+            <td>{{commodity.size }}</td>
+            <td>{{commodity.total_value }}</td>
+            <td>{{commodity.total_price }}</td>
+            <td>{{commodity.demand|has_changed:commodity.comparator_demand }} </td>
+            <td>{{commodity.supply|has_changed:commodity.comparator_supply }} </td>
+            <td>{{commodity.allocation_ratio }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 <script src="//code.jquery.com/jquery-1.12.4.js"></script>
 <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
