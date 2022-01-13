@@ -1,5 +1,5 @@
 {% extends "base.html" %} {% block content %} {% load app_filters %}
-<table id="industry" style="width:80%">
+<table id="industry" class="display compact cell-border" style="width:80%">
     <thead>
         <tr class="w3-text-black">
             <th colspan="2">Industry</th>
@@ -34,23 +34,23 @@
             <td>{{ industry.name }}</td>
             <td>{{ industry.commodity_FK.name }}</td>
             {% for stock in productive_stocks %} {% if stock.industry_FK.name == industry.name %}
-            <td>
+            <td class='dt-body-right'>
                 {{ stock.size|has_changed:stock.old_size}}
             </td>
-            <td>
+            <td class='dt-body-right'>
                 {{ stock.production_requirement}}
             </td>
             {% endif %} {% endfor %}
-            <td> {{ industry.industrystock_set.all|sales_filter}} </td>
-            <td> {{ industry.industrystock_set.all|money_filter }} </td>
-            <td>{{ industry.output_scale }}</td>
-            <td>{{ industry.output_growth_rate}} </td>
+            <td class='dt-body-right'> {{ industry.industrystock_set.all|sales_filter}} </td>
+            <td class='dt-body-right'> {{ industry.industrystock_set.all|money_filter }} </td>
+            <td class='dt-body-right'> {{ industry.output_scale }}</td>
+            <td class='dt-body-right'> {{ industry.output_growth_rate}} </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
-<table id="assets" class="table-sm cell-border" style="width:80%">
+<table id="assets" class="display compact cell-border" style="width:80%">
     <thead>
         <tr class="w3-text-black">
             <th>Industry</th>
@@ -67,19 +67,19 @@
         {% for industry in industries %}
         <tr>
             <td>{{industry.name}}</td>
-            <td>${{industry.initial_capital|has_changed:industry.comparator_initial_capital}}</td>
-            <td>${{industry.work_in_progress|has_changed:industry.comparator_work_in_progress}}</td>
-            <td>${{ industry.industrystock_set.all|sales_filter }}</td>
-            <td>${{ industry.industrystock_set.all|money_filter }}</td>
-            <td>${{ industry.current_capital|has_changed:industry.comparator_current_capital }}</td>
-            <td>${{ industry.profit|has_changed:industry.comparator_profit }}</td>
-            <td>%{{ industry.profit_rate|has_changed:industry.comparator_profit_rate }}</td>
+            <td class='dt-body-right'>${{industry.initial_capital|has_changed:industry.comparator_initial_capital}}</td>
+            <td class='dt-body-right'>${{industry.work_in_progress|has_changed:industry.comparator_work_in_progress}}</td>
+            <td class='dt-body-right'>${{ industry.industrystock_set.all|sales_filter }}</td>
+            <td class='dt-body-right'>${{ industry.industrystock_set.all|money_filter }}</td>
+            <td class='dt-body-right'>${{ industry.current_capital|has_changed:industry.comparator_current_capital }}</td>
+            <td class='dt-body-right'>${{ industry.profit|has_changed:industry.comparator_profit }}</td>
+            <td class='dt-body-right'>%{{ industry.profit_rate|has_changed:industry.comparator_profit_rate }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
-<table id="social-class" class="table-sm cell-border" style="width:80%">
+<table id="social-class" class="display compact cell-border" style="width:80%">
     <thead>
         <tr class="w3-text-black">
             <th>Social Class</th>
@@ -97,19 +97,19 @@
         <tr>
             <td>{{social_class.name}}</td>
             <td>{{social_class.population}}</td>
-            <td> {{ social_class.class_stock.all|sales_filter }}</td>
-            <td> {{ social_class.class_stock.all|consumption_filter }}</td>
-            <td> {{ social_class.class_stock.all|money_filter }}</td>
-            <td> {{social_class.consumption_ratio}}</td>
-            <td>{{social_class.revenue}}</td>
-            <td>{{social_class.assets}}</td>
+            <td class='dt-body-right'> {{ social_class.class_stock.all|sales_filter }}</td>
+            <td class='dt-body-right'> {{ social_class.class_stock.all|consumption_filter }}</td>
+            <td class='dt-body-right'> {{ social_class.class_stock.all|money_filter }}</td>
+            <td class='dt-body-right'> {{social_class.consumption_ratio}}</td>
+            <td class='dt-body-right'>{{social_class.revenue}}</td>
+            <td class='dt-body-right'>{{social_class.assets}}</td>
 
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
-<table id="commodities" class="table-sm cell-border" style="width:80%">
+<table id="commodities" class="display compact cell-border" style="width:80%">
     <thead>
         <tr class="w3-text-black">
             <th colspan=4>Basics</th>
@@ -137,15 +137,15 @@
             <td>{{commodity.name }}</td>
             <td>{{commodity.usage }}</td>
             <td>{{commodity.origin}}</td>
-            <td>{{commodity.turnover_time }}</td>
-            <td>{{commodity.unit_value }}</td>
-            <td>{{commodity.unit_price }}</td>
-            <td>{{commodity.size }}</td>
-            <td>{{commodity.total_value }}</td>
-            <td>{{commodity.total_price }}</td>
-            <td>{{commodity.demand|has_changed:commodity.comparator_demand }} </td>
-            <td>{{commodity.supply|has_changed:commodity.comparator_supply }} </td>
-            <td>{{commodity.allocation_ratio }}</td>
+            <td class='dt-body-right'>{{commodity.turnover_time }}</td>
+            <td class='dt-body-right'>{{commodity.unit_value }}</td>
+            <td class='dt-body-right'>{{commodity.unit_price }}</td>
+            <td class='dt-body-right'>{{commodity.size }}</td>
+            <td class='dt-body-right'>{{commodity.total_value }}</td>
+            <td class='dt-body-right'>{{commodity.total_price }}</td>
+            <td class='dt-body-right'>{{commodity.demand|has_changed:commodity.comparator_demand }} </td>
+            <td class='dt-body-right'>{{commodity.supply|has_changed:commodity.comparator_supply }} </td>
+            <td class='dt-body-right'>{{commodity.allocation_ratio }}</td>
         </tr>
         {% endfor %}
     </tbody>
@@ -161,6 +161,7 @@
             "searching": false,
             "info": false
         });
+
     });
 </script>
 

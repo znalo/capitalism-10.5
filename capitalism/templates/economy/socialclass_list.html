@@ -1,6 +1,6 @@
 {% extends "base.html" %} {% block content %} {% load app_filters %}
-
-<table id="stocks" style="width:80%">
+<h3 class="w3-center">Social Classes</h3>
+<table id="stocks" class="display compact" style="width:80%">
     <thead>
         <tr>
             <th>Time Stamp</th>
@@ -19,7 +19,7 @@
     <tbody>
         {% for record in time_stamped_social_class_list %}
         <tr>
-            <td> {{ record.time_stamp_FK }}</td>
+            <td> {{ record.time_stamp_FK.time_stamp }}</td>
             <td> {{ record.name }}</td>
             <td> {{ record.population }}</td>
             <td> {{ record.commodity_FK.name }}</td>
@@ -38,12 +38,12 @@
 
 <script src="//code.jquery.com/jquery-1.12.4.js"></script>
 <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
-<script src="//cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
 <script>
     $(document).ready(function() {
         $('#stocks').DataTable({
             "paging": false,
-            "info": false
+            "info": false,
+            "searching": false
         });
     });
 </script>

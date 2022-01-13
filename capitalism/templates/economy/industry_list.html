@@ -1,6 +1,6 @@
 {% extends "base.html" %} {% block content %} {% load app_filters %}
-
-<table id="industry" style="width:80%">
+<h3 class="w3-center">Industries</h3>
+<table id="industry" class="display compact" style="width:80%">
     <thead>
         <tr>
             <th>Time Stamp</th>
@@ -14,7 +14,7 @@
     <tbody>
         {% for record in time_stamped_industry_list %}
         <tr>
-            <td> {{ record.time_stamp_FK }}</td>
+            <td> {{ record.time_stamp_FK.time_stamp }}</td>
             <td> {{ record.name }}</td>
             <td> {{ record.industrystock_set.all|sales_filter }} </td>
             <td> {{ record.industrystock_set.all|money_filter }} </td>
@@ -28,7 +28,6 @@
 
 <script src="//code.jquery.com/jquery-1.12.4.js"></script>
 <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
-<script src="//cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
 <script>
     $(document).ready(function() {
         $('#industry').DataTable({

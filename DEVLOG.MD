@@ -206,3 +206,8 @@ Investment stage code complete and the simulation now goes right round the circu
 
 ## Commit investment step complete but needs to be debugged
 
+Some more styling for the tables.
+Comparator is wrong because instead of comparing with the previous superstate, it compares with the previous substate
+TODO fix up the whole comparator thing.
+
+## Commit table styling

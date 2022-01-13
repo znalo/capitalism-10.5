@@ -1,6 +1,7 @@
 {% extends "base.html" %} {% block content %} {% load app_filters %}
+<h3 class="w3-center">Stocks owned by industries</h3>
 
-<table id="stocks" style="width:80%">
+<table id="stocks" class="display compact" style="width:80%">
     <thead>
         <tr>
             <th>ID</th>
@@ -12,14 +13,13 @@
             <th>Old Size</th>
             <th>Production Requirement</th>
             <th>Demand</th>
-            <th>Owner</th>
         </tr>
     </thead>
     <tbody>
         {% for stock in stock_list %}
         <tr>
             <td> {{ stock.id }} </td>
-            <td> {{ stock.time_stamp_FK }}</td>
+            <td> {{ stock.time_stamp_FK.time_stamp }}</td>
             <td> {{ stock.industry_FK.name}} </td>
             <td> {{ stock.commodity_FK.name }}</td>
             <td> {{ stock.usage_type }}</td>
@@ -27,8 +27,6 @@
             <td> {{ stock.old_size}}</td>
             <td> {{ stock.production_requirement }}</td>
             <td> {{ stock.demand }}</td>
-            <td> {{ stock.owner }}</td>
-
         </tr>
         {% endfor %}
     </tbody>
@@ -38,12 +36,12 @@
 
 <script src="//code.jquery.com/jquery-1.12.4.js"></script>
 <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
-<script src="//cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
 <script>
     $(document).ready(function() {
         $('#stocks').DataTable({
             "paging": false,
-            "info": false
+            "info": false,
+            "searching": false
         });
     });
 </script>
