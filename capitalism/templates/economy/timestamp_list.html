@@ -5,7 +5,6 @@
         <tr>
             <th>Project</th>
             <th>Time Stamp</th>
-            <th>Description</th>
             <th>Period</th>
             <th>ID</th>
             <th>Super State</th>
@@ -16,17 +15,14 @@
             <th>Labour Supply Response</th>
             <th>Price Response</th>
             <th>MELT Response</th>
-            <th>Currency Symbol</th>
-            <th>Quantity Symbol</th>
-            <th>Owner</th>
+            <th>Symbols</th>
         </tr>
     </thead>
     <tbody>
         {% for ts in timestamp_list %}
         <tr>
             <td>{{ ts.project_FK.id }} ({{ts.project_FK.description}}} </td>
-            <td>{{ ts.time_stamp}} </td>
-            <td>{{ ts.description}} </td>
+            <td>{{ ts.time_stamp}} ({{ ts.description}}) </td>
             <td>{{ ts.period}} </td>
             <td>{{ ts.id }}</td>
             <td>{{ ts.super_state}} </td>
@@ -37,23 +33,45 @@
             <td>{{ ts.labour_supply_response}} </td>
             <td>{{ ts.price_response_type}} </td>
             <td>{{ ts.melt_response_type}} </td>
-            <td>{{ ts.currency_symbol}} </td>
-            <td>{{ ts.quantity_symbol}} </td>
-            <td>{{ ts.owner }} </td>
+            <td>{{ ts.quantity_symbol}} {{ ts.currency_symbol}} </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
-
-<script src="//code.jquery.com/jquery-1.12.4.js"></script>
-<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+{% endblock %} {% block extra_js %}
 <script>
     $(document).ready(function() {
         $('#timestamps').DataTable({
+            "columns": [{
+                "width": "10%"
+            }, {
+                "width": "10%"
+            }, {
+                "width": "3%"
+            }, {
+                "width": "3%"
+            }, {
+                "width": "3%"
+            }, {
+                "width": "3%"
+            }, {
+                "width": "10%"
+            }, {
+                "width": "4%"
+            }, {
+                "width": "4%"
+            }, {
+                "width": "10%"
+            }, {
+                "width": "10%"
+            }, {
+                "width": "10%"
+            }, {
+                "width": "10%"
+            }, ],
             "info": false
         });
     });
 </script>
-
 {% endblock %}

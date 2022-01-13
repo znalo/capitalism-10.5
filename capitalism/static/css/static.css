@@ -4,7 +4,7 @@ body {
     height: 500px;
     /* You must set a specified height */
     background-position: center;
-    /* Center the image */
+    /* Center the image [not here at present till I figure out how to make it opaque */
     background-repeat: no-repeat;
     /* Do not repeat the image */
     background-size: cover;

@@ -211,3 +211,7 @@ Comparator is wrong because instead of comparing with the previous superstate, i
 TODO fix up the whole comparator thing.
 
 ## Commit table styling
+
+Added sidebar and moved some menu items into it, to make space for the comparator table
+
+## Commit sidebar added, some script rationalisation

@@ -1,5 +1,4 @@
-{% load static %}
-
+{% load static %} {% load control_tags %} {% load app_filters %}
 <!doctype html>
 <html lang="en">
 
@@ -15,10 +14,49 @@
 </head>
 
 <body>
-    {% include 'partials/navbar.html' %}
-    <div class="w3-container w3-padding-48" style="font-size: .6em;">
-        {% block content %}{% endblock %}
+    <div class="w3-top">
+        <div class="w3-bar w3-light-grey">
+            <div class="w3-right">
+                {% project_list %} {% control_states %}
+                <a href="{% url 'mode' %}" class="w3-button w3-small w3-round" role="button">{% logging_mode %}</a>
+                <div class="w3-dropdown-hover">
+                    <button class="w3-button w3-small">Tables</button>
+                    <div class="w3-dropdown-content w3-bar-block w3-card-4">
+                        <a class="w3-bar-item w3-button w3-small  " href="{% url 'commodities' %}">Commodities</a>
+                        <a class="w3-bar-item w3-button w3-small " href="{% url 'industry-stocks' %}">Industry
+                            Stocks</a>
+                        <a class="w3-bar-item w3-button w3-small " href="{% url 'social-stocks' %} ">Social Stocks
+                        </a>
+                        <a class="w3-bar-item w3-button w3-small " href="{% url 'all-stocks' %}" role="button">All
+                            Stocks</a>
+                        <a class="w3-bar-item w3-button w3-small " href="{% url 'social-classes' %}" role="button">Social
+                            Classes</a>
+                        <a class="w3-bar-item w3-button w3-small " href="{% url 'industries' %}" role="button">Industries</a>
+                        <a class="w3-bar-item w3-button w3-small " href="{% url 'all-owners' %}" role="button">All
+                            Owners</a>
+                        <a class="w3-bar-item w3-button w3-small " href="{% url 'time-stamps' %}" role="button">Time
+                            Stamps</a>
+                        <a class="w3-bar-item w3-button w3-small " href="{% url 'sandbox' %}" role="button">Sandbox</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+    <!-- Sidebar -->
+    <div class="w3-sidebar w3-light-grey w3-bar-block" style="width:25%">
+        <a href="{% url 'landing-page' %}" class="w3-bar-item w3-button w3-small w3-round" role="button">Home</a>
+        <a href="{% url 'log' %}" class="w3-bar-item w3-button w3-small w3-round" role="button">Log</a>
+        <a href="{% url 'admin:index' %}" class="w3-bar-item w3-button w3-small w3-round" role="button">Admin</a>
+        <a href="{% url 'initialize' %}" class="w3-bar-item w3-button w3-small w3-round" role="button" method="get">Initialize</a>
+        <a href="{% url 'economy' %}" class="w3-bar-item w3-button w3-small w3-round" role="button">Economy</a>
+    </div>
+    <!-- navbar -->
+    <div style="margin-left:25%">
+        <div class="w3-container w3-padding-24" style="font-size: .6em;">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <script src="//code.jquery.com/jquery-1.12.4.js"></script>
     <script src="//cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
