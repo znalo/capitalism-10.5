@@ -1,32 +1,31 @@
 {% extends "base.html" %} {% block content %}
 
-<table id="stocks" style="width:80%">
+<table id="stocks" class="display compact" style="width:80%">
     <thead>
         <tr>
             <th>ID</th>
+            <th>Project</th>
             <th>Time Stamp</th>
             <th>Commodity</th>
             <th>Stock Type</th>
             <th>Stock Owner</th>
-            <th>Stock Owner FK</th>
             <th>Size</th>
             <th>Last Size</th>
             <th>Value</th>
             <th>Price</th>
             <th>Demand</th>
             <th>Supply</th>
-            <th>Owner</th>
         </tr>
     </thead>
     <tbody>
         {% for stock in stock_list %}
         <tr>
             <td> {{ stock.id }} </td>
-            <td> {{ stock.time_stamp_FK }}</td>
+            <td> {{ stock.time_stamp_FK.project_FK.number }}</td>
+            <td> {{ stock.time_stamp_FK.time_stamp }}</td>
             <td> {{ stock.commodity_FK.name }}</td>
             <td> {{ stock.usage_type }}</td>
             <td> {{ stock.stock_owner_name }}</td>
-            <td> {{ stock.stock_owner_FK.name }}</td>
             <td>
                 {{ stock.size }}
             </td>
@@ -35,7 +34,6 @@
             <td> {{ stock.price}}</td>
             <td> {{ stock.demand }}</td>
             <td> {{ stock.supply }}</td>
-            <td> {{ stock.owner }}</td>
 
         </tr>
         {% endfor %}
@@ -44,12 +42,12 @@
 
 <script src="//code.jquery.com/jquery-1.12.4.js"></script>
 <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
-<script src="//cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
 <script>
     $(document).ready(function() {
         $('#stocks').DataTable({
             "paging": false,
-            "info": false
+            "info": false,
+            "searching": false
         });
     });
 </script>

@@ -1,7 +1,7 @@
-from ..models.states import State, Log
-from ..models.commodity import Commodity
-from ..models.owners import Industry, SocialClass, StockOwner
-from ..models.stocks import Stock, IndustryStock, SocialStock
+from economy.models.states import State, Log
+from economy.models.commodity import Commodity
+from economy.models.owners import Industry, SocialClass, StockOwner
+from economy.models.stocks import Stock, IndustryStock, SocialStock
 from django.http import HttpResponse
 from django.template import loader
 from capitalism.global_constants import *
@@ -23,6 +23,8 @@ def calculate_demand():
     for stock in productive_stocks:
         turnover_time = stock.commodity_FK.turnover_time
         stock.demand = stock.production_requirement*turnover_time
+        stock.demand -= stock.size #! We only want to bring the stock size up to what is needed to produce at the current scale
+        stock.monetary_demand=stock.demand*commodity.unit_price
         stock.save()
         commodity = stock.commodity_FK
         commodity.demand += stock.demand
@@ -33,7 +35,9 @@ def calculate_demand():
         social_class = stock.social_class_FK
         stock.consumption_requirement = social_class.population*social_class.consumption_ratio
         stock.demand = stock.consumption_requirement
+        stock.demand -= stock.size #! We only want to bring the stock size up to what is needed to produce at the current scale
         commodity = stock.commodity_FK
+        stock.monetary_demand=stock.demand*commodity.unit_price
         stock.save()
         commodity.demand += stock.demand
         Log.enter(2,f"{Log.sim_object(stock.social_class_FK.name)}'s  demand for {Log.sim_object(stock.commodity_FK.name)} is increased by {Log.sim_quantity(stock.demand)} and is now {Log.sim_quantity(commodity.demand)}")
@@ -109,11 +113,13 @@ def sale(seller_stock, buyer_stock, seller, buyer):
         seller_money_stock.size+=cost
         seller_money_stock.save()
     Log.enter(1,f"After trade, the seller now has ${Log.sim_quantity(seller_money_stock.size)} and the buyer ${Log.sim_quantity(buyer_money_stock.size)}")
-#! helper function to set the total value and price of all stocks and commodities from their sizes
+
+#! Set the total value and price of all stocks and commodities from their sizes
 #! and to set the initial capital of each industry.
 #! rather than trying to keep track on the fly.
 #! SEE ALSO the documentation for trade(), produce() and reproduce()
 #TODO ideally we should do both, as a check.
+
 def set_total_value_and_price():
     Log.enter(1,"Calculate Total Values, Prices and initial capital")
     current_time_stamp = State.current_stamp()

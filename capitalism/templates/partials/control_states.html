@@ -1,7 +1,7 @@
 {% load app_filters %} {% load control_tags %}
 
 <div class="w3-dropdown-hover">
-    <button class="w3-button w3-small">Simulation</button>
+    <button title="Step through one stage of the circuit" class="w3-button w3-small">Simulation</button>
     <div class="w3-dropdown-content w3-bar-block w3-card-4">
         {% for key, value in superstates.items %} {% if key == active_superstate %}
         <a href="/super/{{ key }}" class="w3-bar-item w3-button w3-small w3-blue" method="get">{{ value }} </a> {% else %}
@@ -9,4 +9,4 @@
         {% endif %} {% endfor %}
     </div>
 </div>
-<a href="/sub/{% current_substate %}" class="w3-button w3-small" method="get">Step({% current_substate %})</a>
+<a href="/sub/{% current_substate %}" title="Step through a micro-calculation of the current stage of the circuit" class="w3-button w3-small" method="get">Step({% current_substate %})</a>

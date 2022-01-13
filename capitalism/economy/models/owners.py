@@ -59,17 +59,22 @@ class Industry(StockOwner):
     profit=models.FloatField(default=0)
     profit_rate =models.FloatField(default=0)
 
-    class Meta:
-        verbose_name = 'Industry'
-        verbose_name_plural = 'Industries'
-
-    def time_stamped_queryset():
-        qs=Industry.objects.filter(time_stamp_FK=State.current_stamp())
-        return qs
+    @staticmethod
+    def current_queryset():
+        return Industry.objects.filter(time_stamp_FK=State.current_stamp())
 
     def productive_stocks(self):
-        qs=IndustryStock.objects.industrystock_set.filter(time_stamp_FK=State.current_stamp(),usage_type=PRODUCTION,industry_FK=self)
-        return qs
+        return IndustryStock.objects.industrystock_set.filter(time_stamp_FK=State.current_stamp(),usage_type=PRODUCTION,industry_FK=self)
+
+    #! calculate how much it will cost to purchase sufficient stocks for this industry to produce at its current scale
+    def replenishment_cost(self):
+        #! Requires that demand is correctly set - this must be provided for by the caller 
+        productive_stocks = IndustryStock.objects.filter(usage_type=PRODUCTION,time_stamp_FK=State.current_stamp(),stock_owner_FK=self)
+        cost=0
+        for stock in productive_stocks:
+            cost+=stock.monetary_demand
+            Log.enter(2,f"Industry {Log.sim_object(self.name)} will need ${Log.sim_quantity(cost)} to replenish its stock of {Log.sim_object(stock.commodity_name)}")
+        return cost
 
     def comparator(self):
         comparator_time_stamp=self.time_stamp_FK.comparator_time_stamp_FK
@@ -78,7 +83,7 @@ class Industry(StockOwner):
             time_stamp_FK=comparator_time_stamp,
             name=self.name
             )
-        if comparator.count()>1:
+        if comparator.count()>1: #! primitive error-checking (there should be only and exactly one comparator) TODO more sophisticated error trapping
             return self
         elif comparator.count()<1:
             return None
@@ -103,9 +108,7 @@ class Industry(StockOwner):
 
     @property
     def comparator_profit_rate(self):
-        profit_rate=self.comparator().profit_rate
-        return profit_rate
-
+        return self.comparator().profit_rate
 
     def __str__(self):
         return f"[Project {self.time_stamp_FK.project_FK.number}] {self.name}"

@@ -5,16 +5,17 @@ from capitalism.global_constants import *
 
 class Stock(models.Model): # Base class for IndustryStock and SocialStock
     time_stamp_FK = models.ForeignKey(TimeStamp, related_name="%(app_label)s_%(class)s_related", on_delete=models.CASCADE)
-    commodity_FK = models.ForeignKey(Commodity, verbose_name="Commodity", null=True, on_delete=models.CASCADE)
-    usage_type = models.CharField(verbose_name="Stock Type", choices=USAGE_CHOICES, max_length=50, default=UNDEFINED) #! Sales, productive, consumption, money, sales
+    commodity_FK = models.ForeignKey(Commodity,  null=True, on_delete=models.CASCADE)
+    usage_type = models.CharField( choices=USAGE_CHOICES, max_length=50, default=UNDEFINED) #! Sales, productive, consumption, money, sales
     owner_type = models.CharField(choices=STOCK_OWNER_TYPES, max_length=20,default=UNDEFINED)
-    size = models.FloatField(verbose_name="Size", default=0)
-    stock_owner_name = models.CharField(verbose_name="Owner Name",max_length=50, default=UNDEFINED)
+    size = models.FloatField( default=0)
+    stock_owner_name = models.CharField(max_length=50, default=UNDEFINED)
     stock_owner_FK=models.ForeignKey("StockOwner",on_delete=models.CASCADE,null=True)
-    value = models.FloatField(verbose_name="Value", default=0)
-    price = models.FloatField(verbose_name="Price", default=0)
-    demand=models.FloatField(verbose_name="Demand", default=0)
-    supply=models.FloatField(verbose_name="Supply", default=0)
+    value = models.FloatField( default=0)
+    price = models.FloatField( default=0)
+    demand=models.FloatField( default=0)
+    supply=models.FloatField( default=0)
+    monetary_demand=models.FloatField(default=0) #! Conveninence field - should normally be simply set to demand * commodity.unit_price
     owner = models.ForeignKey('auth.User', related_name='%(app_label)s_%(class)s_related', on_delete=models.CASCADE, default=1)
 
     def comparator_stock(self):
@@ -32,7 +33,10 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
             return None
         else:
             return comparator_stock.first()
-    
+    @property
+    def commodity_name(self):
+        return self.commodity_FK.name
+
     @property
     def old_size(self):
         if self.comparator_stock()==None:

@@ -202,3 +202,7 @@ Project selection seems to be working
 
 ## Commit landing page with logo well-positioned
 
+Investment stage code complete and the simulation now goes right round the circuit. But the money allocated seems to be wrong. To be debugged. But commit now because code is complete
+
+## Commit investment step complete but needs to be debugged
+

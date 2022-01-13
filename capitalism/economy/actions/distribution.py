@@ -1,5 +1,5 @@
 from ..models.states import State, Log
-from ..models.owners import Industry, SocialClass
+from ..models.owners import Industry, SocialClass, StockOwner
 from ..models.commodity import Commodity
 from ..actions.exchange import calculate_demand, calculate_supply, set_initial_capital
 from capitalism.global_constants import *
@@ -19,7 +19,7 @@ from capitalism.global_constants import *
 
 def revenue():
     Log.enter(0,"Calculate capitalist revenue and other property-based entitlements")
-    for industry in Industry.time_stamped_queryset():
+    for industry in Industry.current_queryset():
         Log.enter(2,f"Industry {Log.sim_object(industry.name)} has made a profit of {Log.sim_quantity(industry.profit)} which will be transferred to the capitalists")
         donor_money_stock=industry.money_stock
         recipient=SocialClass.capitalists()
@@ -33,34 +33,72 @@ def revenue():
 
 
 #! Here, the capitalists decide what to do with their money
-#! There is no special reason for them to invest in any particular industry just because it is there
-#! This takes place if either 
-# * they were simply capitalist planners, or
-# * barriers to entry force the capitalists to re-invest in the same industries
-#! but in general, they will pursue the greatest return on capital
-#! In a price-driven model, the money will therefore go to the industry that is making the greatest profit
-#! but if profit rates are equal, it will be distributed among the various industries proportinately
-#! In general of course there will be a distribution of a 'Marginal Efficiency of Capital' type
+#! There are two fundamentally different simulation scenarios which go to the heart of the divisions in economics
+#! that have been around since Say and Proudhon
 
-#! Curiously, this is may be the simplest to implement, certainly in a price-driven model.
-#! However, it would not guarantee the proportions of the industries so this has to be built in as an option, especially in the non-price-driven case
+#! Proudhon, Say, and all equilibrium theory simply assumes that the economy reproduces itself.
 
-#* The money should be doled out in some manner that reflects the relative size of the industries
-#* perhaps in proportion to the demand for their products? This would be the most obvious provision against some kind of catastrophic simulation-induced failure
+#! In this scenario, we simply take the given scales of production and consumption and perpetuate them.
+# It's not clear what happens if this is not possible, and this is (not unsurprisingly) the problem
+# that dogs all attempts to explore this scenario
 
-#! so
-#* calculate demand and supply again
-#* Allocate money in proportion to the demand for the various outputs
-#* Note that if supply is short in one branch, this method will gradually restore the supply
-#* and vice versa
+#! In the other scenario explored by Marx, Kalecki, etc, there is no assumption of self-reproduction
+#! Then there must be some mechanism or other that adjusts supply to demand, but over time
+#! This too may break down, but assuming the simulation is good, the breakdown (if it occurs) will reflect what happens in the real world.
 
-#! If the above reasoning is correct, then this allocation method is, in effect, the 'Schumpeterian self-restoration' assumption
-#! Of course, there is no reason to suppose the market would behave like this
-#! but that comes later, when we get to the price-driven scenario
+#! This second scenario, however, has two sub-categories.
+#! Generally, price-adjustment is supposed.
+
+#! The question is then whether there is some other possible adjustment process
+#! If so, this is what should be pursued by rational government insofar as this is confined to the satisfaction of need.
+
+#! In this simulation, we should allow for all three variants.
+
+#! We will leave price-adjustment until last. This is entirely for algorithmic reasons. It has no necessary logical foundation.
+#! In fact, we do it  only in order to illustrate the various self-reproducing systems that have been proposed, or logically exist.
+#! This has a purely educational function, and is not actually especially interesting.
+
+#! We therefore start by supposing that money is allocated to maintain the existing levels of production.
+
+#! We should not be overly concerned with a shortage of money, because we know that credit steps in and because monetary
+#! shortage is a relatively complex issue, to be addressed when we have a government and a banking sector.
+
+#! Therefore, the 'disparity' question is this: when production is maintained at existing levels, does
+#! this result in a disparity between supply and demand?
+
+#! The original simulation supposed that this will manifest itself in a disparity between *stocks* and *requirements*.
+#! ?is this algorithmically the same as a disparity between supply and demand?
+#! We'll treat it that way and see what happens (it's an interesting exercise)
+
+#! Note that our current crude allocation mechanism does provide some sort of provision for dealing with
+#! demand/supply mismatches, in that final demand will be reduced as a result, leaving space
+#! for production to increase. But we don't know how the simulation will actually proceed without, basically, doing it.
+
+#! So let's try that to start with.
+#! A more sophisticated approach would be monetary, basically to cut wages, which corresponds more closely
+#! to what actually happens.
+
+#! But reluctant to introduce monetary constraints as the primary mechanism, essentially because credit intervenes.
+
+#! We therefore start from simple 'replenishment', get that working for the principal use cases
+#! Then explore the effect of supply shortages using the simulation itself.
+
 
 def invest():
-    #TODO complete this
-    calculate_demand()
+    calculate_demand() #! this is required if we are to estimate correctly the replenishment cost
+    capitalists=SocialClass.capitalists()
+    for industry in Industry.current_queryset():
+        cost=industry.replenishment_cost()
+        Log.enter(1, f"{Log.sim_object(industry.name)} needs {Log.sim_quantity(cost)} to produce at its current scale of {Log.sim_quantity(industry.output_scale)}")
+        #! just give them the money
+        capitalists_money=capitalists.money_stock
+        industry_money=industry.money_stock
+        capitalists_money.size-=cost
+        industry_money.size+=cost
+    set_initial_capital() #! as soon as we are ready for the next circuit, we should reset the initial capital
+
+#! Not in current use, preserved here because we may want it.
+def effective_demand():
     total_monetarily_effective_demand=0
     for commodity in Commodity.time_stamped_queryset():
         commodity.monetarily_effective_demand=commodity.demand*commodity.unit_price
@@ -75,7 +113,3 @@ def invest():
             Log.enter(2,f"Investment proportion for {Log.sim_object(commodity.name)} is {Log.sim_quantity(commodity.investment_proportion)}")
             commodity.save()
 
-    #! TODO TODO TODO
-
-    set_initial_capital() #! as soon as we are ready for the next circuit, we should reset the initial capital
-     
