@@ -95,6 +95,8 @@ def invest():
         industry_money=industry.money_stock
         capitalists_money.size-=cost
         industry_money.size+=cost
+        industry_money.save()
+        capitalists_money.save()
     set_initial_capital() #! as soon as we are ready for the next circuit, we should reset the initial capital
 
 #! Not in current use, preserved here because we may want it.

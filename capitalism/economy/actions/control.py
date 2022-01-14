@@ -35,12 +35,18 @@ def substep_execute_without_display(act):
     Log.enter(1,f"Initiate action {act} in {current_time_stamp.substate_name}")
 
 def super_step_execute(request,act):
-    remember_where_we_parked=State.current_stamp().comparator_time_stamp_FK
+    remember_where_we_parked=State.current_stamp()
+    #! If we are at a superstate, execute all the substates within that superstate
+    #! If we are partway through a superstate, this same loop will excecute only the remaining substates in that superstate
+    #! TODO we should probably create an additional time stamp to record the entry into a new superstate.
+     #* This will improve the comparator functionality; the additional stamp will always show differences with the previous superstate
+     #* whilst its predecessor substate will always show differences with the previous substate
     while State.superstate()==act:
         substep_execute_without_display(State.substate())
-    #! If we are executing several substates, the comparator time stamp is at the place we started.
-    #! If we haven't executed any substates, this will be the previous superstate
-    #! If we are midway through a superstate, this will be the point in the previous superstate that we've reached so far.
+    #! set the comparator. At present (see TODO above) this will work as follows:
+     #* If we are executing several substates, the comparator time stamp is at the place we started.
+     #* If we haven't executed any substates, this will be the previous superstate
+     #* If we are midway through a superstate, this will be the point in the previous superstate that we've reached so far.
     State.set_current_comparator(remember_where_we_parked)
     return HttpResponseRedirect(reverse("economy"))
 

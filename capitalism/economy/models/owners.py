@@ -73,7 +73,8 @@ class Industry(StockOwner):
         cost=0
         for stock in productive_stocks:
             cost+=stock.monetary_demand
-            Log.enter(2,f"Industry {Log.sim_object(self.name)} will need ${Log.sim_quantity(cost)} to replenish its stock of {Log.sim_object(stock.commodity_name)}")
+            Log.enter(2,f"Industry {Log.sim_object(self.name)} will need ${Log.sim_quantity(stock.monetary_demand)} to replenish its stock of {Log.sim_object(stock.commodity_name)}")
+        Log.enter(2,f"The total money required by {Log.sim_object(self.name)} is {cost}")
         return cost
 
     def comparator(self):

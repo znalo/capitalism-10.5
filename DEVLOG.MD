@@ -225,3 +225,8 @@ Tighted up initialize to try and eliminate the occasional problem of corrupt sta
 Extracted 'initilize' as separate file, for ease of access
 
 ## Commit debug profile created; initialize abstracted as separate file
+
+Simulation now working almost correctly for project 1 (Capitalists seem to keep losing money, but this can be fixed)
+
+## Commir SR working for several periods almost correctly
+
