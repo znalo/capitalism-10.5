@@ -43,15 +43,15 @@
         </div>
     </div>
     <!-- Sidebar -->
-    <div class="w3-sidebar w3-light-grey w3-bar-block" style="width:25%">
-        <a href="{% url 'landing-page' %}" class="w3-bar-item w3-button w3-small w3-round" role="button">Home</a>
-        <a href="{% url 'log' %}" class="w3-bar-item w3-button w3-small w3-round" role="button">Log</a>
-        <a href="{% url 'admin:index' %}" class="w3-bar-item w3-button w3-small w3-round" role="button">Admin</a>
-        <a href="{% url 'initialize' %}" class="w3-bar-item w3-button w3-small w3-round" role="button" method="get">Initialize</a>
-        <a href="{% url 'economy' %}" class="w3-bar-item w3-button w3-small w3-round" role="button">Economy</a>
+    <div class="w3-sidebar w3-sand w3-bar-block " style="width:15%;margin-top:4px">
+        <a href="{% url 'landing-page' %}" class="w3-bar-item w3-button w3-small w3-round" style="padding-top:0px;padding-bottom: 2px" role="button">Home</a>
+        <a href="{% url 'log' %}" class="w3-bar-item w3-button w3-small w3-round" style="padding-top:0px;padding-bottom: 2px" role="button">Log</a>
+        <a href="{% url 'admin:index' %}" class="w3-bar-item w3-button w3-small w3-round" style="padding-top:0px;padding-bottom: 2px" role="button">Admin</a>
+        <a href="{% url 'initialize' %}" class="w3-bar-item w3-button w3-small w3-round" style="padding-top:0px;padding-bottom: 2px" role="button" method="get">Initialize</a>
+        <a href="{% url 'economy' %}" class="w3-bar-item w3-button w3-small w3-round" style="padding-top:0px" role="button">Economy</a> {% include "partials/sidebar_content.html" %}
     </div>
     <!-- navbar -->
-    <div style="margin-left:25%">
+    <div style="margin-left:15%">
         <div class="w3-container w3-padding-24" style="font-size: .6em;">
             {% block content %}{% endblock %}
         </div>

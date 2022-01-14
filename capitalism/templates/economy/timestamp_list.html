@@ -22,11 +22,11 @@
         {% for ts in timestamp_list %}
         <tr>
             <td>{{ ts.project_FK.id }} ({{ts.project_FK.description}}} </td>
-            <td>{{ ts.time_stamp}} ({{ ts.description}}) </td>
+            <td>{{ ts.time_stamp}} ({{ ts.substate}}) </td>
             <td>{{ ts.period}} </td>
             <td>{{ ts.id }}</td>
             <td>{{ ts.super_state}} </td>
-            <td>{{ ts.comparator_time_stamp_FK.id }}({{ ts.comparator_time_stamp_FK.description}}) </td>
+            <td>{{ ts.comparator_time_stamp_FK.id }}({{ ts.comparator_time_stamp_FK.substate}}) </td>
             <td>{{ ts.MELT}} </td>
             <td>{{ ts.population_growth_rate}} </td>
             <td>{{ ts.investment_ratio}} </td>
@@ -44,7 +44,7 @@
     $(document).ready(function() {
         $('#timestamps').DataTable({
             "columns": [{
-                "width": "10%"
+                "width": "20%"
             }, {
                 "width": "10%"
             }, {
@@ -52,23 +52,23 @@
             }, {
                 "width": "3%"
             }, {
+                "width": "10%"
+            }, {
+                "width": "3%"
+            }, {
+                "width": "7%"
+            }, {
                 "width": "3%"
             }, {
                 "width": "3%"
             }, {
                 "width": "10%"
             }, {
-                "width": "4%"
-            }, {
-                "width": "4%"
-            }, {
                 "width": "10%"
             }, {
-                "width": "10%"
+                "width": "9%"
             }, {
-                "width": "10%"
-            }, {
-                "width": "10%"
+                "width": "9%"
             }, ],
             "info": false
         });

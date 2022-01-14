@@ -40,7 +40,7 @@ def substep_execute_without_display(act):
     current_time_stamp=State.current_stamp()
     next_substate_name=SUBSTATES[act].next_substate_name
     current_time_stamp.substate_name=next_substate_name
-    current_time_stamp.description=next_substate_name 
+    current_time_stamp.substate=next_substate_name 
     current_time_stamp.save()
     Log.enter(1,f"Initiate action {act} in {current_time_stamp.substate_name}")
 
@@ -79,7 +79,8 @@ def initialize(request):
         time_stamp = TimeStamp(
             project_FK=Project.objects.get(number=row.project_FK),
             period=row.period,
-            description=row.description,
+            substate=row.description,
+            super_state=M_C, #! projects must start with this superstate
             melt=row.MELT,
             population_growth_rate=row.population_growth_rate,
             investment_ratio=row.investment_ratio,
@@ -90,7 +91,7 @@ def initialize(request):
             quantity_symbol=row.quantity_symbol
         )
         time_stamp.save()
-        time_stamp.comparator_time_stamp_FK=time_stamp #! no belly-button in first stamp
+        time_stamp.comparator_time_stamp_FK=time_stamp #! first stamp has no navel
         time_stamp.save()
         
     state = State(name="Initial", time_stamp_FK=TimeStamp.objects.get(
@@ -251,8 +252,11 @@ def select_project(request,id):
         new_project=Project.objects.get(number=id)
         print (f"found the project and it is {new_project.description}")
         new_time_stamp=TimeStamp.objects.filter(project_FK=new_project).last()
-        print (f"found the time stamp and it is {new_time_stamp.description}")
+        print (f"found the time stamp and it is {new_time_stamp.substate}")
         State.set_project(new_time_stamp)
     except:
         raise Exception ("Cannot find this project - this is a data error. Cannot continue")
+    return HttpResponseRedirect(reverse("economy"))
+
+def comparator_select(request,id):
     return HttpResponseRedirect(reverse("economy"))

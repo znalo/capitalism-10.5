@@ -214,4 +214,9 @@ TODO fix up the whole comparator thing.
 
 Added sidebar and moved some menu items into it, to make space for the comparator table
 
-## Commit sidebar added, some script rationalisation
+## Commit sidebar added, some script rationalisation 
+
+Created the stepping list but as yet haven't fixed the comparator
+
+## Commit step selector list created; does not yet change the comparator
+

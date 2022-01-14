@@ -50,7 +50,8 @@ class Project(models.Model):
 class TimeStamp(models.Model):
     project_FK = models.ForeignKey(Project, related_name='time_stamp', on_delete=models.CASCADE)
     time_stamp = models.IntegerField(default=1)
-    description = models.CharField(max_length=50, default=UNDEFINED)
+    substate = models.CharField(max_length=50, default=UNDEFINED)
+    super_state=models.CharField(max_length=50, default=UNDEFINED)
     period = models.IntegerField(default=1)
     comparator_time_stamp_FK = models.ForeignKey("TimeStamp", on_delete=models.DO_NOTHING, null=True)
     melt = models.CharField(max_length=50, default=UNDEFINED)
@@ -67,7 +68,7 @@ class TimeStamp(models.Model):
          ordering=['project_FK__number','time_stamp',]
 
     def __str__(self):
-        return f"[Time {self.time_stamp}(id:{self.id}) description: {self.description}] [Project {self.project_FK.number}] "
+        return f"[Time {self.time_stamp}(id:{self.id}) description: {self.substate}] [Project {self.project_FK.number}] "
 
 class State(models.Model):
     name = models.CharField(primary_key=True, default="Initial", max_length=50)
@@ -87,7 +88,7 @@ class State(models.Model):
 
     @staticmethod
     def substate():
-        return State.current_stamp().description
+        return State.current_stamp().substate
 
     @staticmethod
     def superstate():

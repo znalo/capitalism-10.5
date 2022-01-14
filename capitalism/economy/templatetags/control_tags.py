@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django import template
-from ..models.states import State, Log, Project
+from ..models.states import State, Log, Project, TimeStamp
 from capitalism.global_constants import *
 
 register = template.Library()
@@ -9,7 +9,7 @@ register = template.Library()
 def control_states():
       context={}
       try:
-            current_substate=State.current_stamp().description
+            current_substate=State.current_stamp().substate
             current_superstate=SUBSTATES[current_substate].superstate_name
       except: #! if anything goes wrong just start at the beginning...
             print("Corrupt initial state encountered {current_substate}; set to start at the beginning of a circuit")
@@ -43,4 +43,14 @@ def project_list():
       project_list=Project.objects.all()
       context={}
       context['projects']= project_list
+      return context
+
+@register.inclusion_tag('partials/step_list.html')
+def step_list():
+#! veddy tempry - in here will go step list so user can select the comparator
+      current_stamp=State.current_stamp()
+      current_project=current_stamp.project_FK
+      state_list=TimeStamp.objects.filter(project_FK=current_project)
+      context={}
+      context['states']= state_list
       return context
