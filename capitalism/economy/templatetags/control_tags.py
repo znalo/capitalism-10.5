@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django import template
-from ..models.states import State, Log, Project, TimeStamp
+from economy.models.states import State, Log, Project, TimeStamp
 from capitalism.global_constants import *
 
 register = template.Library()
@@ -12,7 +12,7 @@ def control_states():
             current_substate=State.current_stamp().substate
             current_superstate=SUBSTATES[current_substate].superstate_name
       except: #! if anything goes wrong just start at the beginning...
-            print("Corrupt initial state encountered {current_substate}; set to start at the beginning of a circuit")
+            print("Corrupt initial state {current_substate} encountered; set to start at the beginning of a circuit")
             current_substate=DEMAND
             current_superstate=M_C
       context['active_superstate']=current_superstate
@@ -22,9 +22,9 @@ def control_states():
 @register.inclusion_tag('partials/current_substate.html')
 def current_substate():
       try:
-            substate=State.current_stamp().description
+            substate=State.current_stamp().substate
       except:
-            substate="corrupted"
+            substate="unknown"
       context={}
       context['substate']=substate
       return context

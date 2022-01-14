@@ -18,12 +18,12 @@ class Log(models.Model):
         try:
             time_stamp=State.current_stamp()
             stamp_number=time_stamp.time_stamp #! TODO rename this field to avoid confusion
-            current_substate=time_stamp.description        
+            current_substate=time_stamp.substate        
             project_id=time_stamp.project_FK.number
         except:
             project_id = 1
             stamp_number=1
-            current_substate="corrupt" #! TODO figure out how to ensure the project doesn't start in a corrupt state (which happens because the State table doesn't contain anything)
+            current_substate="unknown" #! TODO figure out how to ensure the project doesn't start in a corrupt state (which happens because the State table doesn't contain anything)
         this_entry=Log(project_id=project_id,time_stamp_id=stamp_number,substate=current_substate,level=level,message=(message))
         this_entry.save()
 
@@ -105,10 +105,6 @@ class State(models.Model):
         except:
             raise Exception (f"Project or its time stamp either does not exist or is corrupt. This could be a data error, but it might be a programme error. Cannot continue, sorry")
 
-
-    def __str__(self):
-        return self.name
-
     @staticmethod
     def create_stamp():
         Log.enter(1, "MOVING ONE TIME STAMP FORWARD")
@@ -122,7 +118,6 @@ class State(models.Model):
         #! create a new timestamp object by saving with pk=None. Forces Django to create a new database object
         new_time_stamp.pk = None
         new_time_stamp.time_stamp += 1
-        # new_time_stamp.description = "Temporary"#! TODO this should be set to the current action
         remembered_time_stamp=TimeStamp.objects.get(id=remember_where_we_parked)
         new_time_stamp.save()
         new_time_stamp.comparator_time_stamp_FK=remembered_time_stamp
@@ -133,6 +128,14 @@ class State(models.Model):
         Log.debug_entry(
             2, f"Stepping from Old Time Stamp {new_time_stamp.comparator_time_stamp_FK.time_stamp} to New Time Stamp {new_time_stamp.time_stamp}")
         return new_time_stamp
+
+
+    #! Set the comparator of the current time stamp to a new comparator
+    @staticmethod
+    def set_current_comparator(comparator):
+        current_time_stamp = State.current_stamp()
+        current_time_stamp.comparator_time_stamp_FK=comparator
+        current_time_stamp.save()
 
     #! create a complete clone of each object and set it to point to the new time stamp
     #! when this is done, pass through the newly-created children linking them to their new parents
@@ -277,3 +280,7 @@ class State(models.Model):
         time_stamp=State.current_stamp() #! probably redundant - the time_stamp should be remembered in new_time_stamp
         time_stamp.save()
         #! The receiver will perform the action specified by substate
+
+    def __str__(self):
+        return self.name
+

@@ -5,6 +5,7 @@ from economy import views
 from economy.actions import control
 from django.urls import path, include
 from economy.actions.control import select_project
+from economy.actions.initialize import initialize
 
 router = routers.DefaultRouter()
 router.register(r'api-commodities', views.CommodityViewSet)
@@ -34,7 +35,7 @@ urlpatterns = [
     url('tables/all-stocks', views.AllStocksView.as_view(), name='all-stocks'),
 
     url('control/sandbox', views.sandbox, name='sandbox'),
-    url('control/initialize', control.initialize, name='initialize'),
+    url('control/initialize', initialize, name='initialize'),
     url(r'project/(?P<id>[\d-]+)', select_project, name='project-select'),
     url(r'super/(?P<act>[\w-]+)/$', control.super_step_execute, name='stage'),
     url(r'control/(?P<state>[\w-]+)/$', control.comparator_select, name='comparator-select'),

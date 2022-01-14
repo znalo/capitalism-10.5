@@ -1,9 +1,9 @@
 from capitalism.global_constants import *
-from .exchange import set_total_value_and_price, set_current_capital
-from ..models.states import State, Log
-from ..models.commodity import Commodity
-from ..models.owners import Industry, SocialClass
-from ..models.stocks import Stock, IndustryStock, SocialStock
+from economy.actions.exchange import set_total_value_and_price, set_current_capital
+from economy.models.states import State, Log
+from economy.models.commodity import Commodity
+from economy.models.owners import Industry, SocialClass
+from economy.models.stocks import Stock, IndustryStock, SocialStock
 
 #! Actions for the 'production' phase
 

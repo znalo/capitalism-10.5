@@ -2,6 +2,6 @@
     <button class="w3-button w3-small">Project</button>
     <div class="w3-dropdown-content w3-bar-block w3-card-4">
         {% for project in projects %}
-        <a href="/project/{{ project.number }}" class="w3-bar-item w3-button w3-small" method="post">{{ project.description }} </a> {% endfor %}
+        <a href="/project/{{ project.number }}" class="w3-bar-item w3-button w3-small">{{ project.description }} </a> {% endfor %}
     </div>
 </div>

@@ -220,3 +220,8 @@ Created the stepping list but as yet haven't fixed the comparator
 
 ## Commit step selector list created; does not yet change the comparator
 
+Created debug profile (which now works)
+Tighted up initialize to try and eliminate the occasional problem of corrupt start point
+Extracted 'initilize' as separate file, for ease of access
+
+## Commit debug profile created; initialize abstracted as separate file
