@@ -22,11 +22,11 @@
         {% for ts in timestamp_list %}
         <tr>
             <td>{{ ts.project_FK.id }} ({{ts.project_FK.description}}} </td>
-            <td>{{ ts.time_stamp}} ({{ ts.substate}}) </td>
+            <td>{{ ts.time_stamp}} ({{ ts.step}}) </td>
             <td>{{ ts.period}} </td>
             <td>{{ ts.id }}</td>
             <td>{{ ts.super_state}} </td>
-            <td>{{ ts.comparator_time_stamp_FK.id }}({{ ts.comparator_time_stamp_FK.substate}}) </td>
+            <td>{{ ts.comparator_time_stamp_FK.id }}({{ ts.comparator_time_stamp_FK.step}}) </td>
             <td>{{ ts.MELT}} </td>
             <td>{{ ts.population_growth_rate}} </td>
             <td>{{ ts.investment_ratio}} </td>

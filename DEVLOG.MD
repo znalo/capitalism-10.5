@@ -242,7 +242,10 @@ Fixed up so user can click on an item in history and return parameters giving th
 
 ## Commit clickable history created
 
-TODO We need to make the naming a bit clearer. Try to move towards 'state' and 'step'
+TODO We need to make the naming a bit clearer. Try to move towards this: a 'State' consists of a period, a 'stage' and a 'step'
 TODO The period needs to be included in the history
 TODO Maybe: do we need an extra time stamp for the start of a state?
 
+Renamed most references to 'substate' to 'step', and tested most functions
+ 
+## Commit: refactor to rename 'substate' to 'step'

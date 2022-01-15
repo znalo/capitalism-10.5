@@ -20,7 +20,7 @@
             <td>{{ log.level}} </td>
             <td>{{ log.time_stamp_id}} </td>
             <td>{{ log.project_id}} </td>
-            <td>{{ log.substate }}</td>
+            <td>{{ log.step }}</td>
             <td class="pl-{{log.level}}"><span class="log-level{{log.level}}">{{log.message|mark_as_safe }}</span> </td>
         </tr>
         {% endfor %}

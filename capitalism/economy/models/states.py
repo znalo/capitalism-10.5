@@ -6,7 +6,7 @@ from django.utils.html import escape
 
 class Log(models.Model):
     time_stamp_id=models.IntegerField(default=0, null=False)
-    substate=models.CharField(max_length=25,default=UNDEFINED)
+    step=models.CharField(max_length=25,default=UNDEFINED)
     project_id=models.IntegerField(default=0, null=False)
     level=models.IntegerField(default=0, null=False)
     message=models.CharField(max_length=250,null=False)
@@ -18,13 +18,13 @@ class Log(models.Model):
         try:
             time_stamp=State.current_stamp()
             stamp_number=time_stamp.time_stamp #! TODO rename this field to avoid confusion
-            current_substate=time_stamp.substate        
+            current_step=time_stamp.step        
             project_id=time_stamp.project_FK.number
         except:
             project_id = 1
             stamp_number=1
-            current_substate="unknown" #! TODO figure out how to ensure the project doesn't start in a corrupt state (which happens because the State table doesn't contain anything)
-        this_entry=Log(project_id=project_id,time_stamp_id=stamp_number,substate=current_substate,level=level,message=(message))
+            current_step="unknown" #! TODO figure out how to ensure the project doesn't start in a corrupt state (which happens because the State table doesn't contain anything)
+        this_entry=Log(project_id=project_id,time_stamp_id=stamp_number,step=current_step,level=level,message=(message))
         this_entry.save()
 
     def debug_entry(level,message):
@@ -50,7 +50,7 @@ class Project(models.Model):
 class TimeStamp(models.Model):
     project_FK = models.ForeignKey(Project, related_name='time_stamp', on_delete=models.CASCADE)
     time_stamp = models.IntegerField(default=1)
-    substate = models.CharField(max_length=50, default=UNDEFINED)
+    step = models.CharField(max_length=50, default=UNDEFINED)
     super_state=models.CharField(max_length=50, default=UNDEFINED)
     period = models.IntegerField(default=1)
     comparator_time_stamp_FK = models.ForeignKey("TimeStamp", on_delete=models.DO_NOTHING, null=True)
@@ -68,7 +68,7 @@ class TimeStamp(models.Model):
          ordering=['project_FK__number','time_stamp',]
 
     def __str__(self):
-        return f"[Time {self.time_stamp}(id:{self.id}) description: {self.substate}] [Project {self.project_FK.number}] "
+        return f"[Time {self.time_stamp}(id:{self.id}) description: {self.step}] [Project {self.project_FK.number}] "
 
 class State(models.Model):
     name = models.CharField(primary_key=True, default="Initial", max_length=50)
@@ -91,12 +91,13 @@ class State(models.Model):
         return State.current_state().time_stamp_FK.project_FK
 
     @staticmethod
-    def substate():
-        return State.current_stamp().substate
+    def step():
+        return State.current_stamp().step
 
     @staticmethod
     def superstate():
-        return SUBSTATES[State.substate()].superstate_name
+        print(State.step())
+        return STEPS[State.step()].stage_name
 
     #TODO the user should also be a selector for the state, since different users will have different states
     @staticmethod
@@ -129,8 +130,12 @@ class State(models.Model):
         #! reset the current state
         current_state.time_stamp_FK = new_time_stamp
         current_state.save()
+        old_number=new_time_stamp.comparator_time_stamp_FK.time_stamp
+        new_number=new_time_stamp.time_stamp
+        old_step=new_time_stamp.comparator_time_stamp_FK.step
+        new_step=new_time_stamp.step
         Log.debug_entry(
-            2, f"Stepping from Old Time Stamp {new_time_stamp.comparator_time_stamp_FK.time_stamp} to New Time Stamp {new_time_stamp.time_stamp}")
+            2, f"Stepping from Old Time Stamp {old_number} representing step {old_step} to New Time Stamp {new_number} representing step {new_step}")
         return new_time_stamp
 
 
@@ -160,7 +165,7 @@ class State(models.Model):
             industry.id = None
             industry.save()
             Log.debug_entry(
-                2, f"Created a new Industry record {Log.sim_object(industry.name)} with time stamp {industry.time_stamp_FK.time_stamp}")
+                2, f"Created a new Industry record {Log.sim_object(industry.name)} with time stamp {industry.time_stamp_FK.time_stamp} which will contain the results of action {industry.time_stamp_FK.step}")
 
         commodities = Commodity.objects.filter(time_stamp_FK=old_time_stamp)
         for commodity in commodities:
@@ -169,7 +174,7 @@ class State(models.Model):
             commodity.time_stamp_FK = new_time_stamp
             commodity.save()
             Log.debug_entry(
-                2, f"Created a new Commodity record {Log.sim_object(commodity.name)} with time stamp {commodity.time_stamp_FK.time_stamp}")
+                2, f"Created a new Commodity record {Log.sim_object(commodity.name)} with time stamp {commodity.time_stamp_FK.time_stamp} which will contain the results of action {commodity.time_stamp_FK.step}")
 
         social_classes = SocialClass.objects.filter(time_stamp_FK=old_time_stamp)
         for social_class in social_classes:
@@ -178,7 +183,7 @@ class State(models.Model):
             social_class.time_stamp_FK = new_time_stamp
             social_class.save()
             Log.debug_entry(
-                2, f"Created a new Social Class record {Log.sim_object(social_class.name)} with time stamp {social_class.time_stamp_FK.time_stamp}")
+                2, f"Created a new Social Class record {Log.sim_object(social_class.name)} with time stamp {social_class.time_stamp_FK.time_stamp} which will contain the results of action {social_class.time_stamp_FK.step}")
 
         social_stocks = SocialStock.objects.filter(time_stamp_FK=old_time_stamp)
         for social_stock in social_stocks:
@@ -187,7 +192,7 @@ class State(models.Model):
             social_stock.time_stamp_FK = new_time_stamp
             social_stock.save()
             Log.debug_entry(
-                2, f"Created a new Social Stock record of usage type {Log.sim_object(social_stock.usage_type)} for owner {Log.sim_object(social_stock.stock_owner_name)} with time stamp {social_stock.time_stamp_FK.time_stamp}")
+                2, f"Created a new Social Stock record of usage type {Log.sim_object(social_stock.usage_type)} for owner {Log.sim_object(social_stock.stock_owner_name)} with time stamp {social_stock.time_stamp_FK.time_stamp} which will contain the results of action {social_stock.time_stamp_FK.step}")
 
         industry_stocks = IndustryStock.objects.filter(
             time_stamp_FK=old_time_stamp)
@@ -197,7 +202,7 @@ class State(models.Model):
             industry_stock.time_stamp_FK = new_time_stamp
             industry_stock.save()
             Log.debug_entry(
-                2, f"Created a new Industry Stock record of usage type {Log.sim_object(industry_stock.usage_type)} for owner {Log.sim_object(industry_stock.stock_owner_name)} with time stamp {industry_stock.time_stamp_FK.time_stamp}")
+                2, f"Created a new Industry Stock record of usage type {Log.sim_object(industry_stock.usage_type)} for owner {Log.sim_object(industry_stock.stock_owner_name)} with time stamp {industry_stock.time_stamp_FK.time_stamp} which will contain the results of action {industry_stock.time_stamp_FK.step}")
         return
 
     #! this method works with create_stamp (and should perhaps be integrated into it)
@@ -269,13 +274,13 @@ class State(models.Model):
             new_social_class.save()
 
     #! Create a new state by moving forward one time stamp (see 'move_one_stamp')
-    #! States are divided into superstates and substates and this affects the logic
+    #! States are divided into superstates and steps and this affects the logic
     #! The user decides whether they wants to execute a single sub-step, or all the steps in a bunch
     #! We may arrive at this decision either 
-    #*  because we're only processing superstates (user not interested in the detail), or
-    #*  because user is halfway through a superstate and wants to skip to the next superstate
+    #*  because we're only processing stages (user not interested in the detail), or
+    #*  because user is halfway through a stage and wants to skip to the next stage
     @staticmethod
-    def substep():
+    def one_step():
         #! The State 'knows' the time_stamp 
         old_time_stamp = State.current_stamp()
         new_time_stamp = State.create_stamp()
@@ -283,7 +288,7 @@ class State(models.Model):
         State.connect_stamp(new_time_stamp)
         time_stamp=State.current_stamp() #! probably redundant - the time_stamp should be remembered in new_time_stamp
         time_stamp.save()
-        #! The receiver will perform the action specified by substate
+        #! The receiver will perform the action specified by step
 
     def __str__(self):
         return self.name

@@ -25,33 +25,34 @@ def sub_step_execute(request,act):
 
 def substep_execute_without_display(act):
     action=ACTION_LIST[act]
-    State.substep()#! creates new timestamp, ready for the action
+    State.one_step()#! creates new timestamp, ready for the action
     action()#! perform the action in the new timestamp
     current_time_stamp=State.current_stamp()
-    next_substate_name=SUBSTATES[act].next_substate_name
-    current_time_stamp.substate_name=next_substate_name
-    current_time_stamp.substate=next_substate_name 
+    next_step_name=STEPS[act].next_step_name
+    current_time_stamp.step_name=next_step_name
+    current_time_stamp.step=next_step_name 
     current_time_stamp.save()
-    Log.enter(1,f"Initiate action {act} in {current_time_stamp.substate_name} whose superstate is {current_time_stamp.super_state}")
+    Log.enter(1,f"Initiate action {act} in {current_time_stamp.step_name} whose superstate is {current_time_stamp.super_state}")
 
 def super_step_execute(request,act):
     remember_where_we_parked=State.current_stamp()
-    #! If we are at a superstate, execute all the substates within that superstate
-    #! If we are partway through a superstate, this same loop will excecute only the remaining substates in that superstate
+    #! If we are at a superstate, execute all the steps within that superstate
+    #! If we are partway through a superstate, this same loop will excecute only the remaining steps in that superstate
     #! TODO we should probably create an additional time stamp to record the entry into a new superstate.
      #* This will improve the comparator functionality; the additional stamp will always show differences with the previous superstate
-     #* whilst its predecessor substate will always show differences with the previous substate
+     #* whilst its predecessor step will always show differences with the previous step
     while State.superstate()==act:
-        substep_execute_without_display(State.substate())
+        Log.enter(0,f"PROCESSING STAGE {act}, PERFORMING STEP {State.step}")
+        substep_execute_without_display(State.step())
     where_we_are_in_the_mall=State.current_stamp()
-    #! We have executed all the substates of this superstate
+    #! We have executed all the steps of this superstate
     #! Now we have to record the change in superstate
     where_we_are_in_the_mall.super_state=State.superstate()
     where_we_are_in_the_mall.save()
 
     #! set the comparator. At present (see TODO above) this will work as follows:
-     #* If we are executing several substates, the comparator time stamp is at the place we started.
-     #* If we haven't executed any substates, this will be the previous superstate
+     #* If we are executing several steps, the comparator time stamp is at the place we started.
+     #* If we haven't executed any steps, this will be the previous superstate
      #* If we are midway through a superstate, this will be the point in the previous superstate that we've reached so far.
     State.set_current_comparator(remember_where_we_parked)
     return HttpResponseRedirect(reverse("economy"))
@@ -62,7 +63,7 @@ def select_project(request,id):
         new_project=Project.objects.get(number=id)
         print (f"found the project and it is {new_project.description}")
         new_time_stamp=TimeStamp.objects.filter(project_FK=new_project).last()
-        print (f"found the time stamp and it is {new_time_stamp.substate}")
+        print (f"found the time stamp and it is {new_time_stamp.step}")
         State.set_project(new_time_stamp)
     except:
         raise Exception ("Cannot find this project - this is a data error. Cannot continue")

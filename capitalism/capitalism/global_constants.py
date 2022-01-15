@@ -50,44 +50,28 @@ REPRODUCE = "reproduce"
 REVENUE="revenue"
 INVEST="invest"
 
-CONTROL_SUB_STATES = [
-    (DEMAND, "Demand"),
-    (ALLOCATE, "Allocate Supply"),
-    (TRADE, "Trade"),
-    (PRODUCE, "Produce"),
-    (PRICES, "Prices"),
-    (REPRODUCE, "Reproduce"),
-    (REVENUE, "Revenue"),
-    (INVEST, "Invest"),
-    (UNDEFINED, "###")
-]
-
-class SubState:
-    def __init__(self,name, superstate_name, next_substate_name):
+class Step:
+    def __init__(self, name, stage_name, next_step_name):
         self.name = name
-        self.superstate_name=superstate_name
-        self.next_substate_name=next_substate_name
+        self.stage_name=stage_name
+        self.next_step_name=next_step_name
 
 
-SUBSTATES={
-  "demand":SubState(name=DEMAND,superstate_name="M_C", next_substate_name=ALLOCATE),
-  "allocate":SubState(name=ALLOCATE,superstate_name="M_C", next_substate_name=TRADE),
-  "trade":SubState(name=TRADE,superstate_name="M_C",next_substate_name=PRODUCE),
-  "produce":SubState(name=PRODUCE,superstate_name="C_P", next_substate_name=PRICES),
-  "prices":SubState(name=PRICES,superstate_name="C_P", next_substate_name=REPRODUCE),
-  "reproduce":SubState(name=REPRODUCE,superstate_name="C_P", next_substate_name=REVENUE),
-  "revenue":SubState(name=REVENUE,superstate_name="C_M",next_substate_name=INVEST),
-  "invest":SubState(name=INVEST,superstate_name="C_M", next_substate_name=DEMAND),
-  "UNDEFINED":SubState(name=UNDEFINED,superstate_name="C_M", next_substate_name=UNDEFINED)
+STEPS={
+  "demand":Step(name=DEMAND,stage_name="M_C", next_step_name=ALLOCATE),
+  "allocate":Step(name=ALLOCATE,stage_name="M_C", next_step_name=TRADE),
+  "trade":Step(name=TRADE,stage_name="M_C",next_step_name=PRODUCE),
+  "produce":Step(name=PRODUCE,stage_name="C_P", next_step_name=PRICES),
+  "prices":Step(name=PRICES,stage_name="C_P", next_step_name=REPRODUCE),
+  "reproduce":Step(name=REPRODUCE,stage_name="C_P", next_step_name=REVENUE),
+  "revenue":Step(name=REVENUE,stage_name="C_M",next_step_name=INVEST),
+  "invest":Step(name=INVEST,stage_name="C_M", next_step_name=DEMAND),
+  "UNDEFINED":Step(name=UNDEFINED,stage_name="C_M", next_step_name=UNDEFINED)
 }
 
-SUPERSTATES={
+STAGES={
     "M_C":M_C,
     "C_P":C_P,
     "C_M":C_M
 }
-
-SUPERSTATE_NAMES=[ 
-    M_C,C_P,C_M
-]
 

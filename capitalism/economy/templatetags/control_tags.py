@@ -5,28 +5,28 @@ from capitalism.global_constants import *
 
 register = template.Library()
 
-@register.inclusion_tag('partials/control_states.html')
+@register.inclusion_tag('partials/stages.html')
 def control_states():
       context={}
       try:
-            current_substate=State.current_stamp().substate
-            current_superstate=SUBSTATES[current_substate].superstate_name
+            current_step=State.current_stamp().step
+            current_stage=STEPS[current_step].stage_name
       except: #! if anything goes wrong just start at the beginning...
-            print("Corrupt initial state {current_substate} encountered; set to start at the beginning of a circuit")
-            current_substate=DEMAND
-            current_superstate=M_C
-      context['active_superstate']=current_superstate
-      context['superstates']=SUPERSTATES
+            print("Corrupt initial state {current_step} encountered; set to start at the beginning of a circuit")
+            current_step=DEMAND
+            current_stage=M_C
+      context['active_stage']=current_stage
+      context['stages']=STAGES
       return context
 
-@register.inclusion_tag('partials/current_substate.html')
-def current_substate():
+@register.inclusion_tag('partials/current_step.html')
+def current_step():
       try:
-            substate=State.current_stamp().substate
+            step=State.current_stamp().step
       except:
-            substate="unknown"
+            step="unknown"
       context={}
-      context['substate']=substate
+      context['step']=step
       return context
 
 @register.inclusion_tag('partials/current_logging_mode.html')
