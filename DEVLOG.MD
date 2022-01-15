@@ -242,8 +242,8 @@ Fixed up so user can click on an item in history and return parameters giving th
 
 ## Commit clickable history created
 
-TODO We need to make the naming a bit clearer. Try to move towards this: a 'State' consists of a period, a 'stage' and a 'step'
-TODO The period needs to be included in the history
+TODO We need to make the naming a bit clearer. Try to move towards this: a 'State' consists of a period, a 'stage' and a 'step' DONE
+TODO The period needs to be included in the history DONE
 TODO Maybe: do we need an extra time stamp for the start of a state?
 
 Renamed most references to 'substate' to 'step', and tested most functions
@@ -260,3 +260,19 @@ Comparator select now seems to be working
 Fixtures file updated
 
 ## Commit: comparator select seems to be working
+
+TODO Outstanding, in priority order
+* Streamline the display of compared quantities. Is currently inconsistent.
+* extra time stamp for a superstate?
+* collapse functionality 
+* choice of displaying value, quantity, price
+* deploy?
+* impose some kind of monetary constraint DON'T DO THIS YET IF AT ALL
+
+Project 1 now working (at the end of a complete circuit, it is back to where it was)
+Minor problems:
+* demand and supply are not reset to their initial levels. This is not an error as such but could confuse the user
+* similarly initial and current capital.
+
+## Commit: project 1 working
+

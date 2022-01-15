@@ -1,9 +1,5 @@
 from django.db import models
-from django.db.models.base import Model
 from capitalism.global_constants import *
-from django.utils.safestring import mark_safe
-from django.utils.html import escape
-
 
 class Log(models.Model):
     time_stamp_id = models.IntegerField(default=0, null=False)
@@ -41,6 +37,8 @@ class Log(models.Model):
     @staticmethod
     def sim_quantity(value):
         return f"<span class = 'quantity-object'>{value}</span>"
+
+
 
 
 class Project(models.Model):

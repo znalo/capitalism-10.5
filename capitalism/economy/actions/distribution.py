@@ -93,8 +93,10 @@ def invest():
         #! just give them the money
         capitalists_money=capitalists.money_stock
         industry_money=industry.money_stock
-        capitalists_money.size-=cost
-        industry_money.size+=cost
+        transferred_amount=cost-industry_money.size
+        Log.enter(1, f"{Log.sim_object(industry.name)} already has {Log.sim_quantity(industry_money.size)} and will receive {Log.sim_quantity(transferred_amount)}")
+        capitalists_money.size-=transferred_amount
+        industry_money.size+=transferred_amount
         industry_money.save()
         capitalists_money.save()
     set_initial_capital() #! as soon as we are ready for the next circuit, we should reset the initial capital
