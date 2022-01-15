@@ -249,3 +249,10 @@ TODO Maybe: do we need an extra time stamp for the start of a state?
 Renamed most references to 'substate' to 'step', and tested most functions
  
 ## Commit: refactor to rename 'substate' to 'step'
+
+Renamed most references to 'superstate' to 'stage', and tested most functions
+Created new fixture 'fixtures_15.01.2022 and deleted all old fixtures.
+Did not move the new fixture into the fixtures folder yet
+
+## Commit: refactor to rename 'superstate' to 'stage'
+

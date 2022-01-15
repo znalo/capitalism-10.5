@@ -51,7 +51,7 @@ class TimeStamp(models.Model):
     project_FK = models.ForeignKey(Project, related_name='time_stamp', on_delete=models.CASCADE)
     time_stamp = models.IntegerField(default=1)
     step = models.CharField(max_length=50, default=UNDEFINED)
-    super_state=models.CharField(max_length=50, default=UNDEFINED)
+    stage=models.CharField(max_length=50, default=UNDEFINED)
     period = models.IntegerField(default=1)
     comparator_time_stamp_FK = models.ForeignKey("TimeStamp", on_delete=models.DO_NOTHING, null=True)
     melt = models.CharField(max_length=50, default=UNDEFINED)
@@ -95,8 +95,7 @@ class State(models.Model):
         return State.current_stamp().step
 
     @staticmethod
-    def superstate():
-        print(State.step())
+    def stage():
         return STEPS[State.step()].stage_name
 
     #TODO the user should also be a selector for the state, since different users will have different states

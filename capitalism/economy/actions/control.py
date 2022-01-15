@@ -32,28 +32,28 @@ def substep_execute_without_display(act):
     current_time_stamp.step_name=next_step_name
     current_time_stamp.step=next_step_name 
     current_time_stamp.save()
-    Log.enter(1,f"Initiate action {act} in {current_time_stamp.step_name} whose superstate is {current_time_stamp.super_state}")
+    Log.enter(1,f"Initiate action {act} in {current_time_stamp.step_name} whose stage is {current_time_stamp.stage}")
 
 def super_step_execute(request,act):
     remember_where_we_parked=State.current_stamp()
-    #! If we are at a superstate, execute all the steps within that superstate
-    #! If we are partway through a superstate, this same loop will excecute only the remaining steps in that superstate
-    #! TODO we should probably create an additional time stamp to record the entry into a new superstate.
-     #* This will improve the comparator functionality; the additional stamp will always show differences with the previous superstate
+    #! If we are at the start of a stage, execute all the steps within that stage
+    #! If we are partway through a stage, this same loop will excecute only the remaining steps in that stage
+    #! TODO we should probably create an additional time stamp to record the entry into a new stage.
+     #* This will improve the comparator functionality; the additional stamp will always show differences with the previous stage
      #* whilst its predecessor step will always show differences with the previous step
-    while State.superstate()==act:
+    while State.stage()==act:
         Log.enter(0,f"PROCESSING STAGE {act}, PERFORMING STEP {State.step}")
         substep_execute_without_display(State.step())
     where_we_are_in_the_mall=State.current_stamp()
-    #! We have executed all the steps of this superstate
-    #! Now we have to record the change in superstate
-    where_we_are_in_the_mall.super_state=State.superstate()
+    #! We have executed all the steps of this stage
+    #! Now we have to record the change in stage
+    where_we_are_in_the_mall.stage=State.stage()
     where_we_are_in_the_mall.save()
 
     #! set the comparator. At present (see TODO above) this will work as follows:
      #* If we are executing several steps, the comparator time stamp is at the place we started.
-     #* If we haven't executed any steps, this will be the previous superstate
-     #* If we are midway through a superstate, this will be the point in the previous superstate that we've reached so far.
+     #* If we haven't executed any steps, this will be the previous stage
+     #* If we are midway through a stage, this will be the point in the previous stage that we've reached so far.
     State.set_current_comparator(remember_where_we_parked)
     return HttpResponseRedirect(reverse("economy"))
 

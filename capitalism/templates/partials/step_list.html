@@ -10,8 +10,8 @@
         <tbody>
             {% for state in states %}
             <tr>
-                <td> {{ state.super_state}} </td>
-                <td> <a class="w3-bar-item w3-small  " style="padding:0px" href="{% url 'comparator-select' state=state.super_state step=state.step %}">{{state.step}}</a> </td>
+                <td> {{ state.stage}} </td>
+                <td> <a class="w3-bar-item w3-small  " style="padding:0px" href="{% url 'comparator-select' state=state.stage step=state.step %}">{{state.step}}</a> </td>
             </tr>
             {% endfor %}
         </tbody>
