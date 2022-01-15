@@ -38,7 +38,7 @@ def initialize(request):
             project_FK=Project.objects.get(number=row.project_FK),
             period=row.period,
             step=row.description,
-            stage="M_C", #! projects must start with this stage
+            stage="M_C", #! projects must start with this stage TODO remove this field from the CSV file
             melt=row.MELT,
             population_growth_rate=row.population_growth_rate,
             investment_ratio=row.investment_ratio,

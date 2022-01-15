@@ -4,32 +4,35 @@ from capitalism.global_constants import *
 from django.utils.safestring import mark_safe
 from django.utils.html import escape
 
-class Log(models.Model):
-    time_stamp_id=models.IntegerField(default=0, null=False)
-    step=models.CharField(max_length=25,default=UNDEFINED)
-    project_id=models.IntegerField(default=0, null=False)
-    level=models.IntegerField(default=0, null=False)
-    message=models.CharField(max_length=250,null=False)
 
-    logging_mode="verbose"
+class Log(models.Model):
+    time_stamp_id = models.IntegerField(default=0, null=False)
+    period = models.IntegerField(default=0, null=False)
+    stage = models.CharField(max_length=25, default=UNDEFINED)
+    step = models.CharField(max_length=25, default=UNDEFINED)
+    project_id = models.IntegerField(default=0, null=False)
+    level = models.IntegerField(default=0, null=False)
+    message = models.CharField(max_length=250, null=False)
+
+    logging_mode = "verbose"
 
     @staticmethod
-    def enter(level,message):
+    def enter(level, message):
         try:
-            time_stamp=State.current_stamp()
-            stamp_number=time_stamp.time_stamp #! TODO rename this field to avoid confusion
-            current_step=time_stamp.step        
-            project_id=time_stamp.project_FK.number
+            time_stamp = State.current_stamp()
+            # ! TODO rename this field to avoid confusion
+            stamp_number = time_stamp.time_stamp
+            current_step = time_stamp.step
+            project_id = time_stamp.project_FK.number
+            this_entry = Log(time_stamp_id=stamp_number, period=time_stamp.period, stage=time_stamp.stage, step=current_step, project_id=project_id,
+                             level=level, message=(message))
         except:
-            project_id = 1
-            stamp_number=1
-            current_step="unknown" #! TODO figure out how to ensure the project doesn't start in a corrupt state (which happens because the State table doesn't contain anything)
-        this_entry=Log(project_id=project_id,time_stamp_id=stamp_number,step=current_step,level=level,message=(message))
+            this_entry = Log(-1, -1, stage="unknown", step="unknown", project_id=-1,level=level, message="{message} (state not yet fully defined)")
         this_entry.save()
 
-    def debug_entry(level,message):
-        if Log.logging_mode=="verbose":
-            Log.enter(level,message)
+    def debug_entry(level, message):
+        if Log.logging_mode == "verbose":
+            Log.enter(level, message)
 
     @staticmethod
     def sim_object(value):
@@ -39,21 +42,25 @@ class Log(models.Model):
     def sim_quantity(value):
         return f"<span class = 'quantity-object'>{value}</span>"
 
+
 class Project(models.Model):
-    number=models.IntegerField(null=False, default=0)
+    number = models.IntegerField(null=False, default=0)
     description = models.CharField(max_length=50, default="###")
     owner = models.ForeignKey('auth.User', on_delete=models.CASCADE, default=1)
 
     def __str__(self):
         return f"Project {self.number}[{self.description}]"
 
+
 class TimeStamp(models.Model):
-    project_FK = models.ForeignKey(Project, related_name='time_stamp', on_delete=models.CASCADE)
+    project_FK = models.ForeignKey(
+        Project, related_name='time_stamp', on_delete=models.CASCADE)
     time_stamp = models.IntegerField(default=1)
     step = models.CharField(max_length=50, default=UNDEFINED)
-    stage=models.CharField(max_length=50, default=UNDEFINED)
+    stage = models.CharField(max_length=50, default=UNDEFINED)
     period = models.IntegerField(default=1)
-    comparator_time_stamp_FK = models.ForeignKey("TimeStamp", on_delete=models.DO_NOTHING, null=True)
+    comparator_time_stamp_FK = models.ForeignKey(
+        "TimeStamp", on_delete=models.DO_NOTHING, null=True)
     melt = models.CharField(max_length=50, default=UNDEFINED)
     population_growth_rate = models.IntegerField(default=1)
     investment_ratio = models.IntegerField(default=1)
@@ -62,17 +69,20 @@ class TimeStamp(models.Model):
     melt_response_type = models.CharField(max_length=50, null=True)
     currency_symbol = models.CharField(max_length=2, default="$")
     quantity_symbol = models.CharField(max_length=2, default="#")
-    owner = models.ForeignKey('auth.User', related_name='timestamps', on_delete=models.CASCADE, default=1)
+    owner = models.ForeignKey(
+        'auth.User', related_name='timestamps', on_delete=models.CASCADE, default=1)
 
     class Meta:
-         ordering=['project_FK__number','time_stamp',]
+        ordering = ['project_FK__number', 'time_stamp', ]
 
     def __str__(self):
         return f"[Time {self.time_stamp}(id:{self.id}) description: {self.step}] [Project {self.project_FK.number}] "
 
+
 class State(models.Model):
     name = models.CharField(primary_key=True, default="Initial", max_length=50)
-    time_stamp_FK = models.OneToOneField(TimeStamp, related_name='state', on_delete=models.CASCADE, default=1)
+    time_stamp_FK = models.OneToOneField(
+        TimeStamp, related_name='state', on_delete=models.CASCADE, default=1)
     owner = models.ForeignKey('auth.User', on_delete=models.CASCADE, default=1)
 
     @staticmethod
@@ -80,7 +90,8 @@ class State(models.Model):
         try:
             return State.objects.get()
         except:
-            raise Exception ("Corrupted State object: cannot continue. This is most likely a data error. Try re-initialising using loaddata")
+            raise Exception(
+                "Corrupted State object: cannot continue. This is most likely a data error. Try re-initialising using loaddata")
 
     @staticmethod
     def current_stamp():
@@ -98,51 +109,54 @@ class State(models.Model):
     def stage():
         return STEPS[State.step()].stage_name
 
-    #TODO the user should also be a selector for the state, since different users will have different states
+    # TODO the user should also be a selector for the state, since different users will have different states
     @staticmethod
     def set_project(time_stamp):
-        Log.debug_entry(0,f"Setting project to {time_stamp.project_FK.description}")
+        Log.debug_entry(
+            0, f"Setting project to {time_stamp.project_FK.description}")
         try:
-            current_state=State.current_state()
-            current_state.time_stamp_FK=time_stamp
+            current_state = State.current_state()
+            current_state.time_stamp_FK = time_stamp
             current_state.save()
         except:
-            raise Exception (f"Project or its time stamp either does not exist or is corrupt. This could be a data error, but it might be a programme error. Cannot continue, sorry")
+            raise Exception(
+                f"Project or its time stamp either does not exist or is corrupt. This could be a data error, but it might be a programme error. Cannot continue, sorry")
 
     @staticmethod
     def create_stamp():
-        Log.enter(1, "MOVING ONE TIME STAMP FORWARD")
+        Log.enter(0, "MOVING ONE TIME STAMP FORWARD")
         current_state = State.current_state()
         current_time_stamp = State.current_stamp()
         this_project = current_time_stamp.project_FK
         old_time_stamp = TimeStamp.objects.filter(
             project_FK=this_project).order_by('time_stamp').last()
-        remember_where_we_parked=old_time_stamp.id
+        remember_where_we_parked = old_time_stamp.id
         new_time_stamp = old_time_stamp
         #! create a new timestamp object by saving with pk=None. Forces Django to create a new database object
         new_time_stamp.pk = None
         new_time_stamp.time_stamp += 1
-        remembered_time_stamp=TimeStamp.objects.get(id=remember_where_we_parked)
+        remembered_time_stamp = TimeStamp.objects.get(
+            id=remember_where_we_parked)
         new_time_stamp.save()
-        new_time_stamp.comparator_time_stamp_FK=remembered_time_stamp
+        new_time_stamp.comparator_time_stamp_FK = remembered_time_stamp
         new_time_stamp.save()
         #! reset the current state
         current_state.time_stamp_FK = new_time_stamp
         current_state.save()
-        old_number=new_time_stamp.comparator_time_stamp_FK.time_stamp
-        new_number=new_time_stamp.time_stamp
-        old_step=new_time_stamp.comparator_time_stamp_FK.step
-        new_step=new_time_stamp.step
+        old_number = new_time_stamp.comparator_time_stamp_FK.time_stamp
+        new_number = new_time_stamp.time_stamp
+        old_step = new_time_stamp.comparator_time_stamp_FK.step
+        new_step = new_time_stamp.step
         Log.debug_entry(
             2, f"Stepping from Old Time Stamp {old_number} representing step {old_step} to New Time Stamp {new_number} representing step {new_step}")
         return new_time_stamp
 
-
     #! Set the comparator of the current time stamp to a new comparator
+
     @staticmethod
     def set_current_comparator(comparator):
         current_time_stamp = State.current_stamp()
-        current_time_stamp.comparator_time_stamp_FK=comparator
+        current_time_stamp.comparator_time_stamp_FK = comparator
         current_time_stamp.save()
 
     #! create a complete clone of each object and set it to point to the new time stamp
@@ -156,7 +170,7 @@ class State(models.Model):
         from .commodity import Commodity
         from .stocks import IndustryStock, SocialStock
         from .owners import Industry, SocialClass
-        
+
         industries = Industry.objects.filter(time_stamp_FK=old_time_stamp)
         for industry in industries:
             industry.time_stamp_FK = new_time_stamp
@@ -175,7 +189,8 @@ class State(models.Model):
             Log.debug_entry(
                 2, f"Created a new Commodity record {Log.sim_object(commodity.name)} with time stamp {commodity.time_stamp_FK.time_stamp} which will contain the results of action {commodity.time_stamp_FK.step}")
 
-        social_classes = SocialClass.objects.filter(time_stamp_FK=old_time_stamp)
+        social_classes = SocialClass.objects.filter(
+            time_stamp_FK=old_time_stamp)
         for social_class in social_classes:
             social_class.pk = None
             social_class.id = None
@@ -184,7 +199,8 @@ class State(models.Model):
             Log.debug_entry(
                 2, f"Created a new Social Class record {Log.sim_object(social_class.name)} with time stamp {social_class.time_stamp_FK.time_stamp} which will contain the results of action {social_class.time_stamp_FK.step}")
 
-        social_stocks = SocialStock.objects.filter(time_stamp_FK=old_time_stamp)
+        social_stocks = SocialStock.objects.filter(
+            time_stamp_FK=old_time_stamp)
         for social_stock in social_stocks:
             social_stock.pk = None
             social_stock.id = None
@@ -205,7 +221,7 @@ class State(models.Model):
         return
 
     #! this method works with create_stamp (and should perhaps be integrated into it)
-    #! when a new stamp is created (by 'move_one_stamp'), it first creates the stamp and then clones every object 
+    #! when a new stamp is created (by 'move_one_stamp'), it first creates the stamp and then clones every object
     #! so that the time_stamp and the objects together constitute a new 'state' of the simulation
     #! Therefore, once the new objects have been created, all their foreign keys must be linked to their correct parents
     @staticmethod
@@ -248,11 +264,12 @@ class State(models.Model):
             Log.debug_entry(
                 2, f"Connecting Industry Stock of usage type {Log.sim_object(industry_stock.usage_type)} to its industry {Log.sim_object(industry_name)}")
             industry_stock.industry_FK = new_industry
-            industry_stock.stock_owner_FK= new_industry
+            industry_stock.stock_owner_FK = new_industry
             industry_stock.save()
             new_industry.save()
     #! connect social stocks to their commodities and owners
-        social_stocks = SocialStock.objects.filter(time_stamp_FK=new_time_stamp)
+        social_stocks = SocialStock.objects.filter(
+            time_stamp_FK=new_time_stamp)
         for social_stock in social_stocks:
             commodity_name = social_stock.commodity_FK.name
             Log.debug_entry(
@@ -268,27 +285,27 @@ class State(models.Model):
             Log.debug_entry(
                 2, f"Connecting Social Stock of usage_type {Log.sim_object(social_stock.usage_type)} to its social class {Log.sim_object(social_class_name)}")
             social_stock.social_class_FK = new_social_class
-            social_stock.stock_owner_FK= new_social_class
+            social_stock.stock_owner_FK = new_social_class
             social_stock.save()
             new_social_class.save()
 
     #! Create a new state by moving forward one time stamp (see 'move_one_stamp')
     #! States are divided into superstates and steps and this affects the logic
     #! The user decides whether they wants to execute a single sub-step, or all the steps in a bunch
-    #! We may arrive at this decision either 
-    #*  because we're only processing stages (user not interested in the detail), or
-    #*  because user is halfway through a stage and wants to skip to the next stage
+    #! We may arrive at this decision either
+    # *  because we're only processing stages (user not interested in the detail), or
+    # *  because user is halfway through a stage and wants to skip to the next stage
     @staticmethod
     def one_step():
-        #! The State 'knows' the time_stamp 
+        #! The State 'knows' the time_stamp
         old_time_stamp = State.current_stamp()
         new_time_stamp = State.create_stamp()
         State.clone(old_time_stamp, new_time_stamp)
         State.connect_stamp(new_time_stamp)
-        time_stamp=State.current_stamp() #! probably redundant - the time_stamp should be remembered in new_time_stamp
+        # ! probably redundant - the time_stamp should be remembered in new_time_stamp
+        time_stamp = State.current_stamp()
         time_stamp.save()
         #! The receiver will perform the action specified by step
 
     def __str__(self):
         return self.name
-

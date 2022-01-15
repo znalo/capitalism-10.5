@@ -3,9 +3,9 @@
     <button class="w3-button w3-small">Simulation</button>
     <div class="w3-dropdown-content w3-bar-block w3-card-4">
         {% for key, value in stages.items %} {% if key == active_stage %}
-        <a href="/super/{{ key }}" class="w3-bar-item w3-button w3-small w3-blue" method="get">{{ value }} </a> {% else %}
+        <a href="/stage/{{ key }}" class="w3-bar-item w3-button w3-small w3-blue" method="get">{{ value }} </a> {% else %}
         <div class="w3-bar-item w3-button w3-small">{{ value }} </div>
         {% endif %} {% endfor %}
     </div>
 </div>
-<a href="/sub/{% current_step %}" title="Step through a micro-calculation of the current stage of the circuit" class="w3-button w3-small" method="get">Step({% current_step %})</a>
+<a href="/step/{% current_step %}" title="Step through a micro-calculation of the current stage of the circuit" class="w3-button w3-small" method="get">Step({% current_step %})</a>

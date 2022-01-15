@@ -37,9 +37,9 @@ urlpatterns = [
     url('control/sandbox', views.sandbox, name='sandbox'),
     url('control/initialize', initialize, name='initialize'),
     url(r'project/(?P<id>[\d-]+)', select_project, name='project-select'),
-    url(r'super/(?P<act>[\w-]+)/$', control.super_step_execute, name='stage'),
-    url(r'control/(?P<state>[\w-]+)/(?P<step>[\w-]+)/$', control.comparator_select, name='comparator-select'),
-    url(r'sub/(?P<act>[\w-]+)/$', control.sub_step_execute, name='execute'),
+    url(r'stage/(?P<act>[\w-]+)/$', control.stage_execute, name='stage'),
+    url(r'control/(?P<period>[\d-]+)/(?P<stage>[\w-]+)/(?P<step>[\w-]+)/$', control.comparator_select, name='comparator-select'),
+    url(r'step/(?P<act>[\w-]+)/$', control.step_execute, name='execute'),
 
 ]
 

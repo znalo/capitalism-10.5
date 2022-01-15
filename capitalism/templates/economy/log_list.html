@@ -7,9 +7,11 @@
         <tr>
             <th>Id</th>
             <th>Level</th>
-            <th>Time Stamp</th>
+            <th>Stamp</th>
             <th>Project</th>
-            <th>Substate</th>
+            <th>Period</th>
+            <th>Stage</th>
+            <th>Step</th>
             <th>Message</th>
         </tr>
     </thead>
@@ -20,6 +22,8 @@
             <td>{{ log.level}} </td>
             <td>{{ log.time_stamp_id}} </td>
             <td>{{ log.project_id}} </td>
+            <td>{{ log.period }}</td>
+            <td>{{ log.stage }}</td>
             <td>{{ log.step }}</td>
             <td class="pl-{{log.level}}"><span class="log-level{{log.level}}">{{log.message|mark_as_safe }}</span> </td>
         </tr>
@@ -32,7 +36,7 @@
     $(document).ready(function() {
         $('#log').DataTable({
             "columns": [{
-                "width": "3%"
+                "width": "4%"
             }, {
                 "width": "2%"
             }, {
@@ -40,7 +44,11 @@
             }, {
                 "width": "2%"
             }, {
-                "width": "91%"
+                "width": "5%"
+            }, {
+                "width": "5%"
+            }, {
+                "width": "81%"
             }, ],
             "paging": false,
             "info": false,

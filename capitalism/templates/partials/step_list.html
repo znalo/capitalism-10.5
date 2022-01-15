@@ -3,6 +3,7 @@
     <table id="states" class="display compact">
         <thead>
             <tr>
+                <th>Period</th>
                 <th>Stage</th>
                 <th>Step</th>
             </tr>
@@ -10,8 +11,9 @@
         <tbody>
             {% for state in states %}
             <tr>
+                <td> {{ state.period}} </td>
                 <td> {{ state.stage}} </td>
-                <td> <a class="w3-bar-item w3-small  " style="padding:0px" href="{% url 'comparator-select' state=state.stage step=state.step %}">{{state.step}}</a> </td>
+                <td> <a class="w3-bar-item w3-small  " style="padding:0px" href="{% url 'comparator-select' period=state.period stage=state.stage step=state.step %}">{{state.step}}</a> </td>
             </tr>
             {% endfor %}
         </tbody>

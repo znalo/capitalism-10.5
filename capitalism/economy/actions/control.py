@@ -19,11 +19,11 @@ ACTION_LIST={
     'invest':invest,
     }
 
-def sub_step_execute(request,act):
-    substep_execute_without_display(act)
+def step_execute(request,act):
+    step_execute_without_display(act)
     return get_economy_view_context(request)
 
-def substep_execute_without_display(act):
+def step_execute_without_display(act):
     action=ACTION_LIST[act]
     State.one_step()#! creates new timestamp, ready for the action
     action()#! perform the action in the new timestamp
@@ -31,10 +31,13 @@ def substep_execute_without_display(act):
     next_step_name=STEPS[act].next_step_name
     current_time_stamp.step_name=next_step_name
     current_time_stamp.step=next_step_name 
+    #! If the action that we just implemented was "demand" then we are at the start of a new period.
+    if act==DEMAND:
+        current_time_stamp.period+=1        
     current_time_stamp.save()
     Log.enter(1,f"Initiate action {act} in {current_time_stamp.step_name} whose stage is {current_time_stamp.stage}")
 
-def super_step_execute(request,act):
+def stage_execute(request,act):
     remember_where_we_parked=State.current_stamp()
     #! If we are at the start of a stage, execute all the steps within that stage
     #! If we are partway through a stage, this same loop will excecute only the remaining steps in that stage
@@ -42,8 +45,8 @@ def super_step_execute(request,act):
      #* This will improve the comparator functionality; the additional stamp will always show differences with the previous stage
      #* whilst its predecessor step will always show differences with the previous step
     while State.stage()==act:
-        Log.enter(0,f"PROCESSING STAGE {act}, PERFORMING STEP {State.step}")
-        substep_execute_without_display(State.step())
+        Log.enter(0,f"PROCESSING STAGE {act}, PERFORMING STEP {State.step()}")
+        step_execute_without_display(State.step())
     where_we_are_in_the_mall=State.current_stamp()
     #! We have executed all the steps of this stage
     #! Now we have to record the change in stage
@@ -69,7 +72,15 @@ def select_project(request,id):
         raise Exception ("Cannot find this project - this is a data error. Cannot continue")
     return HttpResponseRedirect(reverse("economy"))
 
-def comparator_select(request,state,step):
+def comparator_select(request,period,stage,step):
     #!TODO implement this. It should set the comparator to the selected state
-    Log.enter(1,f"User selected new comparator '{state}-{step}'")
+    Log.enter(1,f"User selected new comparator '{period}-{stage}-{step}'")
+    try:
+        current_stamp=State.current_stamp()
+        comparator=TimeStamp.objects.filter(project_FK=current_stamp.project_FK, period=period, stage=stage,step=step).get()
+        current_stamp.comparator_time_stamp_FK=comparator
+        current_stamp.save()
+    except:
+        raise Exception ("This comparator could not be found. This is a programme error. Cannot continue, sorry")
+
     return HttpResponseRedirect(reverse("economy"))

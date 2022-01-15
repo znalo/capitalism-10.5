@@ -256,3 +256,7 @@ Did not move the new fixture into the fixtures folder yet
 
 ## Commit: refactor to rename 'superstate' to 'stage'
 
+Comparator select now seems to be working
+Fixtures file updated
+
+## Commit: comparator select seems to be working
