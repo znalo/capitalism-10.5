@@ -38,7 +38,7 @@ def initialize(request):
             project_FK=Project.objects.get(number=row.project_FK),
             period=row.period,
             substate=row.description,
-            super_state=M_C, #! projects must start with this superstate
+            super_state="M_C", #! projects must start with this superstate
             melt=row.MELT,
             population_growth_rate=row.population_growth_rate,
             investment_ratio=row.investment_ratio,

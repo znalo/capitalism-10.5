@@ -47,9 +47,7 @@ def project_list():
 
 @register.inclusion_tag('partials/step_list.html')
 def step_list():
-#! veddy tempry - in here will go step list so user can select the comparator
-      current_stamp=State.current_stamp()
-      current_project=current_stamp.project_FK
+      current_project=State.current_project()
       state_list=TimeStamp.objects.filter(project_FK=current_project)
       context={}
       context['states']= state_list

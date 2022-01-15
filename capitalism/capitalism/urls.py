@@ -38,7 +38,7 @@ urlpatterns = [
     url('control/initialize', initialize, name='initialize'),
     url(r'project/(?P<id>[\d-]+)', select_project, name='project-select'),
     url(r'super/(?P<act>[\w-]+)/$', control.super_step_execute, name='stage'),
-    url(r'control/(?P<state>[\w-]+)/$', control.comparator_select, name='comparator-select'),
+    url(r'control/(?P<state>[\w-]+)/(?P<step>[\w-]+)/$', control.comparator_select, name='comparator-select'),
     url(r'sub/(?P<act>[\w-]+)/$', control.sub_step_execute, name='execute'),
 
 ]

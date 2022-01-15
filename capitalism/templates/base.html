@@ -16,6 +16,13 @@
 <body>
     <div class="w3-top">
         <div class="w3-bar w3-light-grey">
+            <div class="w3-left">
+                <a href="{% url 'landing-page' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Home</a>
+                <a href="{% url 'log' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Log</a>
+                <a href="{% url 'admin:index' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Admin</a>
+                <a href="{% url 'initialize' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Initialize</a>
+                <a href="{% url 'economy' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Economy</a>
+            </div>
             <div class="w3-right">
                 {% project_list %} {% control_states %}
                 <a href="{% url 'mode' %}" class="w3-button w3-small w3-round" role="button">{% logging_mode %}</a>
@@ -44,11 +51,7 @@
     </div>
     <!-- Sidebar -->
     <div class="w3-sidebar w3-sand w3-bar-block " style="width:15%;margin-top:4px">
-        <a href="{% url 'landing-page' %}" class="w3-bar-item w3-button w3-small w3-round" style="padding-top:0px;padding-bottom: 2px" role="button">Home</a>
-        <a href="{% url 'log' %}" class="w3-bar-item w3-button w3-small w3-round" style="padding-top:0px;padding-bottom: 2px" role="button">Log</a>
-        <a href="{% url 'admin:index' %}" class="w3-bar-item w3-button w3-small w3-round" style="padding-top:0px;padding-bottom: 2px" role="button">Admin</a>
-        <a href="{% url 'initialize' %}" class="w3-bar-item w3-button w3-small w3-round" style="padding-top:0px;padding-bottom: 2px" role="button" method="get">Initialize</a>
-        <a href="{% url 'economy' %}" class="w3-bar-item w3-button w3-small w3-round" style="padding-top:0px" role="button">Economy</a> {% include "partials/sidebar_content.html" %}
+        {% include "partials/sidebar_content.html" %}
     </div>
     <!-- navbar -->
     <div style="margin-left:15%">

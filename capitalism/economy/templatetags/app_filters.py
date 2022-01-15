@@ -54,7 +54,7 @@ def has_changed(new,old):
     if old==new:
         return new
     else:
-        return mark_safe("<span style=\"color:red\">"+str(new)+"</span>")
+        return mark_safe(f"<span style=\'color:red\'>{new:.0f}</span> (<span style=\'color:green\'>{old:.0f}</span>)")
 
 @register.filter(is_safe=True)
 def mark_as_safe(value):

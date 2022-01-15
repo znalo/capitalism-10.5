@@ -87,6 +87,10 @@ class State(models.Model):
         return State.current_state().time_stamp_FK
 
     @staticmethod
+    def current_project():
+        return State.current_state().time_stamp_FK.project_FK
+
+    @staticmethod
     def substate():
         return State.current_stamp().substate
 

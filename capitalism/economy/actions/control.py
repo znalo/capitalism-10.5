@@ -32,7 +32,7 @@ def substep_execute_without_display(act):
     current_time_stamp.substate_name=next_substate_name
     current_time_stamp.substate=next_substate_name 
     current_time_stamp.save()
-    Log.enter(1,f"Initiate action {act} in {current_time_stamp.substate_name}")
+    Log.enter(1,f"Initiate action {act} in {current_time_stamp.substate_name} whose superstate is {current_time_stamp.super_state}")
 
 def super_step_execute(request,act):
     remember_where_we_parked=State.current_stamp()
@@ -43,6 +43,12 @@ def super_step_execute(request,act):
      #* whilst its predecessor substate will always show differences with the previous substate
     while State.superstate()==act:
         substep_execute_without_display(State.substate())
+    where_we_are_in_the_mall=State.current_stamp()
+    #! We have executed all the substates of this superstate
+    #! Now we have to record the change in superstate
+    where_we_are_in_the_mall.super_state=State.superstate()
+    where_we_are_in_the_mall.save()
+
     #! set the comparator. At present (see TODO above) this will work as follows:
      #* If we are executing several substates, the comparator time stamp is at the place we started.
      #* If we haven't executed any substates, this will be the previous superstate
@@ -62,7 +68,7 @@ def select_project(request,id):
         raise Exception ("Cannot find this project - this is a data error. Cannot continue")
     return HttpResponseRedirect(reverse("economy"))
 
-def comparator_select(request,state):
+def comparator_select(request,state,step):
     #!TODO implement this. It should set the comparator to the selected state
-    Log.enter(1,f"User selected new comparator {state}'")
+    Log.enter(1,f"User selected new comparator '{state}-{step}'")
     return HttpResponseRedirect(reverse("economy"))
