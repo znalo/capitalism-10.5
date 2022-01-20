@@ -296,3 +296,9 @@ Put this directory into TEMPLATES.DIRS in settings
 
 ## Commit: templates now localised in economy app
 
+Removed unused installs
+
+## Commit: removed unused installs
+
+
+
