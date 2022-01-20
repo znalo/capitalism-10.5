@@ -1,5 +1,5 @@
 from django.db import models
-from capitalism.global_constants import *
+from ..global_constants import *
 
 class Log(models.Model):
     time_stamp_id = models.IntegerField(default=0, null=False)

@@ -1,7 +1,7 @@
 from django.db import models
 from .states import TimeStamp, State
 from .commodity import Commodity
-from capitalism.global_constants import *
+from ..global_constants import *
 
 class Stock(models.Model): # Base class for IndustryStock and SocialStock
     time_stamp_FK = models.ForeignKey(TimeStamp, related_name="%(app_label)s_%(class)s_related", on_delete=models.CASCADE)

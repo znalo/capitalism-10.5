@@ -1,4 +1,4 @@
-from capitalism.global_constants import *
+from ..global_constants import *
 from economy.actions.exchange import set_total_value_and_price, set_current_capital
 from economy.models.states import State, Log
 from economy.models.commodity import Commodity

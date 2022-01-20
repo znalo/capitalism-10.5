@@ -1,7 +1,7 @@
 from django.http.response import HttpResponseRedirect
 from economy.models.states import (Project, TimeStamp, State, Log)
 from economy.views import get_economy_view_context
-from capitalism.global_constants import *
+from ..global_constants import *
 from django.urls import reverse
 from economy.actions.exchange import calculate_demand_and_supply, allocate_supply, set_initial_capital, set_total_value_and_price, trade
 from economy.actions.produce import producers, prices, reproduce

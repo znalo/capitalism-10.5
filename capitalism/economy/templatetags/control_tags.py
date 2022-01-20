@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django import template
 from economy.models.states import State, Log, Project, TimeStamp
-from capitalism.global_constants import *
+from ..global_constants import *
 
 register = template.Library()
 

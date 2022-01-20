@@ -3,20 +3,17 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.response import Response
 from django.contrib.auth.models import User
-from .serializers import CommoditiesSerializer
 from .models.states import TimeStamp, Log
 from .models.commodity import Commodity
 from .models.owners import Industry, SocialClass, StockOwner
 from .models.stocks import IndustryStock, SocialStock, Stock
 from rest_framework import permissions
 from .permissions import IsOwnerOrReadOnly
-from rest_framework.decorators import api_view
-from rest_framework.reverse import reverse
 from django.http import HttpResponse
 from django.template import loader
 from django.views.generic import ListView
 from .models.states import State
-from capitalism.global_constants import *
+from .global_constants import *
 
 def get_economy_view_context(request):#TODO change name - this function now not only creates the context but also displays is, so the naming is wrong
         current_time_stamp=State.current_stamp()
@@ -161,18 +158,3 @@ def industryStockTable(request):
 def timeStampTable(request):
     return render(request, 'api-time-stamps.html')
 
-class CommodityViewSet(viewsets.ModelViewSet):
-    queryset = Commodity.objects.all()
-    serializer_class = CommoditiesSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
-                          IsOwnerOrReadOnly]
-
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
-
-@api_view(['GET'])
-def api_root(request, format=None):
-    return Response({
-        'users': reverse('user-list', request=request, format=format),
-        'commodities': reverse('commodity-list', request=request, format=format),
-    })

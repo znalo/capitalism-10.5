@@ -9,7 +9,7 @@ from django.template import loader
 from django.conf import settings
 import os
 import pandas as pd
-from capitalism.global_constants import *
+from ..global_constants import *
 
 #! Gets the whole thing going from CSV static files
 # TODO EITHER: Loads of error checking

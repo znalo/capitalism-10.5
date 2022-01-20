@@ -276,3 +276,16 @@ Minor problems:
 
 ## Commit: project 1 working
 
+Getting ready to establish production version 
+trying DjangoEurope
+
+Remove all the API stuff - we are not using it
+Moved all configuration to economy app - the standard install doesn't realy justify keeping it separate
+The strategy (initially, who knows if it will work) is basically to copy the entire economy app into a placeholder we will create on the host
+
+Probably time for a commit
+
+## Commit: localise everything in the economy app
+
+
+

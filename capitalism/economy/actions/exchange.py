@@ -4,7 +4,7 @@ from economy.models.owners import Industry, SocialClass, StockOwner
 from economy.models.stocks import Stock, IndustryStock, SocialStock
 from django.http import HttpResponse
 from django.template import loader
-from capitalism.global_constants import *
+from ..global_constants import *
 
 #! Calculate the unconstrained demand for all stocks
 #! Use this to calculate the total demand for each commodity

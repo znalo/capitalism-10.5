@@ -1,6 +1,6 @@
 from django import template
 from datetime import date, timedelta
-from capitalism.global_constants import *
+from ..global_constants import *
 from economy.models.states import State
 from django.utils.safestring import mark_safe
 

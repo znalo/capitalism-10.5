@@ -1,6 +1,6 @@
 from django.db import models
 from .states import TimeStamp,State
-from capitalism.global_constants import ORIGIN_CHOICES, USAGE_CHOICES, UNDEFINED
+from ..global_constants import ORIGIN_CHOICES, USAGE_CHOICES, UNDEFINED
 
 class Commodity(models.Model):
     time_stamp_FK = models.ForeignKey(TimeStamp, related_name='commodity', on_delete=models.CASCADE)
