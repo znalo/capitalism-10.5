@@ -2,12 +2,12 @@ from economy.models.states import (Project, TimeStamp, State, Log)
 from economy.models.commodity import Commodity
 from economy.models.owners import Industry, SocialClass
 from economy.models.stocks import IndustryStock, SocialStock
-from economy.views import get_economy_view_context
-from economy.actions.exchange import calculate_demand_and_supply, allocate_supply, set_initial_capital, set_total_value_and_price, trade
+from economy.actions.exchange import set_initial_capital, set_total_value_and_price
 from django.http import HttpResponse
 from django.template import loader
 from django.conf import settings
 import os
+from django.contrib.staticfiles.storage import staticfiles_storage
 import pandas as pd
 from ..global_constants import *
 
@@ -17,7 +17,8 @@ from ..global_constants import *
 def initialize(request):
     #! Basic setup: projects, timestamps and state
     Log.objects.all().delete()
-    file_name = os.path.join(settings.BASE_DIR, "static\\data\\projects.csv")
+    file_name = staticfiles_storage.path('data/projects.csv')    
+    # old_file_name = os.path.join(settings.BASE_DIR, "static\\data\\projects.csv")
     Log.enter(0, "+++REDO FROM START+++")
     Log.debug_entry(1, f"Reading projects from {file_name}")
     Project.objects.all().delete()
@@ -29,7 +30,8 @@ def initialize(request):
     # TODO project.owner (currently defaults messily to superuser)
 
     TimeStamp.objects.all().delete()
-    file_name = os.path.join(settings.BASE_DIR, "static\\data\\timestamps.csv")
+    # old_file_name = os.path.join(settings.BASE_DIR, "static\\data\\timestamps.csv")
+    file_name = staticfiles_storage.path('data/timestamps.csv')    
     Log.debug_entry(1, f"Reading time stamps from {file_name}")
     df = pd.read_csv(file_name)
 
@@ -60,7 +62,8 @@ def initialize(request):
     #! Basic setup complete, now read the data files
     #! Commodities
     Commodity.objects.all().delete()
-    file_name = os.path.join(settings.BASE_DIR, "static\\data\\commodities.csv")
+    # file_name = os.path.join(settings.BASE_DIR, "static\\data\\commodities.csv")
+    file_name = staticfiles_storage.path('data/commodities.csv')    
     Log.debug_entry(1, f"Reading commodities from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
@@ -87,7 +90,8 @@ def initialize(request):
     
     #!Industries
     Industry.objects.all().delete()
-    file_name = os.path.join(settings.BASE_DIR, "static\\data\\industries.csv")
+    # old_file_name = os.path.join(settings.BASE_DIR, "static\\data\\industries.csv")
+    file_name = staticfiles_storage.path('data/industries.csv')    
     Log.debug_entry(1, f"Reading industries from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
@@ -110,7 +114,8 @@ def initialize(request):
 
     #! Social Classes
     SocialClass.objects.all().delete()
-    file_name = os.path.join(settings.BASE_DIR, "static\\data\\social_classes.csv")
+    # old_file_name = os.path.join(settings.BASE_DIR, "static\\data\\social_classes.csv")
+    file_name = staticfiles_storage.path('data/social_classes.csv')
     Log.debug_entry(1, f"Reading social classes from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
@@ -139,7 +144,8 @@ def initialize(request):
     IndustryStock.objects.all().delete()
     SocialStock.objects.all().delete()
 
-    file_name = os.path.join(settings.BASE_DIR, "static\\data\\stocks.csv")
+    # old_file_name = os.path.join(settings.BASE_DIR, "static\\data\\stocks.csv")
+    file_name = staticfiles_storage.path('data/stocks.csv')        
     Log.debug_entry(1, f"Reading stocks from {file_name}")
     df = pd.read_csv(file_name)
 

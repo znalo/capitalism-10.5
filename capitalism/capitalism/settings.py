@@ -134,6 +134,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT= BASE_DIR / "economy/static"
+
 STATICFILES_DIRS = [
     BASE_DIR / "static",
  ]
@@ -141,26 +143,12 @@ STATICFILES_DIRS = [
 
 FIXTURE_DIRS =[str(BASE_DIR.joinpath("fixtures"))]
 
-
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# DRF
-REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
-        'rest_framework_datatables.renderers.DatatablesRenderer',
-    ),
-    'DEFAULT_FILTER_BACKENDS': (
-        'rest_framework_datatables.filters.DatatablesFilterBackend',
-    ),
-    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework_datatables.pagination.DatatablesPageNumberPagination',
-    # 'PAGE_SIZE': 10,
-}
+
 # Set 'django.db.backends' to DEBUG in order to see the DB queries
 LOGGING = {
     "version": 1,

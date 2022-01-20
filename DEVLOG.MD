@@ -300,5 +300,6 @@ Removed unused installs
 
 ## Commit: removed unused installs
 
+Created variables in settings to reference static data files via django (staticfiles_storage.path)
 
-
+## Commit: rationalised static storage in preparation for deployment
