@@ -287,5 +287,12 @@ Probably time for a commit
 
 ## Commit: localise everything in the economy app
 
+Now trying to get ready for production (on djangoeurope at www.dascapital.org)
+Hence remove as many quirks and peculiarities as possible
+Since 'economy' is the only app, we propose to dispense with many if not all of Django's help with locating directories and simplify the folder structure as much as possible
 
+Place all templates simply in 'economy/templates' (Note we cannot set APP_DIRS to false because it raises objections which we're not sure have answers in this production environment)
+Put this directory into TEMPLATES.DIRS in settings
+
+## Commit: templates now localised in economy app
 

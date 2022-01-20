@@ -193,7 +193,7 @@ def initialize(request):
 
     #! temporary for development purposes - quick and dirty visual report on what was done. 
     # TODO the logging system should replace this report
-    template = loader.get_template('economy/initialize.html')
+    template = loader.get_template('initialize.html')
     context = {}
     context['projects'] = Project.objects.all()
     context['time_stamps'] = TimeStamp.objects.all()

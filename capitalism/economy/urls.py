@@ -1,9 +1,8 @@
 from django.contrib import admin
 from django.conf.urls import url
-from rest_framework import routers
 from economy import views
 from economy.actions import control
-from django.urls import path, include
+from django.urls import path
 from economy.actions.control import select_project
 from economy.actions.initialize import initialize
 

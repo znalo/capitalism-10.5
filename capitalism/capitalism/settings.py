@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-c5ro#6!%==d9*4(f+pt(92x!ks74+-2x#mx-t4bdr+5d8dtv$!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -42,10 +42,6 @@ INSTALLED_APPS = [
     'rest_framework_datatables',
     'economy',
     'import_export',
-    'django_filters',
-    'bootstrapform',
-    'bootstrap5',
-    'django_bootstrap_icons',    
 ]
 
 MIDDLEWARE = [
@@ -66,6 +62,7 @@ TEMPLATES = [
         'DIRS': [
             os.path.join(os.path.dirname(__file__), 'templates'),
             str(BASE_DIR.joinpath("templates")),
+            str(BASE_DIR.joinpath('economy/templates')),#! Bit of a botch, just to get the production version running
             ],
         'APP_DIRS': True,
         'OPTIONS': {
