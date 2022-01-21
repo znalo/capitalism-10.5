@@ -303,3 +303,17 @@ Removed unused installs
 Created variables in settings to reference static data files via django (staticfiles_storage.path)
 
 ## Commit: rationalised static storage in preparation for deployment
+
+Rationalise the migrations. We don't really need the history (it should be stored in .git anyhow because I did not create a .gitignore) so
+it will be cleaner to have one single migration at this point, when we are moving over to production. Following the procedure in this
+[stackoverflow](https://stackoverflow.com/questions/58000680/django-safely-remove-old-migrations) answer 5, namely
+
+  * Use the python manage.py migrate your_app_name XXXX in case you want to unapply migrations after the XXXX migration. Otherwise use python manage.py migrate your_app_name zero to completely unapply all migrations.
+
+  * Remove the .pyc files under /migrations/_pycache_/ that you have unapplied.
+
+  * Remove the .py files under migrations/ that you have unapplied.
+
+  * If what you're looking for is to squash all the migrations into one, do the steps above removing all migrations and then run python manage.py makemigrations your_app_name to create a single migration file. After that just run python manage.py migrate your_app_name and you're done.
+
+## Commit before squashing migrations, just in case

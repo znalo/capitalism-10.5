@@ -43,7 +43,7 @@ class Log(models.Model):
 
 class Project(models.Model):
     number = models.IntegerField(null=False, default=0)
-    description = models.CharField(max_length=50, default="###")
+    description = models.CharField(max_length=50, default="demand")
     owner = models.ForeignKey('auth.User', on_delete=models.CASCADE, default=1)
 
     def __str__(self):
@@ -52,13 +52,14 @@ class Project(models.Model):
 
 class TimeStamp(models.Model):
     project_FK = models.ForeignKey(
-        Project, related_name='time_stamp', on_delete=models.CASCADE)
+        Project, related_name='time_stamp', on_delete=models.CASCADE, null=True,blank=True)
+    #! TODO we've allowed blank and null because of the problem of first-time initialization. A better solution is possible
     time_stamp = models.IntegerField(default=1)
     step = models.CharField(max_length=50, default=UNDEFINED)
     stage = models.CharField(max_length=50, default=UNDEFINED)
     period = models.IntegerField(default=1)
     comparator_time_stamp_FK = models.ForeignKey(
-        "TimeStamp", on_delete=models.DO_NOTHING, null=True)
+        "TimeStamp", on_delete=models.DO_NOTHING, null=True, blank=True)
     melt = models.CharField(max_length=50, default=UNDEFINED)
     population_growth_rate = models.IntegerField(default=1)
     investment_ratio = models.IntegerField(default=1)
@@ -80,7 +81,8 @@ class TimeStamp(models.Model):
 class State(models.Model):
     name = models.CharField(primary_key=True, default="Initial", max_length=50)
     time_stamp_FK = models.OneToOneField(
-        TimeStamp, related_name='state', on_delete=models.CASCADE, default=1)
+        TimeStamp, related_name='state', on_delete=models.CASCADE, blank=True, null=True, default=1)
+    #! TODO we've allowed blank and null because of the problem of first-time initialization. A better solution is possible
     owner = models.ForeignKey('auth.User', on_delete=models.CASCADE, default=1)
 
     @staticmethod

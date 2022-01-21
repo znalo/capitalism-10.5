@@ -14,7 +14,7 @@ ORIGIN_CHOICES = [
     (SOCIAL, 'Social'),
     (INDUSTRIAL, 'Industrial'),
     (MONEY, 'Money'),
-    (UNDEFINED, '###')
+    (UNDEFINED, 'UNDEFINED')
 ]
 
 USAGE_CHOICES = [
@@ -22,19 +22,19 @@ USAGE_CHOICES = [
     (CONSUMPTION, 'Consumption'),
     (MONEY, 'Money'),
     (SALES, 'Sales'),
-    (UNDEFINED, '###')
+    (UNDEFINED, 'UNDEFINED')
 ]
 
 SOCIAL_CLASS_TYPES = [
     (CAPITALISTS, "Capitalists"),
     (WORKERS, "Workers"),
-    (UNDEFINED, '###')
+    (UNDEFINED, 'UNDEFINED')
 ]
 
 STOCK_OWNER_TYPES = [
     (INDUSTRY, 'Industry'),
     (SOCIAL_CLASS, 'Social Class'),
-    (UNDEFINED, '###')
+    (UNDEFINED, 'UNDEFINED')
 ]
 
 M_C = "M-C (exchange)"
