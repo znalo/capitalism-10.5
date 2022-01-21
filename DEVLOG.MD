@@ -317,3 +317,5 @@ it will be cleaner to have one single migration at this point, when we are movin
   * If what you're looking for is to squash all the migrations into one, do the steps above removing all migrations and then run python manage.py makemigrations your_app_name to create a single migration file. After that just run python manage.py migrate your_app_name and you're done.
 
 ## Commit before squashing migrations, just in case
+Ran into a problem with migration 10 - it says there is an integrity error
+## Commit after removing all migrations as far back as 0010
