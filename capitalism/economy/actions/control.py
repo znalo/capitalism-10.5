@@ -84,3 +84,4 @@ def comparator_select(request,period,stage,step):
         raise Exception ("This comparator could not be found. This is a programme error. Cannot continue, sorry")
 
     return HttpResponseRedirect(reverse("economy"))
+

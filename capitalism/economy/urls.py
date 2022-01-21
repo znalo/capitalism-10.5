@@ -10,7 +10,6 @@ urlpatterns = [
     path('', views.landingPage, name='landing-page'),
     url('^admin/', admin.site.urls),
 
-    url('log/collapsible', views.log_collapsible, name='log-collapsible'),
     url('log/table', views.LogView.as_view(), name='log'),
     url('log/mode', views.switch_log_mode, name='mode'),
 

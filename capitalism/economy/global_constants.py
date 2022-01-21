@@ -3,12 +3,24 @@ INDUSTRIAL = 'Industrial'
 MONEY = 'Money'
 CONSUMPTION = 'Consumption'
 PRODUCTION = 'Production'
-UNDEFINED = "###"
+UNDEFINED = "Undefined"
 CAPITALISTS = "Capitalists"
 WORKERS = "Workers"
 INDUSTRY = "Industry"
 SOCIAL_CLASS = "Social Class"
 SALES = "Sales"
+DEMAND = "demand"
+ALLOCATE = "allocate"
+TRADE = "trade"
+PRODUCE = "produce"
+PRICES = "prices"
+REPRODUCE = "reproduce"
+REVENUE="revenue"
+INVEST="invest"
+M_C = "M-C (exchange)"
+C_P = "C-P-C' (produce)"
+C_M = "C'-M' (distribute)"
+
 
 ORIGIN_CHOICES = [
     (SOCIAL, 'Social'),
@@ -36,19 +48,6 @@ STOCK_OWNER_TYPES = [
     (SOCIAL_CLASS, 'Social Class'),
     (UNDEFINED, 'UNDEFINED')
 ]
-
-M_C = "M-C (exchange)"
-C_P = "C-P-C' (produce)"
-C_M = "C'-M' (distribute)"
-
-DEMAND = "demand"
-ALLOCATE = "allocate"
-TRADE = "trade"
-PRODUCE = "produce"
-PRICES = "prices"
-REPRODUCE = "reproduce"
-REVENUE="revenue"
-INVEST="invest"
 
 class Step:
     def __init__(self, name, stage_name, next_step_name):

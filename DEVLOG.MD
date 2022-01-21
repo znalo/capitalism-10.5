@@ -319,3 +319,46 @@ it will be cleaner to have one single migration at this point, when we are movin
 ## Commit before squashing migrations, just in case
 Ran into a problem with migration 10 - it says there is an integrity error
 ## Commit after removing all migrations as far back as 0010
+Start the simulation and re-initialize
+
+Actually, all this is not relevant to what we are doing now.
+It's written on the assumption that the user already has a database, whose integrity must be maintained.
+But we are at the development stage when we are always starting from scratch, so the problem does not arise.
+We simply delete the old database and start over.
+The real difficulty is that the database must be initialised, and the question is 'when'?
+This relates to the problem, not yet addressed, of multiple users.
+
+At what point do we start with a clean database?
+And what should a clean database consist of?
+
+There are two solutions:
+
+(1) a clean database means a skeleton, in which there is just one timestamp and one state, and nothing else
+(2) a clean database means a database with one complete project
+
+The goal is (2) eventually
+But (1) is easier and is also a 'recovery from failure' position.
+Recall that in 'initialize' as at present constituted, the whole database is wiped out and reconstructed so any temporary but partial failsafe will be removed.
+The point of a failsafe is that the site should allow the user to re-initialize, rather than falling over.
+
+So we will first try to construct a little 'failsafe' procedure to be invoked when the state is found to be corrupt.
+This should ideally also do a database dump but that's beyond our scope right now because it would get us into all the complications of serialization which we want to avoid until we're running in a production environment
+
+(It could, however, do a dump of the Log table...)
+
+State of play after much messing around:
+* owner field removed from the state models. It should be put back in when we introduce proper login and authorization
+* A 'failsafe' database is established by the landing page, if on arrival it is found that the State object is not initialized
+* Tested starting from scratch by deleting the sqlite database and restarting
+* created a new fixture file and reloaded it
+* ran complete simulation of project 1
+* examined all tables
+
+We'll now make a commit of this working version
+
+## Commit working version with failsafe initialization and fixture file
+
+
+
+
+

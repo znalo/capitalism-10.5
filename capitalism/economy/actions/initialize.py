@@ -17,21 +17,25 @@ from ..global_constants import *
 def initialize(request):
     #! Basic setup: projects, timestamps and state
     Log.objects.all().delete()
+    Log.enter(0, "+++REDO FROM START+++")
     file_name = staticfiles_storage.path('data/projects.csv')    
     # old_file_name = os.path.join(settings.BASE_DIR, "static\\data\\projects.csv")
-    Log.enter(0, "+++REDO FROM START+++")
     Log.debug_entry(1, f"Reading projects from {file_name}")
     Project.objects.all().delete()
     df = pd.read_csv(file_name)
-    # Project.objects.all().delete() (moved to start of this method)
     for row in df.itertuples(index=False, name='Pandas'):
+        print(f"Reading row number {row}")
         project = Project(number=row.project_id, description=row.description)
+        print(f"saving project {project}")
         project.save()
     # TODO project.owner (currently defaults messily to superuser)
 
+    print('about to process timestamps')
     TimeStamp.objects.all().delete()
-    # old_file_name = os.path.join(settings.BASE_DIR, "static\\data\\timestamps.csv")
+    print('previous timestamps deleted')
+
     file_name = staticfiles_storage.path('data/timestamps.csv')    
+    print(f"file name found and it was {file_name}")
     Log.debug_entry(1, f"Reading time stamps from {file_name}")
     df = pd.read_csv(file_name)
 

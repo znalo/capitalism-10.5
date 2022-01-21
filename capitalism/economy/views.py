@@ -124,6 +124,7 @@ class AllStocksView(ListView):
     
 class LogView(ListView):
     model=Log
+    template_name='log_list.html'    
 
 def log_collapsible(request):
     log_iterator=Log.objects.all().order_by('id')
@@ -134,6 +135,14 @@ def log_collapsible(request):
     return HttpResponse(template.render(context, request))    
 
 def landingPage(request):
+    print('landing page running a little test')
+    try:
+        stamp=State.current_stamp()
+        print (f"State on arrival at the landing page is {stamp.time_stamp}")
+    except Exception as error:
+        print(f"Corrupt database; reinitializing to a failsafe initial state")
+        print(error)
+        State.failsafe_restart()
     return render(request, 'landing.html')
 
 #! The viewsets below provide access to the API

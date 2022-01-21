@@ -5,14 +5,17 @@ from ..global_constants import *
 
 register = template.Library()
 
+#! supplies list of stages for the dropdown menu
 @register.inclusion_tag('partials/stages.html')
 def control_states():
       context={}
       try:
             current_step=State.current_stamp().step
             current_stage=STEPS[current_step].stage_name
-      except: #! if anything goes wrong just start at the beginning...
-            print("Corrupt initial state {current_step} encountered; set to start at the beginning of a circuit")
+      except Exception as error: 
+      #! if anything goes wrong, report to the user as if the simulation is the at the beginning... (TODO: very temporary)
+            print(f"Corrupt initial state encountered due to the cause listed below ; the user menu has been set to start at the beginning of a circuit")
+            print(error)
             current_step=DEMAND
             current_stage=M_C
       context['active_stage']=current_stage
@@ -47,8 +50,11 @@ def project_list():
 
 @register.inclusion_tag('partials/step_list.html')
 def step_list():
-      current_project=State.current_project()
-      state_list=TimeStamp.objects.filter(project_FK=current_project)
+      try:
+            current_project=State.current_project()
+            state_list=TimeStamp.objects.filter(project_FK=current_project)
+      except:
+            state_list=TimeStamp.objects.all()
       context={}
       context['states']= state_list
       return context

@@ -1,5 +1,5 @@
 from django.db import models
-from ..global_constants import *
+from economy.global_constants import *
 
 class Log(models.Model):
     time_stamp_id = models.IntegerField(default=0, null=False)
@@ -16,15 +16,16 @@ class Log(models.Model):
     def enter(level, message):
         try:
             time_stamp = State.current_stamp()
-            # ! TODO rename this field to avoid confusion
             stamp_number = time_stamp.time_stamp
             current_step = time_stamp.step
             project_id = time_stamp.project_FK.number
             this_entry = Log(time_stamp_id=stamp_number, period=time_stamp.period, stage=time_stamp.stage, step=current_step, project_id=project_id,
                              level=level, message=(message))
-        except:
-            this_entry = Log(-1, -1, stage="unknown", step="unknown", project_id=-1,level=level, message="{message} (state not yet fully defined)")
-        this_entry.save()
+            this_entry.save()
+        except Exception as error:
+            print(f"Log.enter threw an exception reported below")
+            print (error)
+
 
     def debug_entry(level, message):
         if Log.logging_mode == "verbose":
@@ -38,38 +39,30 @@ class Log(models.Model):
     def sim_quantity(value):
         return f"<span class = 'quantity-object'>{value}</span>"
 
-
-
-
 class Project(models.Model):
-    number = models.IntegerField(null=False, default=0)
-    description = models.CharField(max_length=50, default="demand")
-    owner = models.ForeignKey('auth.User', on_delete=models.CASCADE, default=1)
+    number = models.IntegerField(null=False, default=1)
+    description = models.CharField(max_length=50, default=DEMAND)
 
     def __str__(self):
         return f"Project {self.number}[{self.description}]"
 
 
 class TimeStamp(models.Model):
-    project_FK = models.ForeignKey(
-        Project, related_name='time_stamp', on_delete=models.CASCADE, null=True,blank=True)
+    project_FK = models.ForeignKey(Project, related_name='time_stamp', on_delete=models.CASCADE, null=True,blank=True,default=None)
     #! TODO we've allowed blank and null because of the problem of first-time initialization. A better solution is possible
-    time_stamp = models.IntegerField(default=1)
+    time_stamp = models.IntegerField(default=1) # ! TODO rename this field to avoid confusion
     step = models.CharField(max_length=50, default=UNDEFINED)
     stage = models.CharField(max_length=50, default=UNDEFINED)
     period = models.IntegerField(default=1)
-    comparator_time_stamp_FK = models.ForeignKey(
-        "TimeStamp", on_delete=models.DO_NOTHING, null=True, blank=True)
+    comparator_time_stamp_FK = models.ForeignKey("TimeStamp", on_delete=models.DO_NOTHING, null=True, blank=True, default=None)
     melt = models.CharField(max_length=50, default=UNDEFINED)
     population_growth_rate = models.IntegerField(default=1)
     investment_ratio = models.IntegerField(default=1)
     labour_supply_response = models.CharField(max_length=50, default=UNDEFINED)
     price_response_type = models.CharField(max_length=50, default=UNDEFINED)
-    melt_response_type = models.CharField(max_length=50, null=True)
+    melt_response_type = models.CharField(max_length=50, null=True, blank=True,default=None)
     currency_symbol = models.CharField(max_length=2, default="$")
     quantity_symbol = models.CharField(max_length=2, default="#")
-    owner = models.ForeignKey(
-        'auth.User', related_name='timestamps', on_delete=models.CASCADE, default=1)
 
     class Meta:
         ordering = ['project_FK__number', 'time_stamp', ]
@@ -81,17 +74,32 @@ class TimeStamp(models.Model):
 class State(models.Model):
     name = models.CharField(primary_key=True, default="Initial", max_length=50)
     time_stamp_FK = models.OneToOneField(
-        TimeStamp, related_name='state', on_delete=models.CASCADE, blank=True, null=True, default=1)
+        TimeStamp, related_name='state', on_delete=models.CASCADE, blank=True, null=True, default=None)
     #! TODO we've allowed blank and null because of the problem of first-time initialization. A better solution is possible
-    owner = models.ForeignKey('auth.User', on_delete=models.CASCADE, default=1)
+
+#! minimal function to create a barebones consistent database
+#! let everything default except period
+    def failsafe_restart():
+        Project.objects.all().delete()
+        TimeStamp.objects.all().delete()
+        State.objects.all().delete()
+        first_project=Project(number=1,description=DEMAND)
+        first_project.save()
+        first_stamp=TimeStamp(
+            time_stamp=1,
+            project_FK=first_project,
+            period=0,
+            )
+        first_stamp.save()
+        failsafe_state=State(name="Failsafe Temporary",time_stamp_FK=first_stamp)
+        failsafe_state.save()
 
     @staticmethod
     def current_state():
         try:
             return State.objects.get()
         except:
-            raise Exception(
-                "Corrupted State object: cannot continue. This is most likely a data error. Try re-initialising using loaddata")
+            raise f"Current State does not exist. Cannot Continue"
 
     @staticmethod
     def current_stamp():
