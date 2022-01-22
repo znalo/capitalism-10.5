@@ -358,7 +358,11 @@ We'll now make a commit of this working version
 
 ## Commit working version with failsafe initialization and fixture file
 
+* This now works in the development version on the djangoEurope site (www.dev.dascapital.org)
+* But the production version does not (as of 22 January). 
+* We're working on that, but I think it's an install problem, so I'm assuming for now this version is good to go for production.
 
+Added .gitignore, which should have been done a long time ago.
 
-
+## Commit this is now assumed to be ready for production
 
