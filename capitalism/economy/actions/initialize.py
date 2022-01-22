@@ -5,11 +5,9 @@ from economy.models.stocks import IndustryStock, SocialStock
 from economy.actions.exchange import set_initial_capital, set_total_value_and_price
 from django.http import HttpResponse
 from django.template import loader
-from django.conf import settings
-import os
 from django.contrib.staticfiles.storage import staticfiles_storage
 import pandas as pd
-from ..global_constants import *
+from economy.global_constants import *
 
 #! Gets the whole thing going from CSV static files
 # TODO EITHER: Loads of error checking
@@ -29,10 +27,7 @@ def initialize(request):
         print(f"saving project {project}")
         project.save()
     # TODO project.owner (currently defaults messily to superuser)
-
-    print('about to process timestamps')
     TimeStamp.objects.all().delete()
-    print('previous timestamps deleted')
 
     file_name = staticfiles_storage.path('data/timestamps.csv')    
     print(f"file name found and it was {file_name}")

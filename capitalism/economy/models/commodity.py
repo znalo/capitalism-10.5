@@ -1,6 +1,7 @@
 from django.db import models
 from .states import TimeStamp,State
 from ..global_constants import ORIGIN_CHOICES, USAGE_CHOICES, UNDEFINED
+from .users import User
 
 class Commodity(models.Model):
     time_stamp_FK = models.ForeignKey(TimeStamp, related_name='commodity', on_delete=models.CASCADE)
@@ -19,9 +20,9 @@ class Commodity(models.Model):
     display_order = models.IntegerField(null=True, default=1)
     image_name = models.CharField(max_length=25, default=UNDEFINED)
     tooltip = models.CharField(max_length=50, default=UNDEFINED)
-    owner = models.ForeignKey('auth.User', related_name='commodities', on_delete=models.CASCADE, default=1)
     monetarily_effective_demand=models.FloatField(default=0)
     investment_proportion=models.FloatField(default=0)
+    owner = models.ForeignKey(User, related_name='commodities', on_delete=models.CASCADE, default=1)
 
     class Meta:
         verbose_name = 'Commodity'

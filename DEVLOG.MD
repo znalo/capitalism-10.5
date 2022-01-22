@@ -366,3 +366,38 @@ Added .gitignore, which should have been done a long time ago.
 
 ## Commit this is now assumed to be ready for production
 
+Now working on the user model and logging in
+This is needed so each user has a separate simulation model
+At present everyone shares the same model, which is a bit weird - makes it like a multi-user video game
+Would be interesting to explore as an option, but for now, we want to isolate each user experience
+
+First off is to have a consistent user field throughout.
+Following the practice explained in [Matt Friere's excellent course] (https://learn.justdjango.com/courses/getting-started-with-django/custom-user)
+
+* TODO
+ * User Model
+  * use the django user model (from django.contrib.auth import get_user_model) throughout
+  * rebuild the failsafe and initialization functions so that they create databases on a per-user basis
+  * NOTE this means we cannot re-initialize the entire database just because one user's sim falls over
+  * So the database becomes permanent and must be monitored for faults, properly maintained, etc
+  * which suggests we need to develop some tests
+
+ * Reporting
+  * We should distinguish between Reporting and Logging
+  * Reporting produces a user-friendly account of the simulation which allows the user to see what's been going on
+  * Logging is for database maintenance
+  * for this we need some kind of logging framework
+
+It can be seen from the above that there are three related problems which need to be attacked in some kind of systematic way
+  * User model
+  * Database maintenance
+  * Logging
+
+Start with the user model, which from a design viewpoint is probably the worst place to start, but we need to figure out how the thing works before moving on to logging and DB maintenance. So this is not just a design exercise but a learning exercise.
+
+First stab at introducing the user model - no functionality yet, just seeing what breaks
+
+## Commit first tentative user model fields
+
+
+

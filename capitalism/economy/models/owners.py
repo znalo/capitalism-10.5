@@ -3,13 +3,14 @@ from .states import TimeStamp, State, Log
 from .commodity import Commodity
 from .stocks import IndustryStock, Stock,SocialStock
 from ..global_constants import *
+from .users import User
 
 class StockOwner(models.Model): # Base class for Industry and Social Class
     time_stamp_FK = models.ForeignKey(TimeStamp, related_name="%(app_label)s_%(class)s_related", on_delete=models.CASCADE)
     name = models.CharField(max_length=50, default=UNDEFINED)
     commodity_FK = models.ForeignKey(Commodity, related_name='%(app_label)s_%(class)s_related', on_delete=models.CASCADE)
     stock_owner_type=models.CharField(max_length=20,choices=STOCK_OWNER_TYPES,default=UNDEFINED)
-    owner = models.ForeignKey('auth.User', related_name="%(app_label)s_%(class)s_related", on_delete=models.CASCADE, default=1)
+    owner = models.ForeignKey(User, related_name="%(app_label)s_%(class)s_related", on_delete=models.CASCADE, default=1)
 
     class meta:
         ordering = ['time_stamp_FK.time_stamp']
