@@ -5,6 +5,7 @@ from .users import User
 class Project(models.Model):
     number = models.IntegerField(null=False, default=1)
     description = models.CharField(max_length=50, default=DEMAND)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
     def __str__(self):
         return f"Project {self.number}[{self.description}]"
@@ -26,6 +27,7 @@ class TimeStamp(models.Model):
     melt_response_type = models.CharField(max_length=50, null=True, blank=True,default=None)
     currency_symbol = models.CharField(max_length=2, default="$")
     quantity_symbol = models.CharField(max_length=2, default="#")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
     class Meta:
         ordering = ['project_FK__number', 'time_stamp', ]
@@ -36,8 +38,9 @@ class TimeStamp(models.Model):
 
 class State(models.Model):
     name = models.CharField(primary_key=True, default="Initial", max_length=50)
-    time_stamp_FK = models.OneToOneField(
-        TimeStamp, related_name='state', on_delete=models.CASCADE, blank=True, null=True, default=None)
+    time_stamp_FK = models.OneToOneField(TimeStamp, related_name='state', on_delete=models.CASCADE, blank=True, null=True, default=None)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    
     #! TODO we've allowed blank and null because of the problem of first-time initialization. A better solution is possible
 
 #! minimal function to create a barebones consistent database

@@ -22,7 +22,7 @@ class Commodity(models.Model):
     tooltip = models.CharField(max_length=50, default=UNDEFINED)
     monetarily_effective_demand=models.FloatField(default=0)
     investment_proportion=models.FloatField(default=0)
-    owner = models.ForeignKey(User, related_name='commodities', on_delete=models.CASCADE, default=1)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
     class Meta:
         verbose_name = 'Commodity'

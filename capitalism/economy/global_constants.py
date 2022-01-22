@@ -1,5 +1,10 @@
 import logging
+from economy.models.users import User
+
+
+
 logger = logging.getLogger(__name__)
+admin_user=User.objects.first() #! temporary till authentication is all set up
 
 SOCIAL = 'Social'
 INDUSTRIAL = 'Industrial'

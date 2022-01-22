@@ -15,20 +15,22 @@ from economy.global_constants import *
 # TODO OR: only allow input via validated forms
 def initialize(request):
     #! Basic setup: projects, timestamps and state
-    Log.objects.all().delete()
+    logged_in_user=request.user
+    logger.info(f"Initialise for user {logged_in_user}")
+
+    Log.objects.filter(user=logged_in_user).delete()
     Log.enter(0, "+++REDO FROM START+++")
     file_name = staticfiles_storage.path('data/projects.csv')    
     # old_file_name = os.path.join(settings.BASE_DIR, "static\\data\\projects.csv")
     logger.info( f"Reading projects from {file_name}")
-    Project.objects.all().delete()
+    Project.objects.filter(user=logged_in_user).delete()
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
-        print(f"Reading row number {row}")
-        project = Project(number=row.project_id, description=row.description)
-        print(f"saving project {project}")
+        logger.info(f"Reading row number {row}")
+        project = Project(number=row.project_id, description=row.description, user=logged_in_user)
+        logger.info(f"saving project {project}")
         project.save()
-    # TODO project.owner (currently defaults messily to superuser)
-    TimeStamp.objects.all().delete()
+    TimeStamp.objects.filter(user=logged_in_user).delete()
 
     file_name = staticfiles_storage.path('data/timestamps.csv')    
     print(f"file name found and it was {file_name}")
@@ -48,20 +50,20 @@ def initialize(request):
             price_response_type=row.price_response_type,
             melt_response_type=row.melt_response_type,
             currency_symbol=row.currency_symbol,
-            quantity_symbol=row.quantity_symbol
+            quantity_symbol=row.quantity_symbol,
+            user=logged_in_user,
         )
         time_stamp.save()
         time_stamp.comparator_time_stamp_FK=time_stamp #! first stamp has no navel
         time_stamp.save()
         
-    State.objects.all().delete()
-    state = State(name="Initial", time_stamp_FK=TimeStamp.objects.get(
-        time_stamp=1, project_FK__number=1))
+    State.objects.filter(user=logged_in_user).delete()
+    state = State(name="Initial", time_stamp_FK=TimeStamp.objects.get(time_stamp=1, project_FK__number=1))
     state.save()
 
     #! Basic setup complete, now read the data files
     #! Commodities
-    Commodity.objects.all().delete()
+    Commodity.objects.filter(user=logged_in_user).delete()
     # file_name = os.path.join(settings.BASE_DIR, "static\\data\\commodities.csv")
     file_name = staticfiles_storage.path('data/commodities.csv')    
     logger.info( f"Reading commodities from {file_name}")
@@ -83,13 +85,13 @@ def initialize(request):
             allocation_ratio=0,
             display_order=row.display_order,
             image_name=row.image_name,
-            tooltip=row.tooltip
+            tooltip=row.tooltip,
+            user=logged_in_user,
         )
-        # TODO fix owner
         commodity.save()
     
     #!Industries
-    Industry.objects.all().delete()
+    Industry.objects.filter(user=logged_in_user).delete()
     # old_file_name = os.path.join(settings.BASE_DIR, "static\\data\\industries.csv")
     file_name = staticfiles_storage.path('data/industries.csv')    
     logger.info( f"Reading industries from {file_name}")
@@ -107,13 +109,13 @@ def initialize(request):
             current_capital=0,
             stock_owner_type=INDUSTRY,
             initial_capital=0,
-            work_in_progress=0
+            work_in_progress=0,
+            user=logged_in_user,
         )
-        # TODO fix owner
         industry.save()
 
     #! Social Classes
-    SocialClass.objects.all().delete()
+    SocialClass.objects.filter(user=logged_in_user).delete()
     # old_file_name = os.path.join(settings.BASE_DIR, "static\\data\\social_classes.csv")
     file_name = staticfiles_storage.path('data/social_classes.csv')
     logger.info( f"Reading social classes from {file_name}")
@@ -131,9 +133,9 @@ def initialize(request):
             population=row.population,
             participation_ratio=row.participation_ratio,
             consumption_ratio=row.consumption_ratio,
-            revenue=row.revenue
+            revenue=row.revenue,
+            user=logged_in_user,
         )
-        # TODO fix owner
         social_class.save()
 
     #! Stocks
@@ -141,8 +143,8 @@ def initialize(request):
     # ?And if I delete the children, do the parent objects persist?
     # ? See https://stackoverflow.com/questions/9439730/django-how-do-you-delete-child-class-object-without-deleting-parent-class-objec
     # ? Find out by doing it.
-    IndustryStock.objects.all().delete()
-    SocialStock.objects.all().delete()
+    IndustryStock.objects.filter(user=logged_in_user).delete()
+    SocialStock.objects.filter(user=logged_in_user).delete()
 
     # old_file_name = os.path.join(settings.BASE_DIR, "static\\data\\stocks.csv")
     file_name = staticfiles_storage.path('data/stocks.csv')        
@@ -166,9 +168,9 @@ def initialize(request):
                 owner_type=SOCIAL_CLASS,
                 size=row.quantity,
                 demand=0,
-                supply=0
+                supply=0,
+            user=logged_in_user,
             )
-            # TODO fix owner
             social_stock.save()
             logger.info(f"Created a stock of commodity {(social_stock.commodity_FK.name)} of usage type {row.stock_type} for class {(social_stock.social_class_FK.name)} ")
         elif row.owner_type == "INDUSTRY":
@@ -185,26 +187,25 @@ def initialize(request):
                 owner_type=INDUSTRY,
                 size=row.quantity,
                 demand=0,
-                supply=0
+                supply=0,
+                user=logged_in_user,
             )
-            # TODO fix owner
             industry_stock.save()
             logger.info(f"Created a stock of {(industry_stock.commodity_FK.name)} of usage type {row.stock_type} for industry {(industry_stock.industry_FK.name)}")
         else:
-            Log.enter(0, f"++++UNKNOWN OWNER TYPE++++ {row.owner_type}")
+            logger.error(f"++++UNKNOWN OWNER TYPE++++ {row.owner_type}")
     set_total_value_and_price()
     set_initial_capital()
 
-    #! temporary for development purposes - quick and dirty visual report on what was done. 
-    # TODO the logging system should replace this report
+    # TODO replace this temporary for development purposes - quick and dirty visual report on what was done. 
     template = loader.get_template('initialize.html')
     context = {}
-    context['projects'] = Project.objects.all()
-    context['time_stamps'] = TimeStamp.objects.all()
-    context['commodities'] = Commodity.objects.all()
-    context['industries'] = Industry.objects.all()
-    context['social_classes'] = SocialClass.objects.all().order_by(
+    context['projects'] = Project.objects.filter(user=logged_in_user)
+    context['time_stamps'] = TimeStamp.objects.filter(user=logged_in_user)
+    context['commodities'] = Commodity.objects.filter(user=logged_in_user)
+    context['industries'] = Industry.objects.filter(user=logged_in_user)
+    context['social_classes'] = SocialClass.objects.filter(user=logged_in_user).order_by(
         'time_stamp_FK__number')
-    context['industry_stocks'] = IndustryStock.objects.all()
-    context['social_stocks'] = SocialStock.objects.all()
+    context['industry_stocks'] = IndustryStock.objects.filter(user=logged_in_user)
+    context['social_stocks'] = SocialStock.objects.filter(user=logged_in_user)
     return HttpResponse(template.render(context, request))

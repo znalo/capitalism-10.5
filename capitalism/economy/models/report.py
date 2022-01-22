@@ -11,7 +11,7 @@ class Log(models.Model):
     project_id = models.IntegerField(default=0, null=False)
     level = models.IntegerField(default=0, null=False)
     message = models.CharField(max_length=250, null=False)
-    user=models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
     logging_mode = "verbose"
 

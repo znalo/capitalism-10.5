@@ -415,3 +415,12 @@ Separated `Log` out as a separate class in the file `report.py`
  (TODO this should be refactored to be named `Report`)
 ## Commit separate Log class created
 
+We now added a 'user' class to all models, modified Initialise so it only initializes the logged in user, and tested this for one user (me)
+* TODO table display should select only what the logged in user owns
+* TODO in general, all functionality should be user-specific
+* TODO some unit tests of integrity and isolation
+
+First, construct some kind of authentication and logging in system
+
+## Commit initial step in user isolation: models defined, and initialization
+

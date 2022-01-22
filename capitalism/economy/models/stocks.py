@@ -18,7 +18,7 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
     demand=models.FloatField( default=0)
     supply=models.FloatField( default=0)
     monetary_demand=models.FloatField(default=0) #! Conveninence field - should normally be simply set to demand * commodity.unit_price
-    owner = models.ForeignKey(User, related_name='%(app_label)s_%(class)s_related', on_delete=models.CASCADE, default=1)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
     def comparator_stock(self):
         comparator_time_stamp=self.time_stamp_FK.comparator_time_stamp_FK
