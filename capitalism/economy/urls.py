@@ -2,14 +2,14 @@ from django.contrib import admin
 from django.conf.urls import url
 from economy import views
 from economy.actions import control
-from django.urls import path
+from django.urls import path, include
 from economy.actions.control import select_project
 from economy.actions.initialize import initialize
 
 urlpatterns = [
     path('', views.landingPage, name='landing-page'),
     url('^admin/', admin.site.urls),
-
+    path('accounts/', include('django.contrib.auth.urls')), # new
     url('log/table', views.LogView.as_view(), name='log'),
     url('log/mode', views.switch_log_mode, name='mode'),
 

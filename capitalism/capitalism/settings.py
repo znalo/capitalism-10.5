@@ -61,6 +61,7 @@ TEMPLATES = [
             os.path.join(os.path.dirname(__file__), 'templates'),
             str(BASE_DIR.joinpath("templates")),
             str(BASE_DIR.joinpath('economy/templates')),#! Bit of a botch, just to get the production version running
+            str(BASE_DIR.joinpath('templates'))            
             ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -173,3 +174,4 @@ LOGGING = {
     },
 }
 
+LOGIN_REDIRECT_URL = '/'
