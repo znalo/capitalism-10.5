@@ -3,7 +3,6 @@ from economy.global_constants import *
 from .users import User
 
 
-
 class Project(models.Model):
     number = models.IntegerField(null=False, default=1)
     description = models.CharField(max_length=50, default=DEMAND)
@@ -85,8 +84,7 @@ class State(models.Model):
     # TODO the user should also be a selector for the state, since different users will have different states
     @staticmethod
     def set_project(time_stamp):
-        Log.debug_entry(
-            0, f"Setting project to {time_stamp.project_FK.description}")
+        logger.info(f"Setting project to {time_stamp.project_FK.description}")
         try:
             current_state = State.current_state()
             current_state.time_stamp_FK = time_stamp
@@ -120,8 +118,7 @@ class State(models.Model):
         new_number = new_time_stamp.time_stamp
         old_step = new_time_stamp.comparator_time_stamp_FK.step
         new_step = new_time_stamp.step
-        Log.debug_entry(
-            2, f"Stepping from Old Time Stamp {old_number} representing step {old_step} to New Time Stamp {new_number} representing step {new_step}")
+        logger.info(f"Stepping from Old Time Stamp {old_number} representing step {old_step} to New Time Stamp {new_number} representing step {new_step}")
         return new_time_stamp
 
     #! Set the comparator of the current time stamp to a new comparator
@@ -150,8 +147,7 @@ class State(models.Model):
             industry.pk = None
             industry.id = None
             industry.save()
-            Log.debug_entry(
-                2, f"Created a new Industry record {Log.sim_object(industry.name)} with time stamp {industry.time_stamp_FK.time_stamp} which will contain the results of action {industry.time_stamp_FK.step}")
+            logger.info(f"Created a new Industry record {(industry.name)} with time stamp {industry.time_stamp_FK.time_stamp} which will contain the results of action {industry.time_stamp_FK.step}")
 
         commodities = Commodity.objects.filter(time_stamp_FK=old_time_stamp)
         for commodity in commodities:
@@ -159,8 +155,7 @@ class State(models.Model):
             commodity.id = None
             commodity.time_stamp_FK = new_time_stamp
             commodity.save()
-            Log.debug_entry(
-                2, f"Created a new Commodity record {Log.sim_object(commodity.name)} with time stamp {commodity.time_stamp_FK.time_stamp} which will contain the results of action {commodity.time_stamp_FK.step}")
+            logger.info(f"Created a new Commodity record {(commodity.name)} with time stamp {commodity.time_stamp_FK.time_stamp} which will contain the results of action {commodity.time_stamp_FK.step}")
 
         social_classes = SocialClass.objects.filter(
             time_stamp_FK=old_time_stamp)
@@ -169,8 +164,7 @@ class State(models.Model):
             social_class.id = None
             social_class.time_stamp_FK = new_time_stamp
             social_class.save()
-            Log.debug_entry(
-                2, f"Created a new Social Class record {Log.sim_object(social_class.name)} with time stamp {social_class.time_stamp_FK.time_stamp} which will contain the results of action {social_class.time_stamp_FK.step}")
+            logger.info(f"Created a new Social Class record {(social_class.name)} with time stamp {social_class.time_stamp_FK.time_stamp} which will contain the results of action {social_class.time_stamp_FK.step}")
 
         social_stocks = SocialStock.objects.filter(
             time_stamp_FK=old_time_stamp)
@@ -179,8 +173,7 @@ class State(models.Model):
             social_stock.id = None
             social_stock.time_stamp_FK = new_time_stamp
             social_stock.save()
-            Log.debug_entry(
-                2, f"Created a new Social Stock record of usage type {Log.sim_object(social_stock.usage_type)} for owner {Log.sim_object(social_stock.stock_owner_name)} with time stamp {social_stock.time_stamp_FK.time_stamp} which will contain the results of action {social_stock.time_stamp_FK.step}")
+            logger.info(f"Created a new Social Stock record of usage type {(social_stock.usage_type)} for owner {(social_stock.stock_owner_name)} with time stamp {social_stock.time_stamp_FK.time_stamp} which will contain the results of action {social_stock.time_stamp_FK.step}")
 
         industry_stocks = IndustryStock.objects.filter(
             time_stamp_FK=old_time_stamp)
@@ -189,8 +182,7 @@ class State(models.Model):
             industry_stock.id = None
             industry_stock.time_stamp_FK = new_time_stamp
             industry_stock.save()
-            Log.debug_entry(
-                2, f"Created a new Industry Stock record of usage type {Log.sim_object(industry_stock.usage_type)} for owner {Log.sim_object(industry_stock.stock_owner_name)} with time stamp {industry_stock.time_stamp_FK.time_stamp} which will contain the results of action {industry_stock.time_stamp_FK.step}")
+            logger.info(f"Created a new Industry Stock record of usage type {(industry_stock.usage_type)} for owner {(industry_stock.stock_owner_name)} with time stamp {industry_stock.time_stamp_FK.time_stamp} which will contain the results of action {industry_stock.time_stamp_FK.step}")
         return
 
     #! this method works with create_stamp (and should perhaps be integrated into it)
@@ -205,17 +197,16 @@ class State(models.Model):
         from .owners import Industry, SocialClass
 
         #! connect industries to their related commodities
-        Log.debug_entry(1, "Connecting records")
+        logger.info("Connecting records")
         industries = Industry.objects.filter(time_stamp_FK=new_time_stamp)
         for industry in industries:
             commodity_name = industry.commodity_FK.name
-            Log.debug_entry(
-                2, f"Connecting Industry {Log.sim_object(industry.name)} to its output commodity {Log.sim_object(commodity_name)}")
+            logger.info(f"Connecting Industry {(industry.name)} to its output commodity {(commodity_name)}")
     #! find the commodity with the same name but the new time stamp
             candidates = Commodity.objects.filter(
                 name=commodity_name, time_stamp_FK=new_time_stamp)
             if candidates.count() > 1:
-                Log.debug_entry(0, f"+++DUPLICATE COMMODITIES {candidates}+++")
+                logger.info( f"+++DUPLICATE COMMODITIES {candidates}+++")
             else:
                 industry.commodity_FK = candidates.get()
             industry.save()
@@ -224,8 +215,7 @@ class State(models.Model):
             time_stamp_FK=new_time_stamp)
         for industry_stock in industry_stocks:
             commodity_name = industry_stock.commodity_FK.name
-            Log.debug_entry(
-                2, f"Connecting Industry Stock of usage type {Log.sim_object(industry_stock.usage_type)} to commodity {Log.sim_object(commodity_name)}")
+            logger.info(f"Connecting Industry Stock of usage type {(industry_stock.usage_type)} to commodity {(commodity_name)}")
     #! find the commodity that has the same name but the new time stamp
             new_commodity = Commodity.objects.get(
                 name=commodity_name, time_stamp_FK=new_time_stamp)
@@ -234,8 +224,7 @@ class State(models.Model):
             industry_name = industry_stock.industry_FK.name
             new_industry = Industry.objects.get(
                 name=industry_name, time_stamp_FK=new_time_stamp)
-            Log.debug_entry(
-                2, f"Connecting Industry Stock of usage type {Log.sim_object(industry_stock.usage_type)} to its industry {Log.sim_object(industry_name)}")
+            logger.info(f"Connecting Industry Stock of usage type {(industry_stock.usage_type)} to its industry {(industry_name)}")
             industry_stock.industry_FK = new_industry
             industry_stock.stock_owner_FK = new_industry
             industry_stock.save()
@@ -245,8 +234,7 @@ class State(models.Model):
             time_stamp_FK=new_time_stamp)
         for social_stock in social_stocks:
             commodity_name = social_stock.commodity_FK.name
-            Log.debug_entry(
-                2, f"Connecting Social Stock of usage type {Log.sim_object(social_stock.usage_type)} to commodity {Log.sim_object(commodity_name)}")
+            logger.info(f"Connecting Social Stock of usage type {(social_stock.usage_type)} to commodity {(commodity_name)}")
     #! find the commodity that has the same name but the new time stamp
             new_commodity = Commodity.objects.get(
                 name=commodity_name, time_stamp_FK=new_time_stamp)
@@ -255,8 +243,7 @@ class State(models.Model):
             social_class_name = social_stock.social_class_FK.name
             new_social_class = SocialClass.objects.get(
                 name=social_class_name, time_stamp_FK=new_time_stamp)
-            Log.debug_entry(
-                2, f"Connecting Social Stock of usage_type {Log.sim_object(social_stock.usage_type)} to its social class {Log.sim_object(social_class_name)}")
+            logger.info(f"Connecting Social Stock of usage_type {(social_stock.usage_type)} to its social class {(social_class_name)}")
             social_stock.social_class_FK = new_social_class
             social_stock.stock_owner_FK = new_social_class
             social_stock.save()
@@ -306,10 +293,6 @@ class Log(models.Model):
             this_entry.save()
         else:
             this_entry=Log(time_stamp_id=0, period=0, stage="Not yet started", step="Not yet started", project_id=0,level=level, message=(message))
-
-    def debug_entry(level, message):
-        if Log.logging_mode == "verbose":
-            Log.enter(level, message)
 
     @staticmethod
     def sim_object(value):

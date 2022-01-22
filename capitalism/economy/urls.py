@@ -25,7 +25,7 @@ urlpatterns = [
     url('tables/social-stocks', views.SocialStockView.as_view(), name='social-stocks'),
     url('tables/all-stocks', views.AllStocksView.as_view(), name='all-stocks'),
 
-    url('control/sandbox', views.sandbox, name='sandbox'),
+    url('sandbox', views.sandbox, name='sandbox'),
     url('control/initialize', initialize, name='initialize'),
     url(r'project/(?P<id>[\d-]+)', select_project, name='project-select'),
     url(r'stage/(?P<act>[\w-]+)/$', control.stage_execute, name='stage'),

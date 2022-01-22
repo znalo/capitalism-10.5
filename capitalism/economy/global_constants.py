@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 SOCIAL = 'Social'
 INDUSTRIAL = 'Industrial'
 MONEY = 'Money'

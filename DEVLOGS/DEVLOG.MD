@@ -399,5 +399,15 @@ First stab at introducing the user model - no functionality yet, just seeing wha
 
 ## Commit first tentative user model fields
 
+* Decouple logging from reporting - start
+  * (Moving this file to the folder DEVLOGS)
+  * Created PRODUCTION_NOTES.MD to record changes that we need to ensure are in the production version
+  * In 'settings' add the code from [this blog](https://www.freecodecamp.org/news/logging-in-python-debug-your-django-projects/)
 
+Actually, the [docs](https://docs.djangoproject.com/en/3.2/topics/logging/#examples) are quite comprehensible
+There seems to be a bug in the logging.Streamhandler so we get a broken pipe instead of an error message
+But we only want file output anyhow, so we'll stick with a barebones for now.
 
+* Very simple logging system created - just fires off info report to 'debug.log' - which is enough for now.
+
+## Commit rudimentary logging system established

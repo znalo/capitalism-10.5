@@ -150,30 +150,63 @@ FIXTURE_DIRS =[str(BASE_DIR.joinpath("fixtures"))]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# Set 'django.db.backends' to DEBUG in order to see the DB queries
-LOGGING = {
-    "version": 1,
-    "handlers": {
-        "console": {"level": "DEBUG", "class": "logging.StreamHandler"},
-    },
-    "loggers": {
-        "django.db.backends": {
-            "level": "WARNING",
-            "handlers": ["console"]
-        },
-        "django.request": {
-            "handlers": ["console"],
-            "propagate": False,
-            "level": "WARNING",
-        },
-        "django.server": {
-            "handlers": ["console"],
-            "level": "WARNING",
-            "propagate": False,
-        },
-    },
-}
+
 
 LOGIN_REDIRECT_URL = '/'
 
 AUTH_USER_MODEL='economy.User'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },    
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'debug.log',
+            'formatter': 'verbose'
+        },
+    },
+    'root': {
+        'handlers': ['file'],
+        'level': 'INFO',
+    },
+}
+
+#! Below is what comes with the standard setup
+# # Set 'django.db.backends' to DEBUG in order to see the DB queries
+# LOGGING = {
+#     "version": 1,
+#     "handlers": {
+#         "console": {"level": "DEBUG", "class": "logging.StreamHandler"},
+#     },
+#     "loggers": {
+#         "django.db.backends": {
+#             "level": "WARNING",
+#             "handlers": ["console"]
+#         },
+#         "django.request": {
+#             "handlers": ["console"],
+#             "propagate": False,
+#             "level": "WARNING",
+#         },
+#         "django.server": {
+#             "handlers": ["console"],
+#             "level": "WARNING",
+#             "propagate": False,
+#         },
+#     },
+# }

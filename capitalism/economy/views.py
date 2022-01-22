@@ -11,6 +11,7 @@ from .models.states import State
 from .global_constants import *
 from django.urls import reverse
 
+
 def get_economy_view_context(request):#TODO change name - this function now not only creates the context but also displays is, so the naming is wrong
         current_time_stamp=State.current_stamp()
         industry_stocks = IndustryStock.objects.filter(time_stamp_FK=current_time_stamp)
@@ -39,6 +40,7 @@ def sandbox(request):
     context = {
         'table_query': table_query,
     }
+    logger.error("Test!!")
     return HttpResponse(template.render(context, request))
 
 class TimeStampView(ListView):
