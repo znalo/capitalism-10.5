@@ -424,3 +424,9 @@ First, construct some kind of authentication and logging in system
 
 ## Commit initial step in user isolation: models defined, and initialization
 
+(Digression)
+* Fix static files as in https://learn.justdjango.com/courses/getting-started-with-django/staticfiles
+
+Login button incorporated
+
+## Commit rudimentary login working

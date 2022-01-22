@@ -1,4 +1,4 @@
-from economy.models.states import (Project, TimeStamp, State)
+from economy.models.states import Project, TimeStamp, State
 from economy.models.report import Log
 from economy.models.commodity import Commodity
 from economy.models.owners import Industry, SocialClass

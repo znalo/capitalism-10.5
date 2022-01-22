@@ -5,6 +5,7 @@ from economy.actions import control
 from django.urls import path, include
 from economy.actions.control import select_project
 from economy.actions.initialize import initialize
+from django.contrib.auth.views import LoginView
 
 urlpatterns = [
     path('', views.landingPage, name='landing-page'),
@@ -31,6 +32,8 @@ urlpatterns = [
     url(r'stage/(?P<act>[\w-]+)/$', control.stage_execute, name='stage'),
     url(r'control/(?P<period>[\d-]+)/(?P<stage>[\w-]+)/(?P<step>[\w-]+)/$', control.comparator_select, name='comparator-select'),
     url(r'step/(?P<act>[\w-]+)/$', control.step_execute, name='execute'),
+
+    path('login/',LoginView.as_view(),name='login')
 
 ]
 
