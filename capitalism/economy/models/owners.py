@@ -1,5 +1,6 @@
 from django.db import models
-from .states import TimeStamp, State, Log
+from .states import TimeStamp, State
+from .report import Log
 from .commodity import Commodity
 from .stocks import IndustryStock, Stock,SocialStock
 from ..global_constants import *

@@ -1,6 +1,7 @@
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
-from .models.states import TimeStamp, Log
+from .models.states import TimeStamp
+from economy.models.report import Log
 from .models.commodity import Commodity
 from .models.owners import Industry, SocialClass, StockOwner
 from .models.stocks import IndustryStock, SocialStock, Stock

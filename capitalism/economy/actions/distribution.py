@@ -1,7 +1,7 @@
-from economy.models.states import State, Log
-from economy.models.owners import Industry, SocialClass, StockOwner
+from economy.models.report import Log
+from economy.models.owners import Industry, SocialClass
 from economy.models.commodity import Commodity
-from economy.actions.exchange import calculate_demand, calculate_supply, set_initial_capital
+from economy.actions.exchange import calculate_demand, set_initial_capital
 from ..global_constants import *
 
 #! In the revenue stage, profit is transferred to the owners of the industries

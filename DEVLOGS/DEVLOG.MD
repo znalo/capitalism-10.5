@@ -411,3 +411,7 @@ But we only want file output anyhow, so we'll stick with a barebones for now.
 * Very simple logging system created - just fires off info report to 'debug.log' - which is enough for now.
 
 ## Commit rudimentary logging system established
+Separated `Log` out as a separate class in the file `report.py`
+ (TODO this should be refactored to be named `Report`)
+## Commit separate Log class created
+

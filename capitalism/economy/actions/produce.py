@@ -1,6 +1,7 @@
 from ..global_constants import *
 from economy.actions.exchange import set_total_value_and_price, set_current_capital
-from economy.models.states import State, Log
+from economy.models.states import State
+from economy.models.report import Log
 from economy.models.commodity import Commodity
 from economy.models.owners import Industry, SocialClass
 from economy.models.stocks import Stock, IndustryStock, SocialStock

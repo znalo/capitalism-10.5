@@ -1,5 +1,6 @@
 from django.http.response import HttpResponseRedirect
-from economy.models.states import (Project, TimeStamp, State, Log)
+from economy.models.states import (Project, TimeStamp, State)
+from economy.models.report import Log
 from economy.views import get_economy_view_context
 from ..global_constants import *
 from django.urls import reverse
