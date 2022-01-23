@@ -430,3 +430,17 @@ First, construct some kind of authentication and logging in system
 Login button incorporated
 
 ## Commit rudimentary login working
+
+Next steps
+ * style the forms a bit
+ * restrictions on functionality for users who are not logged in
+ * ensure the functionality is correct for user who is logged in
+ * when a user is created, they should get an initialized database (with perhaps one project?)
+ * Ideally users should be able to dump and restore but that will have to wait
+What should a non-logged in user be able to do?
+ * probably, should see a project 1 simulation that has gone through one complete circuit
+ * should not be able to 
+  * take any steps to move the simulation
+  * initialize
+  
+## Commit save before styling

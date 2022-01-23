@@ -26,7 +26,6 @@
             </div>
             <div class="w3-right">
                 {% project_list %} {% control_states %}
-                <a href="{% url 'mode' %}" class="w3-button w3-small w3-round" role="button">{% logging_mode %}</a> {% include "partials/login_button.html" %}
                 <div class="w3-dropdown-hover">
                     <button class="w3-button w3-small">Tables</button>
                     <div class="w3-dropdown-content w3-bar-block w3-card-4">
@@ -47,6 +46,7 @@
                         <a class="w3-bar-item w3-button w3-small " href="{% url 'sandbox' %}" role="button">Sandbox</a>
                     </div>
                 </div>
+                <a href="{% url 'mode' %}" class="w3-button w3-small w3-round" role="button">{% logging_mode %}</a> {% include "partials/login_button.html" %}
             </div>
         </div>
     </div>

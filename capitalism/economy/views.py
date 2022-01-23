@@ -1,5 +1,6 @@
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
+from economy.forms import UserModelForm
 from .models.states import TimeStamp
 from economy.models.report import Log
 from .models.commodity import Commodity
@@ -11,7 +12,8 @@ from django.views.generic import ListView
 from .models.states import State
 from .global_constants import *
 from django.urls import reverse
-
+from django.views import generic
+from .forms import CustomUserCreationForm
 
 def get_economy_view_context(request):#TODO change name - this function now not only creates the context but also displays is, so the naming is wrong
         current_time_stamp=State.current_stamp()
@@ -148,29 +150,9 @@ def landingPage(request):
         State.failsafe_restart()
     return render(request, 'landing.html')
 
-#! The viewsets below provide access to the API
-#! This development branch currently not being followed
-def apiViews(request):
-    return render(request, 'api_views.html')
+class SignupView(generic.CreateView):
+    template_name='registration/signup.html'
+    form_class=CustomUserCreationForm
 
-def commodityTable(request):
-    return render(request, 'api-commodities.html')
-
-def projectTable(request):
-    return render(request, 'api-projects.html')
-
-def industryTable(request):
-    return render(request, 'api-industries.html')
-
-def socialClassTable(request):
-    return render(request, 'api-social-classes.html')
-
-def socialStockTable(request):
-    return render(request, 'api-social-stocks.html')
-
-def industryStockTable(request):
-    return render(request, 'api-industry-stocks.html')
-
-def timeStampTable(request):
-    return render(request, 'api-time-stamps.html')
-
+    def get_success_url(self):
+        return reverse("login")

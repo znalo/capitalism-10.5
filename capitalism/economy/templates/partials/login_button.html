@@ -2,6 +2,8 @@
 <a href="{% url 'logout' %}" class="w3-bar-item w3-button w3-small">
   ({{ request.user.username }}) Logout
 </a> {% else %}
-<a href="{% url 'login' %}" class="w3-bar-item w3-button w3-small">
-  Login
+<a href="{% url 'login' %}" class="w3-bar-item w3-button w3-small">Login
+</a>
+<a href="{% url 'signup' %}" class="w3-bar-item w3-button w3-small">Sign up </a>
+
 </a> {% endif %}
