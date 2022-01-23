@@ -442,5 +442,21 @@ What should a non-logged in user be able to do?
  * should not be able to 
   * take any steps to move the simulation
   * initialize
-  
+  * see the admin option or visit the admin page
+Other TODOs
+ * note: only admin user should be able to see the admin options
+ * logout should not redirect to the admin login but to the economy page
+ * user permissions
+ * change password option
+
+ 
+
 ## Commit save before styling
+At this point we rebuilt the capenv environment which had got a bit corrupted
+And installed django-crispy-forms
+And did a pip freeze >requirements.txt
+
+For some reason the gitignore is still including all the environment files, so not sure what will happen when we do the next commit
+
+## Commit rebuild environment, some files might be lost?
+

@@ -1,4 +1,4 @@
-#!C:\Users\afree\Documents\Github\capitalism 10.4\capenv\Scripts\python.exe
+#!C:\Users\afree\Documents\Github\capitalism 10.5\capenv\Scripts\python.exe
 # When the django-admin.py deprecation ends, remove this script.
 import warnings
 

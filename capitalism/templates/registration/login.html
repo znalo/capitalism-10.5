@@ -1,6 +1,6 @@
 {% extends 'base.html' %} {% block content %}
 
-<form method="post" class="mt-5">
+<form class="w3-container" method="post" class="mt-5">
     {% csrf_token %} {{ form.as_p }}
     <button type='submit'>
             Login

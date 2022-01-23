@@ -1,4 +1,4 @@
-#!C:\Users\afree\Documents\Github\capitalism 10.4\capenv\Scripts\python.exe
+#!C:\Users\afree\Documents\Github\capitalism 10.5\capenv\Scripts\python.exe
 # Copyright (c) 2005-2012 Stephen John Machin, Lingfo Pty Ltd
 # This script is part of the xlrd package, which is released under a
 # BSD-style licence.

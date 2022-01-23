@@ -156,3 +156,4 @@ class SignupView(generic.CreateView):
 
     def get_success_url(self):
         return reverse("login")
+

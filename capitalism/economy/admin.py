@@ -4,6 +4,7 @@ from .models.report import Log
 from .models.commodity import Commodity
 from .models.owners import Industry, SocialClass
 from .models.stocks import SocialStock, State, IndustryStock
+from .models.users import User
 
 admin.site.register(Commodity)
 admin.site.register(Project)
@@ -14,3 +15,4 @@ admin.site.register(SocialStock)
 admin.site.register(IndustryStock)
 admin.site.register(State)
 admin.site.register(Log)
+admin.site.register(User)

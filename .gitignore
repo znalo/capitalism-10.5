@@ -5,6 +5,9 @@ __pycache__
 db.sqlite3
 media
 
+#Virtual Environment
+capenv/
+
 # Backup files # 
 *.bak 
 
@@ -134,3 +137,6 @@ GitHub.sublime-settings
 !.vscode/launch.json 
 !.vscode/extensions.json 
 .history
+node_modules
+node_modules
+node_modules

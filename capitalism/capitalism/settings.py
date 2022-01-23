@@ -150,6 +150,9 @@ FIXTURE_DIRS =[str(BASE_DIR.joinpath("fixtures"))]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/'
+
+LOGOUT_REDIRECT_URL = '/' # new
+
 EMAIL_BACKEND='django.core.mail.backends.console.EmailBackend'
 
 AUTH_USER_MODEL='economy.User'
