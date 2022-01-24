@@ -123,6 +123,7 @@ def sale(seller_stock, buyer_stock, seller, buyer):
 
 def set_total_value_and_price():
     Log.enter(1,"Calculate Total Values, Prices and initial capital")
+    logger.info("Calculate Total Values, Prices and initial capital")
     current_time_stamp = State.current_stamp()
     stocks=Stock.objects.filter(time_stamp_FK=current_time_stamp)
     for stock in stocks:

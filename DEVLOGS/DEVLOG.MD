@@ -467,3 +467,15 @@ TODO Then we need to come back to fix the permissions
 
 ## Commit login, signup, logout initial working (except for password renewal)
 
+Start work on the user-specific database initialization
+The tack I will follow at first is this:
+* Fix the initialization procedure as it stands so as to create a complete database
+* Create such a database for the admin user
+* Freeze this in some way
+* When a new user logs in, they get a complete copy of the admin user database
+* The admin user himself doesn't run simulations. He logs in as somebody else
+
+-- Some kind of rogue install of pip removed (node_modules, package.json, package_lock.json outside the environment )
+-- Created fixture files for a full database, and for a full database with one circuit completed
+
+## Commit about to overhaul models to deal with multiple users

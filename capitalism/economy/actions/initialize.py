@@ -10,19 +10,20 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 import pandas as pd
 from economy.global_constants import *
 
-#! Gets the whole thing going from CSV static files
-# TODO EITHER: Loads of error checking
-# TODO OR: only allow input via validated forms
+#! Creates a fresh, complete dataset for a single user
+#! Wipes out anything they already have
+
 def initialize(request):
     #! Basic setup: projects, timestamps and state
     logged_in_user=request.user
     logger.info(f"Initialise for user {logged_in_user}")
 
+    #! Projects
     Log.objects.filter(user=logged_in_user).delete()
+    logger.info( f"User {logged_in_user} is re-initializins the database")
     Log.enter(0, "+++REDO FROM START+++")
     file_name = staticfiles_storage.path('data/projects.csv')    
-    # old_file_name = os.path.join(settings.BASE_DIR, "static\\data\\projects.csv")
-    logger.info( f"Reading projects from {file_name}")
+    logger.info (f"Initializing projects from file {file_name}")
     Project.objects.filter(user=logged_in_user).delete()
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
@@ -30,10 +31,10 @@ def initialize(request):
         project = Project(number=row.project_id, description=row.description, user=logged_in_user)
         logger.info(f"saving project {project}")
         project.save()
-    TimeStamp.objects.filter(user=logged_in_user).delete()
 
+    #! Timestamps    
+    TimeStamp.objects.filter(user=logged_in_user).delete()
     file_name = staticfiles_storage.path('data/timestamps.csv')    
-    print(f"file name found and it was {file_name}")
     logger.info( f"Reading time stamps from {file_name}")
     df = pd.read_csv(file_name)
 
@@ -169,7 +170,7 @@ def initialize(request):
                 size=row.quantity,
                 demand=0,
                 supply=0,
-            user=logged_in_user,
+                user=logged_in_user,
             )
             social_stock.save()
             logger.info(f"Created a stock of commodity {(social_stock.commodity_FK.name)} of usage type {row.stock_type} for class {(social_stock.social_class_FK.name)} ")
