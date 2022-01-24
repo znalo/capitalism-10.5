@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework_datatables',
     'economy',
+    'crispy_forms',
+    'crispy_tailwind',
 ]
 
 MIDDLEWARE = [
@@ -156,6 +158,10 @@ LOGOUT_REDIRECT_URL = '/' # new
 EMAIL_BACKEND='django.core.mail.backends.console.EmailBackend'
 
 AUTH_USER_MODEL='economy.User'
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
+
+CRISPY_TEMPLATE_PACK = "tailwind"
 
 LOGGING = {
     'version': 1,

@@ -1,12 +1,10 @@
 from django.contrib import admin
 from django.conf.urls import url
 from economy import views
-from economy.views import SignupView
 from economy.actions import control
 from django.urls import path, include
 from economy.actions.control import select_project
 from economy.actions.initialize import initialize
-from django.contrib.auth.views import LoginView, LogoutView
 
 urlpatterns = [
     path('', views.landingPage, name='landing-page'),
@@ -33,11 +31,12 @@ urlpatterns = [
     url(r'stage/(?P<act>[\w-]+)/$', control.stage_execute, name='stage'),
     url(r'control/(?P<period>[\d-]+)/(?P<stage>[\w-]+)/(?P<step>[\w-]+)/$', control.comparator_select, name='comparator-select'),
     url(r'step/(?P<act>[\w-]+)/$', control.step_execute, name='execute'),
-
-    path('login/',LoginView.as_view(),name='login'),
-    path('logout/',LogoutView.as_view(),name='logout'),
-    path('signup/', SignupView.as_view(), name='signup')
-
-
+# #! The Matt Freire way of authentication and login
+#     path('login/',LoginView.as_view(),name='login'),
+#     path('logout/',LogoutView.as_view(),name='logout'),
+    path('signup/', views.signup, name='signup'),
 ]
-
+#! The [Mozilla way](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Authentication)
+urlpatterns += [
+    path('accounts/', include('django.contrib.auth.urls')),
+]

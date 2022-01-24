@@ -12,8 +12,8 @@ from django.views.generic import ListView
 from .models.states import State
 from .global_constants import *
 from django.urls import reverse
-from django.views import generic
-from .forms import CustomUserCreationForm
+from .forms import SignUpForm
+from django.contrib.auth import authenticate,login
 
 def get_economy_view_context(request):#TODO change name - this function now not only creates the context but also displays is, so the naming is wrong
         current_time_stamp=State.current_stamp()
@@ -150,10 +150,31 @@ def landingPage(request):
         State.failsafe_restart()
     return render(request, 'landing.html')
 
-class SignupView(generic.CreateView):
-    template_name='registration/signup.html'
-    form_class=CustomUserCreationForm
+# class SignupView(generic.CreateView):
+#     template_name='registration/signup.html'
+#     form_class=CustomUserCreationForm
 
-    def get_success_url(self):
-        return reverse("login")
+#     def get_success_url(self):
+#         return reverse("login")
 
+#! See the [CSEStack](https://www.csestack.org/django-sign-up-registration-form/) solution
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            user.refresh_from_db()  
+            # load the profile instance created by the signal
+            user.save()
+            raw_password = form.cleaned_data.get('password1')
+ 
+            # login user after signing up
+            user = authenticate(username=user.username, password=raw_password)
+            login(request, user)
+ 
+            # redirect user to home page
+            # return redirect('home')
+            return HttpResponseRedirect(reverse("economy"))
+    else:
+        form = SignUpForm()
+    return render(request, 'registration/signup.html', {'form': form})

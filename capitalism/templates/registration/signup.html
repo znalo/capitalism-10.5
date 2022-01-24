@@ -1,8 +1,25 @@
 {% extends 'base.html' %} {% block content %}
+<div class="w3-container" style="width:50% ">
+    <div class="w3-card-2 ">
+        <header class="w3-container w3-blue ">
+            <h3>Sign Up</h3>
+        </header>
+        <h5 class="w3-padding-large">Signing up allows you to log in as a user, run the simulation, view the output and maintain a persistent, private copy of your simulation that you can return to at any time. (unless the site falls over). We will not share the information with
+            anyone. However, if you run into problems and ask us to fix them, we may access your account data for diagnostic purposes.</h5>
 
-<form class="w3-container" method="post">
-    {% csrf_token %} {{ form.as_p }}
-    <button type='submit'>Signup</button>
-</form>
+    </div>
 
-{% endblock content %}
+
+    <form method="POST">
+        {% csrf_token %} {% for field in form %}
+        <p>
+            {{ field.label_tag }}<br> {{ field }} {% if field.help_text %}
+            <div style="color: darkslategray ">{{ field.help_text }}</div> {% endif %} {% for error in field.errors %}
+            <p style="color: red ">{{ error }}</p>
+            {% endfor %}
+        </p>
+        {% endfor %}
+        <button type="submit ">Sign up</button>
+    </form>
+</div>
+{% endblock %}

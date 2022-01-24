@@ -460,3 +460,10 @@ For some reason the gitignore is still including all the environment files, so n
 
 ## Commit rebuild environment, some files might be lost?
 
+Login and styling done
+TODO password reset doesn't work because we haven't got emails working
+TODO now we move on to the initialization
+TODO Then we need to come back to fix the permissions
+
+## Commit login, signup, logout initial working (except for password renewal)
+
