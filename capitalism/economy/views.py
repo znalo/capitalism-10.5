@@ -1,7 +1,6 @@
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
-from economy.forms import UserModelForm
-from .models.states import TimeStamp
+from .models.states import TimeStamp, User
 from economy.models.report import Log
 from .models.commodity import Commodity
 from .models.owners import Industry, SocialClass, StockOwner
@@ -9,14 +8,13 @@ from .models.stocks import IndustryStock, SocialStock, Stock
 from django.http import HttpResponse
 from django.template import loader
 from django.views.generic import ListView
-from .models.states import State
 from .global_constants import *
 from django.urls import reverse
 from .forms import SignUpForm
 from django.contrib.auth import authenticate,login
 
 def get_economy_view_context(request):#TODO change name - this function now not only creates the context but also displays is, so the naming is wrong
-        current_time_stamp=State.current_stamp()
+        current_time_stamp=request.user.current_time_stamp
         industry_stocks = IndustryStock.objects.filter(time_stamp_FK=current_time_stamp)
         industries=Industry.objects.filter(time_stamp_FK=current_time_stamp)
         productive_stocks=industry_stocks.filter(usage_type=PRODUCTION).order_by("commodity_FK__display_order")
@@ -59,23 +57,13 @@ class EconomyView(ListView):
         context = get_economy_view_context(context)
         return context
 
-#! toggle logging mode between verbose and clean
-def switch_log_mode(request):
-    if Log.logging_mode=="verbose":
-        Log.logging_mode="clean"
-    else:
-        Log.logging_mode="verbose"
-    return HttpResponseRedirect(reverse("economy"))
-
-
 class IndustryView(ListView):
     model=Industry
     template_name='industry_list.html'    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # qs=Industry.time_stamped_queryset() #! use this in deployment
         qs=Industry.objects.all()
-        context['time_stamped_industry_list']=qs
+        context['industry_list']=qs
         return context    
 
 class CommodityView(ListView):
@@ -83,9 +71,8 @@ class CommodityView(ListView):
     template_name='commodity_list.html'    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # qs=Commodity.time_stamped_queryset() #! use this in deployment
         qs=Commodity.objects.all()
-        context['time_stamped_commodity_list']=qs
+        context['commodity_list']=qs
         return context    
 
 class SocialClassView(ListView):
@@ -93,9 +80,8 @@ class SocialClassView(ListView):
     model=SocialClass
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # qs=SocialClass.time_stamped_queryset() #! use this in deployment
         qs=SocialClass.objects.all()
-        context['time_stamped_social_class_list']=qs
+        context['social_class_list']=qs
         return context
 
 class AllOwnersView(ListView):
@@ -107,7 +93,6 @@ class SocialStockView(ListView):
     template_name='socialstock_list.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # stock_list=SocialStock.time_stamped_queryset()#! use this in deployment
         stock_list=SocialStock.objects.all()
         context['stock_list']= stock_list
         return context    
@@ -117,7 +102,6 @@ class IndustryStockView(ListView):
     template_name='industrystock_list.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # stock_list=IndustryStock.time_stamped_queryset()#! use this in deployment
         stock_list=IndustryStock.objects.all()
         context['stock_list']= stock_list
         return context
@@ -140,14 +124,11 @@ def log_collapsible(request):
     return HttpResponse(template.render(context, request))    
 
 def landingPage(request):
-    print('landing page running a little test')
     try:
-        stamp=State.current_stamp()
-        print (f"State on arrival at the landing page is {stamp.time_stamp}")
+        user=User.objects.get(username="afree") #! Little check to see the admin user exists
+        logger.info(f"Temporary fix: picking up admin user {user}")
     except Exception as error:
-        print(f"Corrupt database; reinitializing to a failsafe initial state")
-        print(error)
-        State.failsafe_restart()
+        logger.error(f"Could not find the admin user because of {error}")
     return render(request, 'landing.html')
 
 # class SignupView(generic.CreateView):

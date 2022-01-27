@@ -1,8 +1,7 @@
 from django.db import models
-from .states import TimeStamp, State
+from .states import TimeStamp, User
 from .commodity import Commodity
 from ..global_constants import *
-from .users import User
 
 
 class Stock(models.Model): # Base class for IndustryStock and SocialStock
@@ -17,12 +16,15 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
     price = models.FloatField( default=0)
     demand=models.FloatField( default=0)
     supply=models.FloatField( default=0)
-    monetary_demand=models.FloatField(default=0) #! Conveninence field - should normally be simply set to demand * commodity.unit_price
+    monetary_demand=models.FloatField(default=0) #! Convenience field - should normally be simply set to demand * commodity.unit_price
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
+    class meta:     #! helps view the objects in time stamp order in admin
+        ordering = ['time_stamp_FK.time_stamp']
+
+    @property
     def comparator_stock(self):
         comparator_time_stamp=self.time_stamp_FK.comparator_time_stamp_FK
-       
         comparator_stock=Stock.objects.filter(
             time_stamp_FK=comparator_time_stamp,
             stock_owner_name=self.stock_owner_name,
@@ -35,62 +37,57 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
             return None
         else:
             return comparator_stock.first()
+
     @property
     def commodity_name(self):
         return self.commodity_FK.name
 
     @property
     def old_size(self):
-        if self.comparator_stock()==None:
+        if self.comparator_stock==None:
             return -1
         else:
-            last_size=self.comparator_stock().size
+            last_size=self.comparator_stock.size
         return last_size
 
     @property
     def old_demand(self):
-        if self.comparator_stock()==None:
+        if self.comparator_stock==None:
             return -1
         else:
-            return self.comparator_stock().demand
+            return self.comparator_stock.demand
 
     @property
     def old_supply(self):
-        if self.comparator_stock()==None:
+        if self.comparator_stock==None:
             return -1
         else:
-            return self.comparator_stock().supply
+            return self.comparator_stock.supply
 
+    @property
+    def current_query_set(self):
+        return Stock.objects.filter(self.user.current_time_stamp)
 
 class IndustryStock(Stock):
-    industry_FK = models.ForeignKey("Industry", verbose_name="Industry", on_delete=models.CASCADE, null=True)#TODO redundant? the base class has stock_owner_FK
-    production_requirement = models.FloatField(verbose_name="Production Requirement", default=0)
+    industry_FK = models.ForeignKey("Industry", on_delete=models.CASCADE, null=True) #TODO redundant? the base class has stock_owner_FK
+    production_requirement = models.FloatField( default=0)
 
     class Meta:
         verbose_name = 'Industry Stock'
         verbose_name_plural = 'Industry Stocks'
 
-    def time_stamped_queryset():
-        qs=IndustryStock.objects.filter(time_stamp_FK=State.current_stamp())
-        return qs
-
     def __str__(self):
-        return f"[Project {self.time_stamp_FK.project_FK.number}] [Industry {self.industry_FK.name}] [Commodity: {self.commodity_FK.name}] [Usage Type: {self.usage_type}]"
+        return f"[Project {self.time_stamp_FK.project_number}] [Industry {self.industry_FK.name}] [Commodity: {self.commodity_FK.name}] [Usage Type: {self.usage_type}]"
 
 
 class SocialStock(Stock):
-    social_class_FK = models.ForeignKey("SocialClass", verbose_name="Social Class", related_name='class_stock', on_delete=models.CASCADE, null=True)
-    consumption_requirement = models.FloatField(verbose_name="Consumption Requirement", default=0)
+    social_class_FK = models.ForeignKey("SocialClass",  related_name='class_stock', on_delete=models.CASCADE, null=True)
+    consumption_requirement = models.FloatField(default=0)
     
     class Meta:
         verbose_name = 'Social Stock'
         verbose_name_plural = 'Social Stocks'
 
-    def time_stamped_queryset():
-        current_state=State.objects.get()
-        qs=SocialStock.objects.filter(time_stamp_FK=current_state.time_stamp_FK)
-        return qs
-
     def __str__(self):
-        return f"[Project {self.time_stamp_FK.project_FK.number}] [Class {self.social_class_FK.name}] [Commodity: {self.commodity_FK.name}] [Usage Type: {self.usage_type}]"
+        return f"[Project {self.time_stamp_FK.project_number}] [Class {self.social_class_FK.name}] [Commodity: {self.commodity_FK.name}] [Usage Type: {self.usage_type}]"
 

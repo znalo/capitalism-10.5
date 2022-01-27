@@ -1,4 +1,4 @@
-from economy.models.states import Project, TimeStamp, State
+from economy.models.states import Project, TimeStamp
 from economy.models.report import Log
 from economy.models.commodity import Commodity
 from economy.models.owners import Industry, SocialClass
@@ -9,30 +9,53 @@ from django.template import loader
 from django.contrib.staticfiles.storage import staticfiles_storage
 import pandas as pd
 from economy.global_constants import *
+from django.contrib import messages
+from django.http.response import HttpResponseRedirect
+from django.urls import reverse
 
+
+#! NOTE NOTE NOTE
+#! The project table is a static table that should only be changed by the admin user
+#! The admin user is responsible for ensuring that simulations are not 'orphaned' thereby.
+#! If this should happen, the simulations will still exist and function, but the user may lose track of which is which
+#! Because the descriptions will either not be accessible or may have changed
+#! TODO make this more foolproof
+
+def initialize_projects(request):
+    logged_in_user=request.user
+    logger.info(f"Initialise projec table {logged_in_user}")
+    #! TODO test that this is the admin user
+    try:
+        Log.objects.filter(user=logged_in_user).delete()
+        logger.info( f"User {logged_in_user} is re-initializing the database")
+        file_name = staticfiles_storage.path('data/projects.csv')    
+        logger.info (f"Initializing projects from file {file_name} for user {logged_in_user}")
+        projects=Project.objects.filter(user=logged_in_user)
+        projects.delete()
+        if 1==1: #! temp so I can check the table
+            raise Exception ("lunch break")
+        df = pd.read_csv(file_name)
+        for row in df.itertuples(index=False, name='Pandas'):
+            logger.info(f"Reading row number {row}")
+            project = Project(number=row.project_id, description=row.description)
+            logger.info(f"saving project {project}")
+            project.save()
+    except Exception as error:
+        logger.error(f"Could not load projects because of {error}")
+        messages.error(request, f"Sorry, could not load the project file because of {error}")
+        return HttpResponseRedirect(reverse("economy"))
+     
 #! Creates a fresh, complete dataset for a single user
-#! Wipes out anything they already have
+#! Wipes out anything they already have so they can start a new simulation
+#! TODO restart a single simulation should be a separate activity
+#! TODO and this should probably also be an admin action and also automatically performed on signup
 
 def initialize(request):
-    #! Basic setup: projects, timestamps and state
     logged_in_user=request.user
-    logger.info(f"Initialise for user {logged_in_user}")
-
-    #! Projects
-    Log.objects.filter(user=logged_in_user).delete()
-    logger.info( f"User {logged_in_user} is re-initializins the database")
+    logger.info(f"Initialise user {logged_in_user}")
     Log.enter(0, "+++REDO FROM START+++")
-    file_name = staticfiles_storage.path('data/projects.csv')    
-    logger.info (f"Initializing projects from file {file_name}")
-    Project.objects.filter(user=logged_in_user).delete()
-    df = pd.read_csv(file_name)
-    for row in df.itertuples(index=False, name='Pandas'):
-        logger.info(f"Reading row number {row}")
-        project = Project(number=row.project_id, description=row.description, user=logged_in_user)
-        logger.info(f"saving project {project}")
-        project.save()
-
     #! Timestamps    
+    #! TODO insist that there is only one time-stamp per project in the CSV file
     TimeStamp.objects.filter(user=logged_in_user).delete()
     file_name = staticfiles_storage.path('data/timestamps.csv')    
     logger.info( f"Reading time stamps from {file_name}")
@@ -40,7 +63,7 @@ def initialize(request):
 
     for row in df.itertuples(index=False, name='Pandas'):
         time_stamp = TimeStamp(
-            project_FK=Project.objects.get(number=row.project_FK),
+            project_number=row.project_FK,
             period=row.period,
             step=row.description,
             stage="M_C", #! projects must start with this stage TODO remove this field from the CSV file
@@ -57,24 +80,19 @@ def initialize(request):
         time_stamp.save()
         time_stamp.comparator_time_stamp_FK=time_stamp #! first stamp has no navel
         time_stamp.save()
-        
-    State.objects.filter(user=logged_in_user).delete()
-    state = State(name="Initial", time_stamp_FK=TimeStamp.objects.get(time_stamp=1, project_FK__number=1))
-    state.save()
+    logged_in_user.current_time_stamp=time_stamp
+    logged_in_user.save()
 
     #! Basic setup complete, now read the data files
     #! Commodities
     Commodity.objects.filter(user=logged_in_user).delete()
-    # file_name = os.path.join(settings.BASE_DIR, "static\\data\\commodities.csv")
     file_name = staticfiles_storage.path('data/commodities.csv')    
     logger.info( f"Reading commodities from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
         logger.info(f"Creating commodity {(row.name)}")
         commodity = Commodity(
-            time_stamp_FK=TimeStamp.objects.get(
-            time_stamp=1,
-            project_FK__number=row.project),
+            time_stamp_FK=TimeStamp.objects.get(project_number=row.project),
             name=row.name,
             origin=row.origin_type,
             unit_value=row.unit_value,
@@ -93,13 +111,11 @@ def initialize(request):
     
     #!Industries
     Industry.objects.filter(user=logged_in_user).delete()
-    # old_file_name = os.path.join(settings.BASE_DIR, "static\\data\\industries.csv")
     file_name = staticfiles_storage.path('data/industries.csv')    
     logger.info( f"Reading industries from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
-        this_time_stamp = TimeStamp.objects.get(
-            time_stamp=1, project_FK__number=row.project)
+        this_time_stamp = TimeStamp.objects.get(project_number=row.project)
         logger.info(f"Creating Industry {(row.industry_name)}")
         industry = Industry(
             time_stamp_FK=this_time_stamp,
@@ -117,13 +133,11 @@ def initialize(request):
 
     #! Social Classes
     SocialClass.objects.filter(user=logged_in_user).delete()
-    # old_file_name = os.path.join(settings.BASE_DIR, "static\\data\\social_classes.csv")
     file_name = staticfiles_storage.path('data/social_classes.csv')
     logger.info( f"Reading social classes from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
-        this_time_stamp = TimeStamp.objects.get(
-            time_stamp=1, project_FK__number=row.project)
+        this_time_stamp = TimeStamp.objects.get(project_number=row.project)
         logger.info(f"Creating Social Class {(row.social_class_name)}")
         social_class = SocialClass(
             time_stamp_FK=this_time_stamp,
@@ -146,15 +160,13 @@ def initialize(request):
     # ? Find out by doing it.
     IndustryStock.objects.filter(user=logged_in_user).delete()
     SocialStock.objects.filter(user=logged_in_user).delete()
-
-    # old_file_name = os.path.join(settings.BASE_DIR, "static\\data\\stocks.csv")
     file_name = staticfiles_storage.path('data/stocks.csv')        
     logger.info( f"Reading stocks from {file_name}")
     df = pd.read_csv(file_name)
 
     # TODO can the below be done more efficiently?
     for row in df.itertuples(index=False, name='Pandas'):
-        this_time_stamp = TimeStamp.objects.get(time_stamp=1, project_FK__number=row.project)
+        this_time_stamp = TimeStamp.objects.get(project_number=row.project)
         if row.owner_type == "CLASS":
             social_class=SocialClass.objects.get(time_stamp_FK=this_time_stamp, name=row.name)
             commodity=Commodity.objects.get(time_stamp_FK=this_time_stamp, name=row.commodity)
@@ -195,13 +207,13 @@ def initialize(request):
             logger.info(f"Created a stock of {(industry_stock.commodity_FK.name)} of usage type {row.stock_type} for industry {(industry_stock.industry_FK.name)}")
         else:
             logger.error(f"++++UNKNOWN OWNER TYPE++++ {row.owner_type}")
-    set_total_value_and_price()
-    set_initial_capital()
+    set_total_value_and_price(user=logged_in_user)
+    set_initial_capital(user=logged_in_user)
 
     # TODO replace this temporary for development purposes - quick and dirty visual report on what was done. 
     template = loader.get_template('initialize.html')
     context = {}
-    context['projects'] = Project.objects.filter(user=logged_in_user)
+    context['projects'] = Project.objects.all()
     context['time_stamps'] = TimeStamp.objects.filter(user=logged_in_user)
     context['commodities'] = Commodity.objects.filter(user=logged_in_user)
     context['industries'] = Industry.objects.filter(user=logged_in_user)
@@ -210,3 +222,4 @@ def initialize(request):
     context['industry_stocks'] = IndustryStock.objects.filter(user=logged_in_user)
     context['social_stocks'] = SocialStock.objects.filter(user=logged_in_user)
     return HttpResponse(template.render(context, request))
+

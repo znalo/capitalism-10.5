@@ -479,3 +479,25 @@ The tack I will follow at first is this:
 -- Created fixture files for a full database, and for a full database with one circuit completed
 
 ## Commit about to overhaul models to deal with multiple users
+
+In fact it's easiest to do away with the State object altogether, and add its attributes and functions to the User object.
+
+All we actually need to know is the user's time stamp.
+All relevant information can be deduced from this.
+
+## Quite a lot of changes
+
+* Abolished the 'State' object, and made the User object the custodian of the current state of the simulation
+* that way, each user has a unique simulation isolated from all others
+* Project is made into a kind of static table that is now owned by the user
+* This therefore has to be created once for all by the admin user, leading to a number of potential integrity leaks
+ * TODO tests to detect any such leaks
+ * TODO some kind of administrator dashboard
+* Proper logging system to create a 'debug.log' which has proven very helpful in error detection
+* Rudimentary messaging and graceful degradation, quite primitive but kind of useful
+* The simulation ONLY currently works if the superuser is called afree and is logged in :{)
+* The comparator logic is not delivering
+* there is a fault at the very end of the circuit which I decided to address after the next commit, because the changes are now very extensive
+
+## Commit basic multi-user logic in place, much to be done, see DEVLOG.MD for details
+

@@ -17,19 +17,19 @@ from ..global_constants import *
 #? that is, they function as credit instruments
 #? but if there is a family owner, it's more moot. Basically, they have credit (it's called "capital" by the accountants) but it is not monetised
 
-def revenue():
+def revenue(user):
     Log.enter(0,"Calculate capitalist revenue and other property-based entitlements")
-    for industry in Industry.current_queryset():
+    for industry in Industry.objects.filter(time_stamp_FK=user.current_time_stamp):
         Log.enter(2,f"Industry {Log.sim_object(industry.name)} has made a profit of {Log.sim_quantity(industry.profit)} which will be transferred to the capitalists")
         donor_money_stock=industry.money_stock
-        recipient=SocialClass.capitalists()
+        print("hunting for capitalists")
+        recipient=SocialClass.objects.get(time_stamp_FK=user.current_time_stamp, name="Capitalists")
         Log.enter(2,f"This will go to {Log.sim_object(recipient.name)}")
         recipient_money_stock=recipient.money_stock
         donor_money_stock.size-=industry.profit
         recipient_money_stock.size+=industry.profit
         donor_money_stock.save()
         recipient_money_stock.save()
-
 
 
 #! Here, the capitalists decide what to do with their money
@@ -84,11 +84,14 @@ def revenue():
 #! Then explore the effect of supply shortages using the simulation itself.
 
 
-def invest():
-    calculate_demand() #! this is required if we are to estimate correctly the replenishment cost
-    capitalists=SocialClass.capitalists()
-    for industry in Industry.current_queryset():
-        cost=industry.replenishment_cost()
+def invest(user):
+    calculate_demand(user=user) #! this is required if we are to estimate correctly the replenishment cost
+    capitalists=SocialClass.objects.get(time_stamp_FK=user.current_time_stamp, name="Capitalists")    
+    industries=Industry.objects.filter(time_stamp_FK=user.current_time_stamp)
+    for industry in industries:
+        print(f"looking for the replenishment cost of industry {industry}")
+        cost=industry.replenishment_cost(user=user)
+        print(f"this cost was {cost}")
         Log.enter(1, f"{Log.sim_object(industry.name)} needs {Log.sim_quantity(cost)} to produce at its current scale of {Log.sim_quantity(industry.output_scale)}")
         #! just give them the money
         capitalists_money=capitalists.money_stock
@@ -99,19 +102,19 @@ def invest():
         industry_money.size+=transferred_amount
         industry_money.save()
         capitalists_money.save()
-    set_initial_capital() #! as soon as we are ready for the next circuit, we should reset the initial capital
+    set_initial_capital(user=user) #! as soon as we are ready for the next circuit, we should reset the initial capital
 
 #! Not in current use, preserved here because we may want it.
-def effective_demand():
+def effective_demand(user):
     total_monetarily_effective_demand=0
-    for commodity in Commodity.time_stamped_queryset():
+    for commodity in Commodity.objects.filter(time_stamp_FK=user.current_time_stamp):
         commodity.monetarily_effective_demand=commodity.demand*commodity.unit_price
         Log.enter(1,f"Evaluating money demand from {commodity.name} of origin {commodity.origin}; demand ={commodity.monetarily_effective_demand}")
         if commodity.origin=="INDUSTRIAL": #! filter didn't work, TODO we found out why, change the code
             total_monetarily_effective_demand+=commodity.monetarily_effective_demand
             commodity.save()
     Log.enter(1,f"Total money demand is {Log.sim_object(total_monetarily_effective_demand)}")
-    for commodity in Commodity.time_stamped_queryset():
+    for commodity in Commodity.current_queryset():
         if commodity.origin=="INDUSTRIAL": #! filter didn't work, TODO we found out why, change the code
             commodity.investment_proportion=commodity.monetarily_effective_demand/total_monetarily_effective_demand
             Log.enter(2,f"Investment proportion for {Log.sim_object(commodity.name)} is {Log.sim_quantity(commodity.investment_proportion)}")

@@ -1,7 +1,6 @@
 from django.db import models
 from economy.global_constants import *
-from .users import User
-from .states import State
+from .states import User
 
 class Log(models.Model):
     time_stamp_id = models.IntegerField(default=0, null=False)
@@ -13,19 +12,18 @@ class Log(models.Model):
     message = models.CharField(max_length=250, null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
-    logging_mode = "verbose"
-
     @staticmethod
     def enter(level, message):
-        if (State.objects.all().count())!=0:
-            time_stamp = State.current_stamp()
-            stamp_number = time_stamp.time_stamp
-            current_step = time_stamp.step
-            project_id = time_stamp.project_FK.number
-            this_entry = Log(time_stamp_id=stamp_number, period=time_stamp.period, stage=time_stamp.stage, step=current_step, project_id=project_id,level=level, message=(message))
+        user=User.objects.get(username="afree") #! Very VERY Temporary
+        try:
+            current_time_stamp = user.current_time_stamp
+            stamp_number = current_time_stamp.time_stamp
+            current_step = current_time_stamp.step
+            project_id = current_time_stamp.project_number
+            this_entry = Log(time_stamp_id=stamp_number, period=current_time_stamp.period, stage=current_time_stamp.stage, step=current_step, project_id=project_id,level=level, message=(message))
             this_entry.save()
-        else:
-            this_entry=Log(time_stamp_id=0, period=0, stage="Not yet started", step="Not yet started", project_id=0,level=level, message=(message))
+        except Exception as error:
+            logger.error(f"Could not make a log entry because of {error}")
 
     @staticmethod
     def sim_object(value):

@@ -1,7 +1,5 @@
 from django import template
-from datetime import date, timedelta
 from ..global_constants import *
-from economy.models.states import State
 from django.utils.safestring import mark_safe
 
 register = template.Library()
@@ -14,7 +12,7 @@ def stock_compare(usage_type, value):
         return F"NO {usage_type} STOCK"
     else:
         current_stock=stocks.get()  
-        comparator_stock=current_stock.comparator_stock()
+        comparator_stock=current_stock.comparator_stock
         new=current_stock.size
         old=comparator_stock.size
         if old==new:
@@ -41,7 +39,7 @@ def multiply(value, arg):
 
 @register.filter(name='current_step')
 def current_step(value):
-    sub_state= State.current_stamp().sub_state_name
+    sub_state= State.current_stamp.sub_state_name
     return sub_state
 
 @register.filter(name='current_control_super_state')

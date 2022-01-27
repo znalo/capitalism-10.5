@@ -1,31 +1,13 @@
 from ..global_constants import *
 from economy.actions.exchange import set_total_value_and_price, set_current_capital
-from economy.models.states import State
 from economy.models.report import Log
 from economy.models.commodity import Commodity
 from economy.models.owners import Industry, SocialClass
 from economy.models.stocks import Stock, IndustryStock, SocialStock
 
 #! Actions for the 'production' phase
-
-def set_commodity_size(commodity):
-    Log.enter(1,f"Recaculating the size of commodity {commodity.name}; currently this is {commodity.size} ")
-    stocks=Stock.objects.filter(commodity_FK=commodity)
-    size=0
-    for stock in stocks:
-        size+=stock.size
-    commodity.size=size
-    commodity.save()
-    Log.enter(2,f"Commodity {commodity.name} size is {size} ")
-
-def set_commodity_sizes():
-    Log.enter(1,f"Recalculating all commodity sizes ")
-    current_state = State.objects.get(name="Initial")
-    commodities=Commodity.objects.filter(time_stamp_FK=current_state.time_stamp_FK)
-    for commodity in commodities:
-        set_commodity_size(commodity)
-
-    #! scale output down if constrained by stock size. Normally should not happen, but we have to catch this to ensure stocks don't go negative
+#! scale output down if constrained by stock size. Normally should not happen, but we have to catch this to ensure stocks don't go negative
+#TODO this should be a method of the Industry object
 def scale_output(industry):
     desired_scale=1
     scale_ratio=desired_scale
@@ -68,25 +50,28 @@ def produce(industry):
     sales_stock.save()
     Log.enter(1,f"{industry.name}'s sales stock has increased by {industry.output_scale} to {sales_stock.size} and its value has risen to {sales_stock.value}" )
 
-def producers():
+def producers(user):
 #! For each industry, check in case stock availability reduces output scale. Should not normally happen but we have to catch it
 #! if it does, to prevent negative stocks
     Log.enter(0,"Start Producing")
-    current_state = State.objects.get(name="Initial")
-    for industry in Industry.objects.all().filter(time_stamp_FK=current_state.time_stamp_FK):
-        ratio=scale_output(industry)
+    #! establish the scale at which production is possible, given the stocks available
+    for industry in Industry.objects.filter(time_stamp_FK=user.current_time_stamp):
+        #! TODO this method (scale_output) does not seem ever to have existed
+        #! I surmise this is because I started creating it but did not go down that route
+        #! and if so, the only way the simulation could have worked is if 'producers(user') is not invoked.
+        #! Will investigate further.
+        ratio=industry.scale_output()
         Log.enter(1,f"{industry}'s output will be scaled by {ratio} and so will produce {industry.output_scale} units of {industry.commodity_FK.name}")
 #! For each industry, carry out production
-    for industry in Industry.objects.all().filter(time_stamp_FK=current_state.time_stamp_FK):
+    for industry in Industry.objects.filter(time_stamp_FK=user.current_time_stamp):
         produce(industry)
         industry.save()
 #TODO Recalculate commodity size on the fly, and use the below only as a double check
-    set_commodity_sizes()
-    set_current_capital()    
+    Commodity.set_commodity_sizes(user=user)
+    set_current_capital(user=user)    
 
-def prices():
-    set_total_value_and_price()
-
+def prices(user):
+    set_total_value_and_price(user=user)
 
 #! Production determines output values and prices
 #! Once we have a sophisticated pricing model, prices will change as a result of reproduction (in response to demand, etc)
@@ -95,10 +80,9 @@ def prices():
 #! Then, in the sophisticated model, prices will respond to the changes in stocks. If stocks have fallen, prices will fall and vice versa.
 
 #! Social Consumption
-def reproduce():
+def reproduce(user):
     Log.enter(0,f"Social Consumption")
-    current_state = State.objects.get(name="Initial")
-    classes=SocialClass.objects.filter(time_stamp_FK=current_state.time_stamp_FK)
+    classes=SocialClass.objects.filter(time_stamp_FK=user.current_time_stamp)
     for social_class in classes:
         Log.enter(1, f"Social Class {social_class.name}")
         # TODO find its consumption stock and consume it
@@ -107,11 +91,11 @@ def reproduce():
         #! (re-)production determined by participation_ratio
         #! Both constrained by the stock at their disposal but more simply than for industries
 
-        consumption_stocks=SocialStock.objects.filter(social_class_FK=social_class,usage_type=CONSUMPTION)
+        consumption_stocks=SocialStock.objects.filter(time_stamp_FK=user.current_time_stamp, social_class_FK=social_class,usage_type=CONSUMPTION)
         if consumption_stocks.count()<1:
             Log.enter(0,f"consumption stock of {social_class} does not exist")
 
-        sales_stocks=SocialStock.objects.filter(social_class_FK=social_class,usage_type=SALES)
+        sales_stocks=SocialStock.objects.filter(time_stamp_FK=user.current_time_stamp, social_class_FK=social_class,usage_type=SALES)
         if sales_stocks.count()<1:
             Log.enter(0,f"Sales stock of {social_class} does not exist")
         elif sales_stocks.count()>1:

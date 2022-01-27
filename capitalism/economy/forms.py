@@ -1,7 +1,7 @@
 from django import forms
 # from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, UsernameField
-from economy.models.users import User
+from economy.models.states import User
 
 # User=get_user_model()
 

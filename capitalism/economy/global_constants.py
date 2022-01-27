@@ -1,10 +1,6 @@
 import logging
-from economy.models.users import User
-
-
 
 logger = logging.getLogger(__name__)
-admin_user=User.objects.first() #! temporary till authentication is all set up
 
 SOCIAL = 'Social'
 INDUSTRIAL = 'Industrial'
@@ -58,22 +54,22 @@ STOCK_OWNER_TYPES = [
 ]
 
 class Step:
-    def __init__(self, name, stage_name, next_step_name):
+    def __init__(self, name, stage_name, next_step):
         self.name = name
         self.stage_name=stage_name
-        self.next_step_name=next_step_name
+        self.next_step=next_step
 
 
 STEPS={
-  "demand":Step(name=DEMAND,stage_name="M_C", next_step_name=ALLOCATE),
-  "allocate":Step(name=ALLOCATE,stage_name="M_C", next_step_name=TRADE),
-  "trade":Step(name=TRADE,stage_name="M_C",next_step_name=PRODUCE),
-  "produce":Step(name=PRODUCE,stage_name="C_P", next_step_name=PRICES),
-  "prices":Step(name=PRICES,stage_name="C_P", next_step_name=REPRODUCE),
-  "reproduce":Step(name=REPRODUCE,stage_name="C_P", next_step_name=REVENUE),
-  "revenue":Step(name=REVENUE,stage_name="C_M",next_step_name=INVEST),
-  "invest":Step(name=INVEST,stage_name="C_M", next_step_name=DEMAND),
-  "UNDEFINED":Step(name=UNDEFINED,stage_name="C_M", next_step_name=UNDEFINED)
+  "demand":Step(name=DEMAND,stage_name="M_C", next_step=ALLOCATE),
+  "allocate":Step(name=ALLOCATE,stage_name="M_C", next_step=TRADE),
+  "trade":Step(name=TRADE,stage_name="M_C",next_step=PRODUCE),
+  "produce":Step(name=PRODUCE,stage_name="C_P", next_step=PRICES),
+  "prices":Step(name=PRICES,stage_name="C_P", next_step=REPRODUCE),
+  "reproduce":Step(name=REPRODUCE,stage_name="C_P", next_step=REVENUE),
+  "revenue":Step(name=REVENUE,stage_name="C_M",next_step=INVEST),
+  "invest":Step(name=INVEST,stage_name="C_M", next_step=DEMAND),
+  "UNDEFINED":Step(name=UNDEFINED,stage_name="C_M", next_step=UNDEFINED)
 }
 
 STAGES={

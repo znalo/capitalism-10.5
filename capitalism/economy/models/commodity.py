@@ -1,7 +1,7 @@
 from django.db import models
-from .states import TimeStamp,State
-from ..global_constants import ORIGIN_CHOICES, USAGE_CHOICES, UNDEFINED
-from .users import User
+from .states import TimeStamp, User
+from ..global_constants import ORIGIN_CHOICES, USAGE_CHOICES, UNDEFINED, logger
+from .report import Log
 
 class Commodity(models.Model):
     time_stamp_FK = models.ForeignKey(TimeStamp, related_name='commodity', on_delete=models.CASCADE)
@@ -29,10 +29,6 @@ class Commodity(models.Model):
         verbose_name_plural = 'Commodities'
         ordering = ['time_stamp_FK']
 
-    def time_stamped_queryset():
-        qs=Commodity.objects.filter(time_stamp_FK=State.current_stamp())
-        return qs
-
     def comparator_commodity(self):
         comparator_time_stamp=self.time_stamp_FK.comparator_time_stamp_FK
         comparator_qs=Commodity.objects.filter(
@@ -45,7 +41,21 @@ class Commodity(models.Model):
             return None
         else:
             return comparator_qs.first()
-    
+
+    def set_commodity_size(self):
+        from .stocks import Stock #! have to do this here to avoid circular import. TODO not very happy with this
+        Log.enter(1,f"Recaculating the size of commodity {self.name}; currently this is {self.size} ")
+        current_time_stamp=self.user.current_time_stamp
+        stocks=Stock.objects.filter(commodity_FK=self,time_stamp_FK=current_time_stamp) 
+        #! TODO What a mess
+        #! TODO can we resolve this mess by converting all related querysets into methods of the relevant objects
+        size=0
+        for stock in stocks:
+            size+=stock.size
+        self.size=size
+        self.save()
+        Log.enter(2,f"Commodity {Log.sim_object(self.name)} size is {Log.sim_quantity(size)} ")
+
     @property
     def comparator_demand(self):
         return self.comparator_commodity().demand
@@ -54,6 +64,16 @@ class Commodity(models.Model):
     def comparator_supply(self):
         return self.comparator_commodity().supply
 
+    @staticmethod
+    def set_commodity_sizes(user):
+        Log.enter(1,f"Recalculating all commodity sizes for user {user}")
+        logger.info(f"Recalculating all commodity sizes for user {user}")
+        commodities=Commodity.objects.filter(time_stamp_FK=user.current_time_stamp)
+        for commodity in commodities:
+            commodity.set_commodity_size()
+
+    def current_query_set(self):
+        return Commodity.objects.filter(time_stamp_FK=self.user.current_time_stamp)
 
     def __str__(self):
         return f"[Time Stamp {self.time_stamp_FK.time_stamp}] {self.name}"

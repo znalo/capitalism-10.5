@@ -1,21 +1,19 @@
-from economy.models.states import State
+from economy.models.states import User
 from economy.models.report import Log
 from economy.models.commodity import Commodity
 from economy.models.owners import Industry, SocialClass, StockOwner
 from economy.models.stocks import Stock, IndustryStock, SocialStock
-from django.http import HttpResponse
-from django.template import loader
 from ..global_constants import *
 
 #! Calculate the unconstrained demand for all stocks
 #! Use this to calculate the total demand for each commodity
 #! Later (in 'allocate') we impose constraints arising from supply and (TODO) money shortages
-def calculate_demand():
+def calculate_demand(user):
+    logger.info(f"Calculate demand for user {user}")
     Log.enter(1,"Calculate Demand")
-    current_state = State.objects.get(name="Initial")
-    productive_stocks = IndustryStock.objects.filter(usage_type=PRODUCTION,time_stamp_FK=current_state.time_stamp_FK)
-    social_stocks = SocialStock.objects.filter(time_stamp_FK=current_state.time_stamp_FK).exclude(usage_type=MONEY).exclude(usage_type=SALES)
-    commodities = Commodity.objects.filter(time_stamp_FK=current_state.time_stamp_FK).exclude(usage=MONEY)
+    productive_stocks = IndustryStock.objects.filter(usage_type=PRODUCTION,time_stamp_FK=user.current_time_stamp)
+    social_stocks = SocialStock.objects.filter(time_stamp_FK=user.current_time_stamp).exclude(usage_type=MONEY).exclude(usage_type=SALES)
+    commodities = Commodity.objects.filter(time_stamp_FK=user.current_time_stamp).exclude(usage=MONEY)
 
     for commodity in commodities:
         commodity.demand = 0
@@ -46,16 +44,16 @@ def calculate_demand():
 
 # TODO abstract the rendering into a single function
 
-def calculate_supply():
+def calculate_supply(user):
+    logger.info(f"Calculate supply for user {user}")
     Log.enter(1,"Calculate supply")
-    current_state = State.objects.get(name="Initial")
     #! Initialize every commodity's supply field to zero, prior to recalculating it from sales stocks
-    commodities = Commodity.objects.filter(time_stamp_FK=current_state.time_stamp_FK).exclude(usage=MONEY)
+    commodities = Commodity.objects.filter(time_stamp_FK=user.current_time_stamp).exclude(usage=MONEY)
     for commodity in commodities:
         commodity.supply = 0
         commodity.save()
     #! Calculate aggregate individual supply from the sales stocks and assign it to the appropriate commodity's supply field
-    stocks = Stock.objects.filter( time_stamp_FK=current_state.time_stamp_FK,usage_type=SALES)
+    stocks = Stock.objects.filter( time_stamp_FK=user.current_time_stamp,usage_type=SALES)
     for stock in stocks:
         commodity = stock.commodity_FK
         #? at this point supply is the same as the stock size, but may get scaled down if global supply is excessive
@@ -64,14 +62,16 @@ def calculate_supply():
         commodity.supply += stock.supply
         Log.enter(2,f" Supply of {Log.sim_object(commodity.name)} from the industry {Log.sim_object(stock.stock_owner_name)} is {Log.sim_quantity(stock.size)}. Total supply is now {Log.sim_quantity(commodity.supply)}")
         commodity.save()
-def calculate_demand_and_supply():
-    calculate_demand()
-    calculate_supply()
 
-def allocate_supply():
+def calculate_demand_and_supply(user):
+    logger.info(f"Calculate demand and supply for user {user}")
+    calculate_demand(user=user)
+    calculate_supply(user=user)
+
+def allocate_supply(user):
+    logger.info(f"Allocate supply for user {user}")
     Log.enter(1,"Allocate demand depending on supply")
-    current_state = State.objects.get(name="Initial")
-    commodities = Commodity.objects.filter(time_stamp_FK=current_state.time_stamp_FK).exclude(usage=MONEY)
+    commodities = Commodity.objects.filter(time_stamp_FK=user.current_time_stamp).exclude(usage=MONEY)
     for commodity in commodities:
         Log.enter(2,f" Allocating supply for commodity {Log.sim_object(commodity.name)} whose supply is {Log.sim_quantity(commodity.supply)} and demand is {Log.sim_quantity(commodity.demand)}")
         if commodity.supply > 0:
@@ -83,7 +83,7 @@ def allocate_supply():
             Log.enter(3,f" Demand was greater than supply and is reduced to commodity.demand")
         commodity.save()
 
-        related_stocks = commodity.stock_set.filter(time_stamp_FK=current_state.time_stamp_FK)
+        related_stocks = commodity.stock_set.filter(time_stamp_FK=user.current_time_stamp)
         for stock in related_stocks:
             if commodity.allocation_ratio>1: # demand is greater than supply, reduce it
                 stock.demand=stock.demand/commodity.allocation_ratio
@@ -121,11 +121,10 @@ def sale(seller_stock, buyer_stock, seller, buyer):
 #! SEE ALSO the documentation for trade(), produce() and reproduce()
 #TODO ideally we should do both, as a check.
 
-def set_total_value_and_price():
+def set_total_value_and_price(user):
     Log.enter(1,"Calculate Total Values, Prices and initial capital")
-    logger.info("Calculate Total Values, Prices and initial capital")
-    current_time_stamp = State.current_stamp()
-    stocks=Stock.objects.filter(time_stamp_FK=current_time_stamp)
+    logger.info(f"Calculate Total Values, Prices and initial capital for user {user}")
+    stocks=Stock.objects.filter(time_stamp_FK=user.current_time_stamp)
     for stock in stocks:
         unit_price=stock.commodity_FK.unit_price
         unit_value=stock.commodity_FK.unit_value
@@ -135,11 +134,11 @@ def set_total_value_and_price():
         owner_name=stock.stock_owner_name
         stock.save()
         Log.enter(2,f"Size of the stock of {Log.sim_object(stock.commodity_FK.name)} owned by {Log.sim_object(owner_name)} is {Log.sim_quantity(stock.size)}. Its value is {Log.sim_quantity(stock.value)} and its price is {Log.sim_quantity(stock.price)}")
-    for commodity in Commodity.objects.filter(time_stamp_FK=current_time_stamp):
+    for commodity in Commodity.objects.filter(time_stamp_FK=user.current_time_stamp):
         commodity.total_value=0
         commodity.total_price=0
         commodity.size=0
-        stocks=Stock.objects.filter(time_stamp_FK=current_time_stamp,commodity_FK=commodity)
+        stocks=Stock.objects.filter(time_stamp_FK=user.current_time_stamp,commodity_FK=commodity)
         for stock in stocks:
             commodity.total_value+=stock.value
             commodity.total_price+=stock.price
@@ -150,7 +149,7 @@ def set_total_value_and_price():
     #! Therefore we:
     #* calculate these unit values and prices
     #* recalculate the value and price of each stock
-    for commodity in Commodity.objects.filter(time_stamp_FK=current_time_stamp):
+    for commodity in Commodity.objects.filter(time_stamp_FK=user.current_time_stamp):
         Log.enter(1, f"There are now {Log.sim_quantity(commodity. size)} units of Commodity {Log.sim_object(commodity.name)} with total value {Log.sim_quantity(commodity.total_value)} and total price {Log.sim_quantity(commodity.total_price)}")
         if commodity.size!=0:
             new_unit_value=commodity.total_value/commodity.size
@@ -164,7 +163,7 @@ def set_total_value_and_price():
         commodity.unit_price=new_unit_price
         commodity.save()
     #! Now we have to revalue and reprice all stocks
-    for stock in Stock.objects.filter(time_stamp_FK=current_time_stamp):
+    for stock in Stock.objects.filter(time_stamp_FK=user.current_time_stamp):
         unit_price=stock.commodity_FK.unit_price
         unit_value=stock.commodity_FK.unit_value
         Log.enter(2,f"Size of {Log.sim_object(stock.commodity_FK.name)} owned by {Log.sim_object(stock.stock_owner_name)} is {Log.sim_quantity(stock.size)}, with value {Log.sim_quantity(stock.value)} and price {Log.sim_quantity(stock.price)}")
@@ -175,13 +174,13 @@ def set_total_value_and_price():
         stock.price=new_price
         stock.save()
 
-def trade():
+def trade(user):
     Log.enter(0,"TRADE")
+    logger.info(f"User {user} is trading")
     Log.enter(1,"Industries")
-    current_time_stamp = State.current_stamp()
-
+ 
     #! iterate over all stocks that want to buy something
-    buyer_stocks=Stock.objects.filter(time_stamp_FK=current_time_stamp).exclude(usage_type=MONEY).exclude(usage_type=SALES)
+    buyer_stocks=Stock.objects.filter(time_stamp_FK=user.current_time_stamp).exclude(usage_type=MONEY).exclude(usage_type=SALES)
     for buyer_stock in buyer_stocks:
         buyer=buyer_stock.stock_owner_FK
         buyer_commodity=buyer_stock.commodity_FK
@@ -190,11 +189,11 @@ def trade():
         Log.enter(2,f"The buyer has {Log.sim_quantity(buyer_money_stock.size)} in money and the unit price is {Log.sim_quantity(buyer_commodity.unit_price)}. Looking for sellers")
         
         #! iterate over all potential sellers of this commodity
-        potential_sellers=StockOwner.objects.filter(time_stamp_FK=current_time_stamp)
+        potential_sellers=StockOwner.objects.filter(time_stamp_FK=user.current_time_stamp)
 
         for seller in potential_sellers:
             seller_name=seller.name
-            seller_stock=seller.sales_stock()
+            seller_stock=seller.sales_stock
             seller_commodity=seller_stock.commodity_FK
             Log.enter(2,f"{Log.sim_object(seller_name)} can offer {Log.sim_quantity(seller_stock.supply)} of {Log.sim_object(seller_commodity.name)} for sale to {Log.sim_object(buyer.name)} who wants {Log.sim_object(buyer_commodity.name)}")
             if seller_commodity==buyer_commodity:
@@ -218,13 +217,12 @@ def trade():
     #* Note that though the total price of the assets of each owner will be unchanged by trade
     #* the value of these assets will - as a result of unequal exchange
     #* So we make this calculation both before and after production
-    set_total_value_and_price()
-    set_current_capital()
+    set_total_value_and_price(user=user)
+    set_current_capital(user=user)
  
-def set_initial_capital():
+def set_initial_capital(user):
     #! Calculate the initial capital of each industry
     #! After production, we will then be able to calculate the profit
-    current_time_stamp=State.current_stamp()
 
     #! THE BELOW DOES NOT WORK. FIND OUT WHY
     # for stock in IndustryStock.objects.filter(time_stamp_FK=current_time_stamp):
@@ -241,11 +239,11 @@ def set_initial_capital():
     #     Log.enter(1, f"saving industry {industry.name} whose capital is {industry.initial_capital}" )
     #     industry.save()
     
-    for industry in Industry.objects.filter(time_stamp_FK=current_time_stamp):
+    for industry in Industry.objects.filter(time_stamp_FK=user.current_time_stamp):
         Log.enter(1,f"calculating the initial capital of industry {industry.name}")
         capital=0
         work_in_progress=0
-        for stock in industry.stock_set.filter(time_stamp_FK=current_time_stamp):
+        for stock in industry.stock_set.filter(time_stamp_FK=user.current_time_stamp):
             Log.enter(2,f"Adding the price {Log.sim_quantity(stock.price)} of the stock of {Log.sim_object(stock.commodity_FK.name)}, type {Log.sim_object(stock.usage_type)}")
             capital+=stock.price
             if stock.usage_type==PRODUCTION:
@@ -257,14 +255,13 @@ def set_initial_capital():
         industry.save() 
 
 
-def set_current_capital():
+def set_current_capital(user):
     #! Calculate the current capital of each industry
-    current_time_stamp=State.current_stamp()
-    for industry in Industry.objects.filter(time_stamp_FK=current_time_stamp):
+    for industry in Industry.objects.filter(time_stamp_FK=user.current_time_stamp):
         Log.enter(1,f"calculating the current capital of industry {industry.name}")
         capital=0
         work_in_progress=0
-        for stock in industry.stock_set.filter(time_stamp_FK=current_time_stamp):
+        for stock in industry.stock_set.filter(time_stamp_FK=user.current_time_stamp):
             capital+=stock.price
             if stock.usage_type==PRODUCTION:
                 work_in_progress+=stock.price
