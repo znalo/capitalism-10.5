@@ -26,7 +26,11 @@ class User(AbstractUser):
 
     def set_project(self,project_number):
         logger.info(f"Changing project of user {self.username} from {self.current_time_stamp.project_number} to {project_number}")
-        self.current_time_stamp.project_number=project_number
+        new_time_stamp=TimeStamp.objects.filter(user=self,project_number=project_number).last() #! pick up wherever the simulation of this project by this user left off
+        logger.info(f"The relevant time stamp is {new_time_stamp}")
+        self.current_time_stamp=new_time_stamp
+        self.save()
+
 
     #! Set the comparator of the current time stamp to a new comparator
     def set_current_comparator(self,comparator):

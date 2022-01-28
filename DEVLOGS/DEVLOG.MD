@@ -519,3 +519,7 @@ Fixed problem that Log (report.py) records not deleted on initialize
 Improved some tables
 
 ## Commit fixed reporting bug, and table display improved
+
+Fixed project selection
+
+## Commit fixed project selection
