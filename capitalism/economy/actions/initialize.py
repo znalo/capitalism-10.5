@@ -80,7 +80,9 @@ def initialize(request):
         time_stamp.save()
         time_stamp.comparator_time_stamp_FK=time_stamp #! first stamp has no navel
         time_stamp.save()
-    logged_in_user.current_time_stamp=time_stamp
+    #! Start off with project 1
+    time_one=TimeStamp.objects.get(user=logged_in_user,project_number=1)
+    logged_in_user.current_time_stamp=time_one
     logged_in_user.save()
 
     #! Basic setup complete, now read the data files

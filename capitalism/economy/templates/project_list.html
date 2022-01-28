@@ -1,0 +1,30 @@
+{% extends "base.html" %} {% block content %} {% load app_filters %}
+<h3 class="w3-center">Projects</h3>
+<table id="project" class="display compact" style="width:80%">
+    <thead>
+        <tr>
+            <th>Number</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for project in project_list %}
+        <tr>
+            <td> {{ project.number }}</td>
+            <td> {{ project.description }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %} {% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#project').DataTable({
+            "paging": false,
+            "searching": false,
+            "info": false
+        });
+    });
+</script>
+{% endblock %}

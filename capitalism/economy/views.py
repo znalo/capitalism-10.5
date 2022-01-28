@@ -1,6 +1,6 @@
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
-from .models.states import TimeStamp, User
+from .models.states import Project, TimeStamp, User
 from economy.models.report import Log
 from .models.commodity import Commodity
 from .models.owners import Industry, SocialClass, StockOwner
@@ -13,7 +13,7 @@ from django.urls import reverse
 from .forms import SignUpForm
 from django.contrib.auth import authenticate,login
 
-def get_economy_view_context(request):#TODO change name - this function now not only creates the context but also displays is, so the naming is wrong
+def get_economy_view_context(request):#TODO change name - this function now not only creates the context but also displays it, so the naming is wrong
         current_time_stamp=request.user.current_time_stamp
         industry_stocks = IndustryStock.objects.filter(time_stamp_FK=current_time_stamp)
         industries=Industry.objects.filter(time_stamp_FK=current_time_stamp)
@@ -44,6 +44,10 @@ def sandbox(request):
     logger.error("Test!!")
     return HttpResponse(template.render(context, request))
 
+class ProjectView(ListView):
+    model=Project
+    template_name='project_list.html'
+
 class TimeStampView(ListView):
     model=TimeStamp
     template_name='timestamp_list.html'    
@@ -53,7 +57,7 @@ class EconomyView(ListView):
     template_name='economy.html'
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs) #! Necessary?
         context = get_economy_view_context(context)
         return context
 
@@ -62,7 +66,7 @@ class IndustryView(ListView):
     template_name='industry_list.html'    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        qs=Industry.objects.all()
+        qs=Industry.objects.filter(time_stamp_FK=self.request.user.current_time_stamp)
         context['industry_list']=qs
         return context    
 
@@ -71,7 +75,7 @@ class CommodityView(ListView):
     template_name='commodity_list.html'    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        qs=Commodity.objects.all()
+        qs=Commodity.objects.filter(time_stamp_FK=self.request.user.current_time_stamp)
         context['commodity_list']=qs
         return context    
 
@@ -80,7 +84,7 @@ class SocialClassView(ListView):
     model=SocialClass
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        qs=SocialClass.objects.all()
+        qs=SocialClass.objects.filter(time_stamp_FK=self.request.user.current_time_stamp)
         context['social_class_list']=qs
         return context
 
@@ -93,7 +97,7 @@ class SocialStockView(ListView):
     template_name='socialstock_list.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        stock_list=SocialStock.objects.all()
+        stock_list=SocialStock.objects.filter(time_stamp_FK=self.request.user.current_time_stamp)
         context['stock_list']= stock_list
         return context    
 
@@ -102,7 +106,7 @@ class IndustryStockView(ListView):
     template_name='industrystock_list.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        stock_list=IndustryStock.objects.all()
+        stock_list=IndustryStock.objects.filter(time_stamp_FK=self.request.user.current_time_stamp)
         context['stock_list']= stock_list
         return context
         
