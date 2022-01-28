@@ -78,7 +78,7 @@ class Industry(StockOwner):
     @property
     def replenishment_cost(self):
         #! Requires that demand is correctly set - this must be provided for by the caller 
-        print(f"enter calculation of replenishment cost for industry {self}")
+        logger.info(f"enter calculation of replenishment cost for industry {self}")
         cost=0
         productive_stocks=IndustryStock.objects.filter(usage_type=PRODUCTION,time_stamp_FK=self.user.current_time_stamp)
         print (f"The productive stock query set is {productive_stocks}")

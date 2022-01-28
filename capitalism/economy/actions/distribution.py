@@ -90,7 +90,7 @@ def invest(user):
     industries=Industry.objects.filter(time_stamp_FK=user.current_time_stamp)
     for industry in industries:
         print(f"looking for the replenishment cost of industry {industry}")
-        cost=industry.replenishment_cost(user=user)
+        cost=industry.replenishment_cost
         print(f"this cost was {cost}")
         Log.enter(1, f"{Log.sim_object(industry.name)} needs {Log.sim_quantity(cost)} to produce at its current scale of {Log.sim_quantity(industry.output_scale)}")
         #! just give them the money

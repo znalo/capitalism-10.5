@@ -90,9 +90,10 @@ def initialize(request):
     logger.info( f"Reading commodities from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
-        logger.info(f"Creating commodity {(row.name)}")
+        this_time_stamp=TimeStamp.objects.get(project_number=row.project,user=logged_in_user)        
+        logger.info(f"Creating commodity {(row.name)} for user {logged_in_user} and project {row.project} with time stamp {this_time_stamp}")
         commodity = Commodity(
-            time_stamp_FK=TimeStamp.objects.get(project_number=row.project),
+            time_stamp_FK=this_time_stamp,
             name=row.name,
             origin=row.origin_type,
             unit_value=row.unit_value,
@@ -115,12 +116,13 @@ def initialize(request):
     logger.info( f"Reading industries from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
-        this_time_stamp = TimeStamp.objects.get(project_number=row.project)
-        logger.info(f"Creating Industry {(row.industry_name)}")
+        this_time_stamp = TimeStamp.objects.get(project_number=row.project, user=logged_in_user)
+        this_commodity=Commodity.objects.get(time_stamp_FK=this_time_stamp, name=row.commodity_name, user=logged_in_user)
+        logger.info(f"Creating Industry {(row.industry_name)} with output {this_commodity} for user {logged_in_user} and project {row.project} with time stamp {this_time_stamp}")
         industry = Industry(
             time_stamp_FK=this_time_stamp,
             name=row.industry_name,
-            commodity_FK=Commodity.objects.get(time_stamp_FK=this_time_stamp, name=row.commodity_name),
+            commodity_FK=this_commodity,
             output_scale=row.output,
             output_growth_rate=row.growth_rate,
             current_capital=0,
@@ -137,13 +139,13 @@ def initialize(request):
     logger.info( f"Reading social classes from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
-        this_time_stamp = TimeStamp.objects.get(project_number=row.project)
-        logger.info(f"Creating Social Class {(row.social_class_name)}")
+        this_time_stamp = TimeStamp.objects.get(project_number=row.project, user=logged_in_user)
+        # labour_power=Commodity.objects.get(time_stamp_FK=this_time_stamp, name="Labour Power", user=logged_in_user),
+        logger.info(f"Creating Social Class {(row.social_class_name)} for user {logged_in_user} and project {row.project} with time stamp {this_time_stamp}")
         social_class = SocialClass(
             time_stamp_FK=this_time_stamp,
             name=row.social_class_name,
-            commodity_FK=Commodity.objects.get(
-                time_stamp_FK=this_time_stamp, name="Labour Power"),
+            commodity_FK=Commodity.objects.get(time_stamp_FK=this_time_stamp, name="Labour Power", user=logged_in_user),
             stock_owner_type=SOCIAL_CLASS,
             population=row.population,
             participation_ratio=row.participation_ratio,
@@ -166,10 +168,11 @@ def initialize(request):
 
     # TODO can the below be done more efficiently?
     for row in df.itertuples(index=False, name='Pandas'):
-        this_time_stamp = TimeStamp.objects.get(project_number=row.project)
+        this_time_stamp = TimeStamp.objects.get(project_number=row.project, user=logged_in_user)
         if row.owner_type == "CLASS":
-            social_class=SocialClass.objects.get(time_stamp_FK=this_time_stamp, name=row.name)
-            commodity=Commodity.objects.get(time_stamp_FK=this_time_stamp, name=row.commodity)
+            social_class=SocialClass.objects.get(time_stamp_FK=this_time_stamp, name=row.name,user=logged_in_user)
+            commodity=Commodity.objects.get(time_stamp_FK=this_time_stamp, name=row.commodity, user=logged_in_user)
+            logger.info(f"Creating a stock of commodity {(commodity.name)} of usage type {row.stock_type} for class {(social_class.name)} ")
             social_stock = SocialStock(
                 time_stamp_FK=this_time_stamp,
                 social_class_FK=social_class,
@@ -184,11 +187,12 @@ def initialize(request):
                 supply=0,
                 user=logged_in_user,
             )
+            
             social_stock.save()
-            logger.info(f"Created a stock of commodity {(social_stock.commodity_FK.name)} of usage type {row.stock_type} for class {(social_stock.social_class_FK.name)} ")
         elif row.owner_type == "INDUSTRY":
-            industry=Industry.objects.get(time_stamp_FK=this_time_stamp, name=row.name)
-            commodity=Commodity.objects.get(time_stamp_FK=this_time_stamp, name=row.commodity)
+            industry=Industry.objects.get(time_stamp_FK=this_time_stamp, name=row.name, user=logged_in_user)
+            commodity=Commodity.objects.get(time_stamp_FK=this_time_stamp, name=row.commodity, user=logged_in_user)
+            logger.info(f"Creating a stock of {(commodity.name)} of usage type {row.stock_type} for industry {(industry.name)}")
             industry_stock = IndustryStock(
                 time_stamp_FK=this_time_stamp,
                 industry_FK=industry,
@@ -204,7 +208,6 @@ def initialize(request):
                 user=logged_in_user,
             )
             industry_stock.save()
-            logger.info(f"Created a stock of {(industry_stock.commodity_FK.name)} of usage type {row.stock_type} for industry {(industry_stock.industry_FK.name)}")
         else:
             logger.error(f"++++UNKNOWN OWNER TYPE++++ {row.owner_type}")
     set_total_value_and_price(user=logged_in_user)

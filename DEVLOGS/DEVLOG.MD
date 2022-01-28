@@ -501,3 +501,4 @@ All relevant information can be deduced from this.
 
 ## Commit basic multi-user logic in place, much to be done, see DEVLOG.MD for details
 
+## Commit more stable version, now can initialize the admin user provided he's called afree :-{ and run through a complete simulation
