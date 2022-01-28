@@ -26,7 +26,7 @@ urlpatterns = [
 
     url('sandbox', views.sandbox, name='sandbox'),
     url('control/initialize', initialize, name='initialize'),
-    url(r'project/', views.ProjectView.as_view(), name='projects'),
+    url(r'projects/', views.ProjectView.as_view(), name='projects'),
     url(r'project/(?P<project_number>[\d-]+)', select_project, name='project-select'),
     url(r'stage/(?P<act>[\w-]+)/$', control.stage_execute, name='stage'),
     url(r'control/(?P<period>[\d-]+)/(?P<stage>[\w-]+)/(?P<step>[\w-]+)/$', control.comparator_select, name='comparator-select'),

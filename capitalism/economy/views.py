@@ -91,6 +91,12 @@ class SocialClassView(ListView):
 class AllOwnersView(ListView):
     model=StockOwner
     template_name='stockowner_list.html'    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        stock_list=StockOwner.objects.order_by("time_stamp_FK.project_number","time_stamp_FK.time_stamp")
+        context['stock_list']= stock_list
+        return context
+
 
 class SocialStockView(ListView):
     model=SocialStock
@@ -118,6 +124,12 @@ class AllStocksView(ListView):
 class LogView(ListView):
     model=Log
     template_name='log_list.html'    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        qs=Log.objects.filter(time_stamp_id=self.request.user.current_time_stamp.time_stamp)
+        context['log_list']=qs
+        return context    
+
 
 def log_collapsible(request):
     log_iterator=Log.objects.all().order_by('id')

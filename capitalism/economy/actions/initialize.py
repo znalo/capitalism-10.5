@@ -23,7 +23,7 @@ from django.urls import reverse
 
 def initialize_projects(request):
     logged_in_user=request.user
-    logger.info(f"Initialise projec table {logged_in_user}")
+    logger.info(f"Initialise project table {logged_in_user}")
     #! TODO test that this is the admin user
     try:
         Log.objects.filter(user=logged_in_user).delete()

@@ -514,3 +514,8 @@ Fixed problem that initialize starts user off with project 8
 Table displays restricted so they only show the current project
 
 ## Commit fixed some outstanding problems see DEVLOG
+
+Fixed problem that Log (report.py) records not deleted on initialize
+Improved some tables
+
+## Commit fixed reporting bug, and table display improved

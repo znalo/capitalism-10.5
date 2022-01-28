@@ -5,6 +5,7 @@
         <tr>
             <th>ID</th>
             <th>Time Stamp</th>
+            <th>Project</th>
             <th>Owner Name</th>
             <th>Sales Commodity</th>
             <th>Type</th>
@@ -13,8 +14,9 @@
     <tbody>
         {% for record in stockowner_list %}
         <tr>
-            <td> {{ record.id }}</td>
-            <td> {{ record.time_stamp_FK.time_stamp }}</td>
+            <td class="w3-center"> {{ record.id }}</td>
+            <td class="w3-center"> {{ record.time_stamp_FK.time_stamp }}</td>
+            <td class="w3-center"> {{ record.time_stamp_FK.project_number }}</td>
             <td> {{ record.name }}</td>
             <td> {{ record.commodity_FK.name }}</td>
             <td> {{ record.stock_owner_type }}</td>
