@@ -523,3 +523,9 @@ Improved some tables
 Fixed project selection
 
 ## Commit fixed project selection
+
+Fixed comparator selection, but comparator is not correctly set by the step action
+
+## Commit fixed comparator selection
+
+

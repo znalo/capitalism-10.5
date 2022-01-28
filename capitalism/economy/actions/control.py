@@ -80,7 +80,7 @@ def comparator_select(request, period,stage,step):
         current_time_stamp.comparator_time_stamp_FK=comparator
         current_time_stamp.save()
     except Exception as error:
-        logger.error(f"Comparator could not be found {period}-{stage}-{step}")
+        logger.error(f"Comparator could not be found {period}-{stage}-{step} because {error}")
         messages.error (request, f"Comparator could not be found")
 
     return HttpResponseRedirect(reverse("economy"))

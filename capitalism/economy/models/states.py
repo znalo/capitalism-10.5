@@ -14,7 +14,7 @@ class User(AbstractUser):
 
     @property
     def current_project(self):
-        return self.current_time_stamp.project_FK()
+        return self.current_time_stamp.project_number
 
     @property
     def current_step(self):
