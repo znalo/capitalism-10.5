@@ -23,33 +23,6 @@ body {
     background-size: cover;
 }
 
-.log-level1 {
-    color: blue;
-    margin-left: 1em
-}
-
-.log-level2 {
-    color: green;
-    margin-left: 2em
-}
-
-.log-level3 {
-    color: red;
-    margin-left: 3em;
-}
-
-.log-level4 {
-    margin-left: 4em;
-}
-
-.simulation-object {
-    color: purple;
-}
-
-.quantity-object {
-    font-weight: 600;
-}
-
 
 /* Experimental see https://www.w3schools.com/howto/howto_css_tooltip.asp */
 

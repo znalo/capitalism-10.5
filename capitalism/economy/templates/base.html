@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="{% static 'css/static.css' %}">
+    <!-- TODO it doesn't seem as if the static.css is being picked up -->
     <link rel="shortcut icon" href="{% static '/img/favicon.ico' %}">
 </head>
 
@@ -18,7 +19,7 @@
         <div class="w3-bar w3-light-grey">
             <div class="w3-left">
                 <a href="{% url 'landing-page' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Home</a>
-                <a href="{% url 'log' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Report</a>
+                <a href="{% url 'trace' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Trace</a>
                 <a href="{% url 'admin:index' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Admin</a>
                 <a href="{% url 'initialize' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Initialize</a>
                 <a href="{% url 'economy' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Economy</a>

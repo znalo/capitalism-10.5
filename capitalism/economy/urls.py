@@ -10,7 +10,7 @@ urlpatterns = [
     path('', views.landingPage, name='landing-page'),
     url('^admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')), # new
-    url('log/table', views.LogView.as_view(), name='log'),
+    url('report/table', views.TraceView.as_view(), name='trace'),
 
     url('tables/economy', views.get_economy_view_context, name='economy'),
     url('tables/time-stamps', views.TimeStampView.as_view(), name='time-stamps'),

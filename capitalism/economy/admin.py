@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models.states import Project, TimeStamp, User
-from .models.report import Log
+from .models.report import Trace
 from .models.commodity import Commodity
 from .models.owners import Industry, SocialClass
 from .models.stocks import SocialStock, IndustryStock
@@ -12,5 +12,5 @@ admin.site.register(Industry)
 admin.site.register(SocialClass)
 admin.site.register(SocialStock)
 admin.site.register(IndustryStock)
-admin.site.register(Log)
+admin.site.register(Trace)
 admin.site.register(User)

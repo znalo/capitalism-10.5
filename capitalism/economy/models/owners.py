@@ -1,6 +1,6 @@
 from django.db import models
 from .states import TimeStamp, User
-from .report import Log
+from .report import Trace
 from .commodity import Commodity
 from .stocks import IndustryStock, Stock,SocialStock
 from ..global_constants import *
@@ -19,10 +19,10 @@ class StockOwner(models.Model): # Base class for Industry and Social Class
     def money_stock(self):
         stocks = Stock.objects.filter(time_stamp_FK=self.time_stamp_FK, usage_type=MONEY, stock_owner_FK=self)
         if stocks.count()>1:
-            logger.error(f"+++{self.name} has duplicate money stock") #! TODO Log to raise an exception if entry is -1
+            logger.error(f"+++{self.name} has duplicate money stock") 
             return None
         elif stocks.count()==0:
-            logger.error(f"+++{self.name} has no money stock") #! TODO Log to raise an exception if entry is -1
+            logger.error(f"+++{self.name} has no money stock") 
             return None
         return stocks.get()
 
@@ -30,10 +30,10 @@ class StockOwner(models.Model): # Base class for Industry and Social Class
     def sales_stock(self):
         stocks = Stock.objects.filter(time_stamp_FK=self.time_stamp_FK, usage_type=SALES, stock_owner_FK=self)
         if stocks.count()>1:
-            logger.error(f"+++{self.name} has duplicate sales stock") #! TODO Log to raise an exception if entry is -1
+            logger.error(f"+++{self.name} has duplicate sales stock") 
             return None
         elif stocks.count()==0:
-            logger.error(f"+++{self.name} has no sales stock") #! TODO Log to raise an exception if entry is -1
+            logger.error(f"+++{self.name} has no sales stock") 
             return None
         return stocks.get()
     
@@ -87,8 +87,8 @@ class Industry(StockOwner):
             print(f"This cost was found and it is {stock.monetary_demand}")
             cost+=stock.monetary_demand
             print(f"This cost was found and it is {stock.monetary_demand}")
-            Log.enter(2,f"Industry {Log.sim_object(self.name)} will need ${Log.sim_quantity(stock.monetary_demand)} to replenish its stock of {Log.sim_object(stock.commodity_name)}")
-        Log.enter(2,f"The total money required by {Log.sim_object(self.name)} is {cost}")
+            Trace.enter(self.user,2,f"Industry {Trace.sim_object(self.name)} will need ${Trace.sim_quantity(stock.monetary_demand)} to replenish its stock of {Trace.sim_object(stock.commodity_name)}")
+        Trace.enter(self.user,2,f"The total money required by {Trace.sim_object(self.name)} is {cost}")
         return cost
 
     @property

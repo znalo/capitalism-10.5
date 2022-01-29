@@ -1,4 +1,4 @@
-from economy.models.report import Log
+from economy.models.report import Trace
 from economy.models.owners import Industry, SocialClass
 from economy.models.commodity import Commodity
 from economy.actions.exchange import calculate_demand, set_initial_capital
@@ -18,13 +18,13 @@ from ..global_constants import *
 #? but if there is a family owner, it's more moot. Basically, they have credit (it's called "capital" by the accountants) but it is not monetised
 
 def revenue(user):
-    Log.enter(0,"Calculate capitalist revenue and other property-based entitlements")
+    Trace.enter(user,0,"Calculate capitalist revenue and other property-based entitlements")
     for industry in Industry.objects.filter(time_stamp_FK=user.current_time_stamp):
-        Log.enter(2,f"Industry {Log.sim_object(industry.name)} has made a profit of {Log.sim_quantity(industry.profit)} which will be transferred to the capitalists")
+        Trace.enter(user,2,f"Industry {Trace.sim_object(industry.name)} has made a profit of {Trace.sim_quantity(industry.profit)} which will be transferred to the capitalists")
         donor_money_stock=industry.money_stock
         print("hunting for capitalists")
         recipient=SocialClass.objects.get(time_stamp_FK=user.current_time_stamp, name="Capitalists")
-        Log.enter(2,f"This will go to {Log.sim_object(recipient.name)}")
+        Trace.enter(user,2,f"This will go to {Trace.sim_object(recipient.name)}")
         recipient_money_stock=recipient.money_stock
         donor_money_stock.size-=industry.profit
         recipient_money_stock.size+=industry.profit
@@ -92,12 +92,12 @@ def invest(user):
         print(f"looking for the replenishment cost of industry {industry}")
         cost=industry.replenishment_cost
         print(f"this cost was {cost}")
-        Log.enter(1, f"{Log.sim_object(industry.name)} needs {Log.sim_quantity(cost)} to produce at its current scale of {Log.sim_quantity(industry.output_scale)}")
+        Trace.enter(user,1, f"{Trace.sim_object(industry.name)} needs {Trace.sim_quantity(cost)} to produce at its current scale of {Trace.sim_quantity(industry.output_scale)}")
         #! just give them the money
         capitalists_money=capitalists.money_stock
         industry_money=industry.money_stock
         transferred_amount=cost-industry_money.size
-        Log.enter(1, f"{Log.sim_object(industry.name)} already has {Log.sim_quantity(industry_money.size)} and will receive {Log.sim_quantity(transferred_amount)}")
+        Trace.enter(user,1, f"{Trace.sim_object(industry.name)} already has {Trace.sim_quantity(industry_money.size)} and will receive {Trace.sim_quantity(transferred_amount)}")
         capitalists_money.size-=transferred_amount
         industry_money.size+=transferred_amount
         industry_money.save()
@@ -109,14 +109,14 @@ def effective_demand(user):
     total_monetarily_effective_demand=0
     for commodity in Commodity.objects.filter(time_stamp_FK=user.current_time_stamp):
         commodity.monetarily_effective_demand=commodity.demand*commodity.unit_price
-        Log.enter(1,f"Evaluating money demand from {commodity.name} of origin {commodity.origin}; demand ={commodity.monetarily_effective_demand}")
+        Trace.enter(user,1,f"Evaluating money demand from {commodity.name} of origin {commodity.origin}; demand ={commodity.monetarily_effective_demand}")
         if commodity.origin=="INDUSTRIAL": #! filter didn't work, TODO we found out why, change the code
             total_monetarily_effective_demand+=commodity.monetarily_effective_demand
             commodity.save()
-    Log.enter(1,f"Total money demand is {Log.sim_object(total_monetarily_effective_demand)}")
+    Trace.enter(user,1,f"Total money demand is {Trace.sim_object(total_monetarily_effective_demand)}")
     for commodity in Commodity.current_queryset():
         if commodity.origin=="INDUSTRIAL": #! filter didn't work, TODO we found out why, change the code
             commodity.investment_proportion=commodity.monetarily_effective_demand/total_monetarily_effective_demand
-            Log.enter(2,f"Investment proportion for {Log.sim_object(commodity.name)} is {Log.sim_quantity(commodity.investment_proportion)}")
+            Trace.enter(user,2,f"Investment proportion for {Trace.sim_object(commodity.name)} is {Trace.sim_quantity(commodity.investment_proportion)}")
             commodity.save()
 

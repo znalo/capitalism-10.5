@@ -528,4 +528,10 @@ Fixed comparator selection, but comparator is not correctly set by the step acti
 
 ## Commit fixed comparator selection
 
+Fixed so there is no dependency on getting the admin user
+TODO test make this now work with any user
+TODO the comparator is not correctly set in initialize
+TODO sign-in enforcement - unsigned users should not really see much at all
+TODO only the superuser should be able to see the admin link (or even visit admin at all)
 
+## Commit code now multi-user in principle but only tested with the superuser so far

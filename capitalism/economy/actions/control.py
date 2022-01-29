@@ -1,6 +1,6 @@
 from django.http.response import HttpResponseRedirect
 from economy.models.states import Project, TimeStamp, User
-from economy.models.report import Log
+from economy.models.report import Trace
 from economy.views import get_economy_view_context
 from ..global_constants import *
 from django.urls import reverse
@@ -66,7 +66,7 @@ def stage_execute(request,act):
 
 def select_project(request,project_number):
     user=request.user
-    Log.enter(0,f"Switching to project {project_number}")
+    Trace.enter(user,0,f"Switching to project {project_number}")
     logger.info(f"User {user} is switching to project {project_number}")
     user.set_project(project_number)
     return HttpResponseRedirect(reverse("economy"))

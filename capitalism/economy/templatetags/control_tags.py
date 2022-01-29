@@ -11,11 +11,10 @@ register = template.Library()
 def control_states(context):
       new_context={}
       try:
-            user=User.objects.get(username='afree') #! Very VERY temporary
-            logger.info(f"Found admin user {user}")
+            user=context.request.user
+            logger.info(f"User {user} invoked control_states")
       except Exception as error:
-            logger.error(f"The admin user could not be found {error}")
-            messages.error(context['request'],f"The admin user must be logged in because this is still at the development stage {error}")
+            logger.error(f"The user could not be found because {error}")
             raise Exception ("Giving Up")
       try:
             current_step=user.current_step
@@ -30,10 +29,10 @@ def control_states(context):
       context=new_context
       return context
 
-@register.inclusion_tag('partials/current_step.html')
-def current_step():
+@register.inclusion_tag('partials/current_step.html',takes_context=True)
+def current_step(context):
       try:
-            user=User.objects.get(username='afree') #! Very VERY temporary
+            user=context.request.user
             step=user.current_step
       except Exception as error:
             logger.error(f"Could not find the current step because of {error}")
@@ -52,7 +51,7 @@ def project_list():
 @register.inclusion_tag('partials/step_list.html', takes_context=True)
 def step_list(context):
       try:
-            user=User.objects.get(username='afree') #! Very VERY temporary
+            user=context.request.user
             logger.info(f"Found the admin user. Time Stamp is {user.current_time_stamp}")
             logger.info(f"Project is {user.current_time_stamp.project_number}")
             current_project_number=user.current_time_stamp.project_number

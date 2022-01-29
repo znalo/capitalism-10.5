@@ -1,8 +1,37 @@
 {% extends "base.html" %} {% block content %} {% load app_filters %}
 
+<style>
+    .trace-level1 {
+        color: blue;
+        margin-left: 1em
+    }
+    
+    .trace-level2 {
+        color: green;
+        margin-left: 2em
+    }
+    
+    .trace-level3 {
+        color: red;
+        margin-left: 3em;
+    }
+    
+    .trace-level4 {
+        margin-left: 4em;
+    }
+    
+    .simulation-object {
+        color: purple;
+    }
+    
+    .quantity-object {
+        font-weight: 600;
+    }
+</style>
+
 <button type="button">Switch off level 2 (not working yet!) </button>
 
-<table id="log" class="display compact" style="width:80%">
+<table id="trace" class="display compact" style="width:80%">
     <thead>
         <tr>
             <th>Id</th>
@@ -16,16 +45,16 @@
         </tr>
     </thead>
     <tbody>
-        {% for log in log_list %}
-        <tr class="toggle-level{{log.level}}">
-            <td>{{ log.id}} </td>
-            <td>{{ log.level}} </td>
-            <td>{{ log.time_stamp_id}} </td>
-            <td>{{ log.project_id}} </td>
-            <td>{{ log.period }}</td>
-            <td>{{ log.stage }}</td>
-            <td>{{ log.step }}</td>
-            <td class="pl-{{log.level}}"><span class="log-level{{log.level}}">{{log.message|mark_as_safe }}</span> </td>
+        {% for trace in trace_list %}
+        <tr class="toggle-level{{trace.level}}">
+            <td>{{ trace.id}} </td>
+            <td>{{ trace.level}} </td>
+            <td>{{ trace.time_stamp_id}} </td>
+            <td>{{ trace.project_id}} </td>
+            <td>{{ trace.period }}</td>
+            <td>{{ trace.stage }}</td>
+            <td>{{ trace.step }}</td>
+            <td class="pl-{{trace.level}}"><span class="trace-level{{trace.level}}">{{trace.message|mark_as_safe }}</span> </td>
         </tr>
         {% endfor %}
     </tbody>
@@ -34,7 +63,7 @@
 {% endblock %} {% block extra_js %}
 <script>
     $(document).ready(function() {
-        $('#log').DataTable({
+        $('#trace').DataTable({
             "columns": [{
                 "width": "4%"
             }, {

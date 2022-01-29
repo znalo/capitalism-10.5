@@ -1,5 +1,5 @@
 from economy.models.states import Project, TimeStamp
-from economy.models.report import Log
+from economy.models.report import Trace
 from economy.models.commodity import Commodity
 from economy.models.owners import Industry, SocialClass
 from economy.models.stocks import IndustryStock, SocialStock
@@ -26,7 +26,7 @@ def initialize_projects(request):
     logger.info(f"Initialise project table {logged_in_user}")
     #! TODO test that this is the admin user
     try:
-        Log.objects.filter(user=logged_in_user).delete()
+        Trace.objects.filter(user=logged_in_user).delete()
         logger.info( f"User {logged_in_user} is re-initializing the database")
         file_name = staticfiles_storage.path('data/projects.csv')    
         logger.info (f"Initializing projects from file {file_name} for user {logged_in_user}")
@@ -53,7 +53,7 @@ def initialize_projects(request):
 def initialize(request):
     logged_in_user=request.user
     logger.info(f"Initialise user {logged_in_user}")
-    Log.enter(0, "+++REDO FROM START+++")
+    Trace.enter(request.user,0, "+++REDO FROM START+++")
     #! Timestamps    
     #! TODO insist that there is only one time-stamp per project in the CSV file
     TimeStamp.objects.filter(user=logged_in_user).delete()

@@ -1,6 +1,6 @@
 from ..global_constants import *
 from economy.actions.exchange import set_total_value_and_price, set_current_capital
-from economy.models.report import Log
+from economy.models.report import Trace
 from economy.models.commodity import Commodity
 from economy.models.owners import Industry, SocialClass
 from economy.models.stocks import Stock, IndustryStock, SocialStock
@@ -15,7 +15,7 @@ def scale_output(industry):
     for productive_stock in IndustryStock.objects.all().filter(industry_FK=industry,usage_type=PRODUCTION):
         if productive_stock.production_requirement*scale_ratio>productive_stock.size:
             scale_ratio=productive_stock.size/productive_stock.production_requirement
-            Log.enter(3,f"Insufficient stock of {productive_stock.commodity_FK.name}; reducing scale by factor of {scale_ratio}")
+            Trace.enter(industry.user,3,f"Insufficient stock of {productive_stock.commodity_FK.name}; reducing scale by factor of {scale_ratio}")
     #! now we know the scale at which we can operate, reset the production requirements of all the productive stocks
     for productive_stock in IndustryStock.objects.filter(industry_FK=industry):
         productive_stock.production_requirement*=scale_ratio
@@ -26,7 +26,7 @@ def scale_output(industry):
 def produce(industry):
     sales_stocks=IndustryStock.objects.filter(industry_FK=industry,usage_type=SALES)
     if sales_stocks.count()!=1:
-        Log (0,f"+++industry with no sales Stock+++")
+        logger.error(f"+++industry with no sales Stock+++")
     sales_stock=sales_stocks.get()
     unit_price_of_output=industry.commodity_FK.unit_price
     added_value=0
@@ -40,20 +40,20 @@ def produce(industry):
         elif commodity.origin=="SOCIAL": #! assume it's labour power - alternative models may want to add other sources of value
             added_value+=used_up_quantity
         else:
-            Log.enter(0,f"+++Commodity {commodity.name} has unknown origin+++")
+            Trace.enter(industry.user,0,f"+++Commodity {commodity.name} has unknown origin+++")
         ps.save()
-        Log.enter(2,f"{industry.name}'s stock of {ps.commodity_FK.name} has been reduced by {used_up_quantity} to {ps.size}")
-        Log.enter(2,f"Total social stock of {commodity.name}  has been reduced by {used_up_quantity} to {commodity.size}")
+        Trace.enter(industry.user,2,f"{industry.name}'s stock of {ps.commodity_FK.name} has been reduced by {used_up_quantity} to {ps.size}")
+        Trace.enter(industry.user,2,f"Total social stock of {commodity.name}  has been reduced by {used_up_quantity} to {commodity.size}")
     sales_stock.size+=industry.output_scale
     sales_stock.value+=added_value
     sales_stock.price=sales_stock.size*unit_price_of_output
     sales_stock.save()
-    Log.enter(1,f"{industry.name}'s sales stock has increased by {industry.output_scale} to {sales_stock.size} and its value has risen to {sales_stock.value}" )
+    Trace.enter(industry.user,1,f"{industry.name}'s sales stock has increased by {industry.output_scale} to {sales_stock.size} and its value has risen to {sales_stock.value}" )
 
 def producers(user):
 #! For each industry, check in case stock availability reduces output scale. Should not normally happen but we have to catch it
 #! if it does, to prevent negative stocks
-    Log.enter(0,"Start Producing")
+    Trace.enter(user,0,"Start Producing")
     #! establish the scale at which production is possible, given the stocks available
     for industry in Industry.objects.filter(time_stamp_FK=user.current_time_stamp):
         #! TODO this method (scale_output) does not seem ever to have existed
@@ -61,7 +61,7 @@ def producers(user):
         #! and if so, the only way the simulation could have worked is if 'producers(user') is not invoked.
         #! Will investigate further.
         ratio=industry.scale_output()
-        Log.enter(1,f"{industry}'s output will be scaled by {ratio} and so will produce {industry.output_scale} units of {industry.commodity_FK.name}")
+        Trace.enter(user,1,f"{industry}'s output will be scaled by {ratio} and so will produce {industry.output_scale} units of {industry.commodity_FK.name}")
 #! For each industry, carry out production
     for industry in Industry.objects.filter(time_stamp_FK=user.current_time_stamp):
         produce(industry)
@@ -81,10 +81,10 @@ def prices(user):
 
 #! Social Consumption
 def reproduce(user):
-    Log.enter(0,f"Social Consumption")
+    Trace.enter(user,0,f"Social Consumption")
     classes=SocialClass.objects.filter(time_stamp_FK=user.current_time_stamp)
     for social_class in classes:
-        Log.enter(1, f"Social Class {social_class.name}")
+        Trace.enter(user,1, f"Social Class {social_class.name}")
         # TODO find its consumption stock and consume it
         # TODO find its sales stock (normally only labour) and increase it
         #! consumption determined by population and consumption ratio
@@ -93,31 +93,31 @@ def reproduce(user):
 
         consumption_stocks=SocialStock.objects.filter(time_stamp_FK=user.current_time_stamp, social_class_FK=social_class,usage_type=CONSUMPTION)
         if consumption_stocks.count()<1:
-            Log.enter(0,f"consumption stock of {social_class} does not exist")
+            Trace.enter(user,0,f"consumption stock of {social_class} does not exist")
 
         sales_stocks=SocialStock.objects.filter(time_stamp_FK=user.current_time_stamp, social_class_FK=social_class,usage_type=SALES)
         if sales_stocks.count()<1:
-            Log.enter(0,f"Sales stock of {social_class} does not exist")
+            Trace.enter(user,0,f"Sales stock of {social_class} does not exist")
         elif sales_stocks.count()>1:
-            Log.enter(0,f"Duplicate stock of {social_class}")
+            Trace.enter(user,0,f"Duplicate stock of {social_class}")
         else:
             sales_stock=sales_stocks.get()
             sales_amount=social_class.population*social_class.participation_ratio
 
         if consumption_stocks.count()<1:
-            Log.enter(0,f"consumption stock of {social_class} does not exist")
+            Trace.enter(user,0,f"consumption stock of {social_class} does not exist")
 
         for cs in consumption_stocks: #! initial scaffold for multiplicity of consumption goods - needed for 3-sector model, etc, but will develop later
             quantity_consumed=cs.consumption_requirement
             if cs.size<quantity_consumed:
-                Log.enter(2,f"consumption by {social_class} constrained to {cs.size} because it does not have enough")
+                Trace.enter(user,2,f"consumption by {social_class} constrained to {cs.size} because it does not have enough")
                 quantity_consumed=cs.size
             cs.size-=quantity_consumed
             sales_stock.size+=sales_amount
             sales_stock.save()
             cs.save()
-            Log.enter(1,f"Social Class {social_class} has consumed {quantity_consumed} and created {sales_amount} of sales stocks")
-            Log.enter(1,f"{social_class} now owns {cs.size} in consumption goods and has {sales_stock.size} to sell")
+            Trace.enter(user,1,f"Social Class {social_class} has consumed {quantity_consumed} and created {sales_amount} of sales stocks")
+            Trace.enter(user,1,f"{social_class} now owns {cs.size} in consumption goods and has {sales_stock.size} to sell")
 
     
 

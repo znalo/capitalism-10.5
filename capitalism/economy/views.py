@@ -1,7 +1,7 @@
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from .models.states import Project, TimeStamp, User
-from economy.models.report import Log
+from economy.models.report import Trace
 from .models.commodity import Commodity
 from .models.owners import Industry, SocialClass, StockOwner
 from .models.stocks import IndustryStock, SocialStock, Stock
@@ -121,30 +121,18 @@ class AllStocksView(ListView):
     template_name='stock_list.html'    
 
     
-class LogView(ListView):
-    model=Log
-    template_name='log_list.html'    
+class TraceView(ListView):
+    model=Trace
+    template_name='trace_list.html'    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        qs=Log.objects.filter(time_stamp_id=self.request.user.current_time_stamp.time_stamp)
-        context['log_list']=qs
+        qs=Trace.objects.filter(time_stamp_id=self.request.user.current_time_stamp.time_stamp)
+        context['trace_list']=qs
         return context    
 
-
-def log_collapsible(request):
-    log_iterator=Log.objects.all().order_by('id')
-    template = loader.get_template('log_collapsible.html')
-    context = {
-        'log_iterator': log_iterator,
-    }
-    return HttpResponse(template.render(context, request))    
-
 def landingPage(request):
-    try:
-        user=User.objects.get(username="afree") #! Little check to see the admin user exists
-        logger.info(f"Temporary fix: picking up admin user {user}")
-    except Exception as error:
-        logger.error(f"Could not find the admin user because of {error}")
+    user=request.user
+    logger.info(f"User {user} has landed on the home page")
     return render(request, 'landing.html')
 
 # class SignupView(generic.CreateView):
