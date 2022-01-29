@@ -52,15 +52,14 @@ def project_list():
 def step_list(context):
       try:
             user=context.request.user
-            logger.info(f"Found the admin user. Time Stamp is {user.current_time_stamp}")
-            logger.info(f"Project is {user.current_time_stamp.project_number}")
+            logger.info(f"Calculating step list for user {user} with project  {user.current_time_stamp.project_number}")
             current_project_number=user.current_time_stamp.project_number
             step_list=TimeStamp.objects.filter(user=user, project_number=current_project_number)
       except Exception as error:
             logger.error(f"Could not find the step list because of {error}")
             request = context['request']
             messages.error(request,f"There is a problem in the database as follows: [{error}]")
-            step_list=TimeStamp.objects.all()
+            step_list=None
       context={}
       context['states']= step_list
       return context

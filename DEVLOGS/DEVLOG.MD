@@ -540,7 +540,9 @@ TODO anonymous user should not have any database entries
 ## Commit can now sign up and log in as new user, create and run simulations
 
 TODO the comparator is not correctly set in initialize
-TODO anonymous user should not have any database entries
+TODO anonymous user should not have any database entries DONE
 TODO email included in signup (test for bots and snoopers)
 TODO some kind of admin dashboard so we can debug any problems with user databases
+
+## Commit fixed minor problems see DEVLOG
 
