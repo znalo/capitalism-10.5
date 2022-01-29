@@ -1,9 +1,18 @@
-{% load control_tags %} {% step_list %} {% if messages %}
+{% if user.is_authenticated %} {% load control_tags %} {% step_list %} {% if messages %}
 
 <div class="messages w3-pink w3-small">
     {% for message in messages %}
     <div {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</div>
     <p>Please contact the developer </p>
     {% endfor %}
+</div>
+{% endif %} {% else %}
+<div class="w3-card-4 w3-pale-red">
+
+
+    <div class="w3-container">
+        <p> This site simulates a capitalist economy. If you're already a signed-up user, log in, otherwise sign up. Happy learning!</p>
+    </div>
+
 </div>
 {% endif %}

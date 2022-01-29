@@ -529,9 +529,18 @@ Fixed comparator selection, but comparator is not correctly set by the step acti
 ## Commit fixed comparator selection
 
 Fixed so there is no dependency on getting the admin user
-TODO test make this now work with any user
+
+TODO test make this now work with any user DONE
 TODO the comparator is not correctly set in initialize
-TODO sign-in enforcement - unsigned users should not really see much at all
+TODO sign-in enforcement - unsigned users should not really see much at all DONE
 TODO only the superuser should be able to see the admin link (or even visit admin at all)
+TODO anonymous user should not have any database entries
 
 ## Commit code now multi-user in principle but only tested with the superuser so far
+## Commit can now sign up and log in as new user, create and run simulations
+
+TODO the comparator is not correctly set in initialize
+TODO anonymous user should not have any database entries
+TODO email included in signup (test for bots and snoopers)
+TODO some kind of admin dashboard so we can debug any problems with user databases
+
