@@ -1,6 +1,6 @@
-from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
-from .models.states import Project, TimeStamp, User
+from economy.actions.initialize import initialize
+from .models.states import Project, TimeStamp
 from economy.models.report import Trace
 from .models.commodity import Commodity
 from .models.owners import Industry, SocialClass, StockOwner
@@ -9,9 +9,10 @@ from django.http import HttpResponse
 from django.template import loader
 from django.views.generic import ListView
 from .global_constants import *
-from django.urls import reverse
 from .forms import SignUpForm
 from django.contrib.auth import authenticate,login
+from django.http.response import HttpResponseRedirect
+from django.urls import reverse
 
 def get_economy_view_context(request):#TODO change name - this function now not only creates the context but also displays it, so the naming is wrong
         current_time_stamp=request.user.current_time_stamp
@@ -135,13 +136,6 @@ def landingPage(request):
     logger.info(f"User {user} has landed on the home page")
     return render(request, 'landing.html')
 
-# class SignupView(generic.CreateView):
-#     template_name='registration/signup.html'
-#     form_class=CustomUserCreationForm
-
-#     def get_success_url(self):
-#         return reverse("login")
-
 #! See the [CSEStack](https://www.csestack.org/django-sign-up-registration-form/) solution
 def signup(request):
     if request.method == 'POST':
@@ -152,14 +146,16 @@ def signup(request):
             # load the profile instance created by the signal
             user.save()
             raw_password = form.cleaned_data.get('password1')
- 
             # login user after signing up
             user = authenticate(username=user.username, password=raw_password)
             login(request, user)
- 
-            # redirect user to home page
-            # return redirect('home')
+            # Initialise the user's database
+            initialize(request)           
             return HttpResponseRedirect(reverse("economy"))
     else:
         form = SignUpForm()
     return render(request, 'registration/signup.html', {'form': form})
+
+def initialize_and_redisplay(request):
+    initialize(request)
+    return HttpResponseRedirect(reverse("economy"))    

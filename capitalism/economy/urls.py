@@ -4,7 +4,6 @@ from economy import views
 from economy.actions import control
 from django.urls import path, include
 from economy.actions.control import select_project
-from economy.actions.initialize import initialize
 
 urlpatterns = [
     path('', views.landingPage, name='landing-page'),
@@ -25,7 +24,7 @@ urlpatterns = [
     url('tables/all-stocks', views.AllStocksView.as_view(), name='all-stocks'),
 
     url('sandbox', views.sandbox, name='sandbox'),
-    url('control/initialize', initialize, name='initialize'),
+    url('initialize', views.initialize_and_redisplay, name='initialize'),
     url(r'projects/', views.ProjectView.as_view(), name='projects'),
     url(r'project/(?P<project_number>[\d-]+)', select_project, name='project-select'),
     url(r'stage/(?P<act>[\w-]+)/$', control.stage_execute, name='stage'),

@@ -546,3 +546,9 @@ TODO some kind of admin dashboard so we can debug any problems with user databas
 
 ## Commit fixed minor problems see DEVLOG
 
+Database initialization now working (except for the very first superuser login but then only minor)
+
+## Commit tidied up and tested database initialization
+
+
+

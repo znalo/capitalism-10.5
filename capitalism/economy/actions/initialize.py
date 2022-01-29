@@ -4,8 +4,6 @@ from economy.models.commodity import Commodity
 from economy.models.owners import Industry, SocialClass
 from economy.models.stocks import IndustryStock, SocialStock
 from economy.actions.exchange import set_initial_capital, set_total_value_and_price
-from django.http import HttpResponse
-from django.template import loader
 from django.contrib.staticfiles.storage import staticfiles_storage
 import pandas as pd
 from economy.global_constants import *
@@ -214,17 +212,4 @@ def initialize(request):
             logger.error(f"++++UNKNOWN OWNER TYPE++++ {row.owner_type}")
     set_total_value_and_price(user=logged_in_user)
     set_initial_capital(user=logged_in_user)
-
-    # TODO replace this temporary for development purposes - quick and dirty visual report on what was done. 
-    template = loader.get_template('initialize.html')
-    context = {}
-    context['projects'] = Project.objects.all()
-    context['time_stamps'] = TimeStamp.objects.filter(user=logged_in_user)
-    context['commodities'] = Commodity.objects.filter(user=logged_in_user)
-    context['industries'] = Industry.objects.filter(user=logged_in_user)
-    context['social_classes'] = SocialClass.objects.filter(user=logged_in_user).order_by(
-        'time_stamp_FK__number')
-    context['industry_stocks'] = IndustryStock.objects.filter(user=logged_in_user)
-    context['social_stocks'] = SocialStock.objects.filter(user=logged_in_user)
-    return HttpResponse(template.render(context, request))
 
