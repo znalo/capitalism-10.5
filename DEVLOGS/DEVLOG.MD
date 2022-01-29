@@ -550,5 +550,8 @@ Database initialization now working (except for the very first superuser login b
 
 ## Commit tidied up and tested database initialization
 
+Started trying to add email authentication. It caused problems, so all I'm doing for now is harvesting the emails of signed up users, so we can communicate
+Added the privacy and disclaimer page
 
+## Commit disclaimer page added
 

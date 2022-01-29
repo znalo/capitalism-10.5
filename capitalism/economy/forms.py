@@ -13,14 +13,7 @@ class UserModelForm(forms.ModelForm):
             'last_name',
         )
 
-# class CustomUserCreationForm(UserCreationForm):
-#     class Meta:
-#       model=User
-#       fields=("username",)
-#       field_classes={'username':UsernameField}
-
- 
 class SignUpForm(UserCreationForm):
     class Meta:
         model = User
-        fields = ('username', 'password1', 'password2', )
+        fields = ('username', 'password1', 'password2', 'email' )

@@ -159,3 +159,6 @@ def signup(request):
 def initialize_and_redisplay(request):
     initialize(request)
     return HttpResponseRedirect(reverse("economy"))    
+
+def disclaimers(request):
+    return render(request, 'disclaimers.html')

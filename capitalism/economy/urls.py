@@ -30,6 +30,8 @@ urlpatterns = [
     url(r'stage/(?P<act>[\w-]+)/$', control.stage_execute, name='stage'),
     url(r'control/(?P<period>[\d-]+)/(?P<stage>[\w-]+)/(?P<step>[\w-]+)/$', control.comparator_select, name='comparator-select'),
     url(r'step/(?P<act>[\w-]+)/$', control.step_execute, name='execute'),
+    url(r'disclaimers/', views.disclaimers, name='disclaimers'),
+
 # #! The Matt Freire way of authentication and login
 #     path('login/',LoginView.as_view(),name='login'),
 #     path('logout/',LogoutView.as_view(),name='logout'),
