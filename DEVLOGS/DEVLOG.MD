@@ -573,3 +573,8 @@ This will be our first tack.
 
 ## Commit Getting ready for clean install. This commit is made so that we can return to this working version easily without the complications of creating a new branch.
 
+This worked. Hence, it ought to be possible to do the same thing on the server.
+We would either have to do a complete reinstall, or perhaps switching to a clean database would be enough.
+
+## Commit Made a clean (local) install
+
