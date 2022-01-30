@@ -534,7 +534,7 @@ TODO test make this now work with any user DONE
 TODO the comparator is not correctly set in initialize
 TODO sign-in enforcement - unsigned users should not really see much at all DONE
 TODO only the superuser should be able to see the admin link (or even visit admin at all)
-TODO anonymous user should not have any database entries
+TODO anonymous user should not have any database entries DONE
 
 ## Commit code now multi-user in principle but only tested with the superuser so far
 ## Commit can now sign up and log in as new user, create and run simulations
@@ -554,4 +554,22 @@ Started trying to add email authentication. It caused problems, so all I'm doing
 Added the privacy and disclaimer page
 
 ## Commit disclaimer page added
+
+TODO the comparator is not correctly set in initialize
+TODO only the superuser should be able to see the admin link (or even visit admin at all)
+TODO test the darn simulation itself...
+
+Porting to the server.
+
+HUGE problem is that Django makes it hard to change the user model midstream. It does not create the new database table 'economy_users'.
+
+See https://code.djangoproject.com/ticket/25313
+See https://docs.djangoproject.com/en/3.1/topics/auth/customizing/#using-a-custom-user-model-when-starting-a-project
+
+However, the problem is less messy than if the project is already running with users and a database
+In that we should simply be able to remove all the migrations and start over with a clean install.
+
+This will be our first tack.
+
+## Commit Getting ready for clean install. This commit is made so that we can return to this working version easily without the complications of creating a new branch.
 

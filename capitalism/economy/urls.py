@@ -38,6 +38,10 @@ urlpatterns = [
     path('signup/', views.signup, name='signup'),
 ]
 #! The [Mozilla way](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Authentication)
+#! See also https://docs.djangoproject.com/en/3.1/topics/auth/customizing/#using-a-custom-user-model-when-starting-a-project
+#! NOTE we ran into problems server-side because custom user model was created mid-project.
+#! See https://code.djangoproject.com/ticket/25313
+
 urlpatterns += [
-    path('accounts/', include('django.contrib.auth.urls')),
+    path('users/', include('django.contrib.auth.urls')),
 ]

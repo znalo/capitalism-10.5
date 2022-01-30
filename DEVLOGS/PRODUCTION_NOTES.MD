@@ -26,3 +26,14 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'c3p0manitoba.gmail.com'
 EMAIL_HOST_PASSWORD = ''
+
+The django setup stores the registration templates in a different place (dproject/templates).
+So the new registration templates have to be copied to it separately
+
+HUGE problem is that Django makes it hard to change the user model midstream. It does not create the new database table 'economy_users'
+However, the problem is less messy than if the project is already running with users and a database
+In that we should simply be able to remove all the migrations and start over with a clean install.
+
+
+
+
