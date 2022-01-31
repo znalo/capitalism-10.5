@@ -39,7 +39,7 @@ class User(AbstractUser):
 
     #! Move forward one time stamp and clone all the associated objects
     def one_step(self):
-        logger.info("User {self} is moving one time stamp forward")
+        logger.info(f"User {self} is moving one time stamp forward")
         old_time_stamp_id = self.current_time_stamp.id
         new_time_stamp = self.current_time_stamp
         #! create a new timestamp object by saving with pk=None. Forces Django to create a new database object

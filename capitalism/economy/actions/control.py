@@ -48,6 +48,8 @@ def step_execute_without_display(request,act):
         current_time_stamp.period+=1        
     current_time_stamp.save()
     logger.info(f"Initiate action {act} in {current_time_stamp.step} whose stage is {current_time_stamp.stage}")
+    logger.info(f"The id of the current time stamp is {current_time_stamp.time_stamp} and that of its comparator is {current_time_stamp.comparator_time_stamp_FK.time_stamp}")
+
 
 def stage_execute(request,act):
     user=request.user
@@ -67,11 +69,11 @@ def stage_execute(request,act):
     where_we_are_in_the_mall.stage=user.current_stage
     where_we_are_in_the_mall.save()
 
-    #! set the comparator. At present (see TODO above) this will work as follows:
-     #* If we are executing several steps, the comparator time stamp is at the place we started.
-     #* If we haven't executed any steps, this will be the previous stage
-     #* If we are midway through a stage, this will be the point in the previous stage that we've reached so far.
-    user.set_current_comparator(remember_where_we_parked)
+    # #! set the comparator. At present (see TODO above) this will work as follows:
+    #  #* If we are executing several steps, the comparator time stamp is at the place we started.
+    #  #* If we haven't executed any steps, this will be the previous stage
+    #  #* If we are midway through a stage, this will be the point in the previous stage that we've reached so far.
+    # user.set_current_comparator(remember_where_we_parked)
     return HttpResponseRedirect(reverse("economy"))
 
 def select_project(request,project_number):
@@ -86,7 +88,7 @@ def comparator_select(request, period,stage,step):
     try:
         current_time_stamp=request.user.current_time_stamp
         current_project_number=request.user.current_project
-        comparator=TimeStamp.objects.get(project_number=current_project_number, period=period, stage=stage,step=step)
+        comparator=TimeStamp.objects.get(project_number=current_project_number, period=period, stage=stage,step=step,user=request.user)
         current_time_stamp.comparator_time_stamp_FK=comparator
         current_time_stamp.save()
     except Exception as error:
