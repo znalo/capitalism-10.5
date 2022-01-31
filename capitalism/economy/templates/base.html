@@ -23,7 +23,8 @@
                 <a href="{% url 'trace' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Trace</a>
                 <a href="{% url 'admin:index' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Admin</a>
                 <a href="{% url 'initialize' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Initialize</a>
-                <a href="{% url 'economy' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Economy</a> {% endif %}
+                <a href="{% url 'economy' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Economy</a> {% endif %} {% if user.is_superuser %}
+                <a href="{% url 'dashboard' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Dashboard</a> {% endif %}
             </div>
             <div class="w3-right">
                 {% if user.is_authenticated %} {% project_list %} {% control_states %}

@@ -4,7 +4,7 @@ from economy.models.report import Trace
 from economy.views import get_economy_view_context
 from ..global_constants import *
 from django.urls import reverse
-from economy.actions.exchange import calculate_demand_and_supply, allocate_supply, set_initial_capital, set_total_value_and_price, trade
+from economy.actions.exchange import calculate_demand_and_supply, allocate_supply, trade
 from economy.actions.produce import producers, prices, reproduce
 from economy.actions.distribution import revenue, invest
 from django.contrib import messages
@@ -26,7 +26,17 @@ def step_execute(request,act):
     return get_economy_view_context(request=request)
 
 def step_execute_without_display(request,act):
-    action=ACTION_LIST[act]
+    try:
+        action=ACTION_LIST[act]
+    except Exception as error:
+        #! We reach this point if the timestamp contains some unexpected action
+        #! This can occur if the timestamp was given its default value of UNDEFINED
+        #! Or if it was the 'Initial' timestamp that is given to a user when that user is created.
+        #! TODO eventually, we don't want this to happen at all. For now we just trap it and render it harmless.
+        #! Then we can study the cause
+        logger.error(f"User {request.user} encountered an undefined timestamp action {act}. Nothing was done")
+        messages.warning("There was a minor programming error. Please inform the developer")
+        return
     user=request.user
     current_time_stamp=user.current_time_stamp
     user.one_step()#! creates new timestamp, ready for the action

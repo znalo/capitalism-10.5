@@ -1,13 +1,13 @@
 from django.shortcuts import render
 from economy.actions.initialize import initialize
-from .models.states import Project, TimeStamp
+from .models.states import Project, TimeStamp, User
 from economy.models.report import Trace
 from .models.commodity import Commodity
 from .models.owners import Industry, SocialClass, StockOwner
 from .models.stocks import IndustryStock, SocialStock, Stock
 from django.http import HttpResponse
 from django.template import loader
-from django.views.generic import ListView
+from django.views.generic import ListView,UpdateView, DeleteView
 from .global_constants import *
 from .forms import SignUpForm
 from django.contrib.auth import authenticate,login
@@ -119,9 +119,8 @@ class IndustryStockView(ListView):
         
 class AllStocksView(ListView):
     model=Stock
-    template_name='stock_list.html'    
+    template_name='stock_list.html'
 
-    
 class TraceView(ListView):
     model=Trace
     template_name='trace_list.html'    
@@ -148,6 +147,15 @@ def signup(request):
             raw_password = form.cleaned_data.get('password1')
             # login user after signing up
             user = authenticate(username=user.username, password=raw_password)
+            #! User must have a current time stamp even though the data is not initialized
+            #! Because the relation is one to one.
+            #! TODO a bit of a design flaw here...
+            new_time_stamp=TimeStamp(project_number=0, time_stamp=0, step="Initial", stage="Initial", user=user)
+            new_time_stamp.save()
+            new_time_stamp.comparator_time_stamp_FK=new_time_stamp
+            new_time_stamp.save()
+            user.current_time_stamp=new_time_stamp
+            user.save()
             login(request, user)
             # Initialise the user's database
             initialize(request)           
@@ -162,3 +170,19 @@ def initialize_and_redisplay(request):
 
 def disclaimers(request):
     return render(request, 'disclaimers.html')
+
+class Dashboard(ListView):
+    model=User
+    template_name='dashboard.html'    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        qs=User.objects.all()
+        context={}
+        context['users']=qs
+        return context    
+
+class UserDetail(DeleteView):
+    template_name='user_form.html'    
+    model=User
+    fields=["username"]
+    success_url='dashboard'

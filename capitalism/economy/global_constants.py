@@ -24,7 +24,7 @@ INVEST="invest"
 M_C = "M-C (exchange)"
 C_P = "C-P-C' (produce)"
 C_M = "C'-M' (distribute)"
-
+INITIAL="Initial"
 
 ORIGIN_CHOICES = [
     (SOCIAL, 'Social'),
@@ -69,7 +69,8 @@ STEPS={
   "reproduce":Step(name=REPRODUCE,stage_name="C_P", next_step=REVENUE),
   "revenue":Step(name=REVENUE,stage_name="C_M",next_step=INVEST),
   "invest":Step(name=INVEST,stage_name="C_M", next_step=DEMAND),
-  "UNDEFINED":Step(name=UNDEFINED,stage_name="C_M", next_step=UNDEFINED)
+  "UNDEFINED":Step(name=UNDEFINED,stage_name="C_M", next_step=UNDEFINED),
+  "Initial":Step(name=INITIAL,stage_name="C_M", next_step=INITIAL),
 }
 
 STAGES={

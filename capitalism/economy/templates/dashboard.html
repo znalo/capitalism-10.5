@@ -1,0 +1,16 @@
+{% extends "base.html" %} {% block content %}
+
+<div class="w3-container">
+    <div class="w3-medium">
+        <ul class="w3-ul w3-card-4">
+            <h3>Users</h3>
+            {% for user in users %}
+            <li>
+                <a href="/userdetail/{{ user.pk }}">{{ user }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+{% endblock %}
