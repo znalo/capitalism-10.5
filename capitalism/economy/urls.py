@@ -7,6 +7,8 @@ from economy.actions.control import select_project
 
 urlpatterns = [
     path('', views.landingPage, name='landing-page'),
+    path('justlanded/', views.newlyLanded, name='just-landed'),
+    path('status/', views.status_update, name='status'),
     url('^admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')), # new
     url('report/table', views.TraceView.as_view(), name='trace'),
@@ -33,6 +35,7 @@ urlpatterns = [
     url(r'disclaimers/', views.disclaimers, name='disclaimers'),
     url('dashboard', views.Dashboard.as_view(), name='dashboard'),
     path('userdetail/<int:pk>/', views.UserDetail.as_view(),name='user-detail'),
+    
 
 # #! The Matt Freire way of authentication and login
 #     path('login/',LoginView.as_view(),name='login'),

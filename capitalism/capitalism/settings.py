@@ -155,7 +155,7 @@ FIXTURE_DIRS =[str(BASE_DIR.joinpath("fixtures"))]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/justlanded'
 
 LOGOUT_REDIRECT_URL = '/' # new
 

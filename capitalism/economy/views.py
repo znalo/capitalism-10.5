@@ -13,6 +13,7 @@ from .forms import SignUpForm
 from django.contrib.auth import authenticate,login
 from django.http.response import HttpResponseRedirect
 from django.urls import reverse
+from django.contrib import messages
 
 def get_economy_view_context(request):#TODO change name - this function now not only creates the context but also displays it, so the naming is wrong
         current_time_stamp=request.user.current_time_stamp
@@ -134,6 +135,20 @@ def landingPage(request):
     user=request.user
     logger.info(f"User {user} has landed on the home page")
     return render(request, 'landing.html')
+
+def status_update(request):
+    user=request.user
+    logger.info(f"User {user} requested a status update")
+    return render(request, 'status.html')
+
+#! to display messages to people that just logged in
+def newlyLanded(request):
+    user=request.user
+    logger.info(f"User {user} has landed on the new landing page")
+    messages.info(request,"Hi, welcome to capitalism")
+    messages.info(request, "To view the current state of the project, visit the Status Update Page")
+    return render(request, 'landing.html')
+
 
 #! See the [CSEStack](https://www.csestack.org/django-sign-up-registration-form/) solution
 def signup(request):

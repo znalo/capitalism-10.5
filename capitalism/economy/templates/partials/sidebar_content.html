@@ -3,8 +3,9 @@
 <div class="messages w3-pink w3-small">
     {% for message in messages %}
     <div {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</div>
+    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
     <p>Please contact the developer </p>
-    {% endfor %}
+    {% endif %} {% endfor %}
 </div>
 {% endif %} {% else %}
 <div class="w3-card-4 w3-pale-red">

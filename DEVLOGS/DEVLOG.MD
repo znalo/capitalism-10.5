@@ -7,3 +7,5 @@ I've therefore started this new Developer Log, and have hived off the previous n
 ## Commit Created rudimentary admin dashboard to view and delete users
 TODO security for this action
 TODO admin should probably not be able to delete self
+
+## Commit Status page and a short message for new signers

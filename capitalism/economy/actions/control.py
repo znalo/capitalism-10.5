@@ -35,7 +35,7 @@ def step_execute_without_display(request,act):
         #! TODO eventually, we don't want this to happen at all. For now we just trap it and render it harmless.
         #! Then we can study the cause
         logger.error(f"User {request.user} encountered an undefined timestamp action {act}. Nothing was done")
-        messages.warning("There was a minor programming error. Please inform the developer")
+        messages.warning(request,"There was a minor programming error. Please inform the developer")
         return
     user=request.user
     current_time_stamp=user.current_time_stamp
