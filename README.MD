@@ -12,6 +12,9 @@ At 30 January 2022 this is now running at [this experimental site](www.dascapita
 
 To contact me use alan.freeman@umanitoba.ca: I haven't been able to add this to my github profile, for reasons I don't understand.
 
+## Buglist 
+### Project 1
+Too much money is allocated to industries in the distribution stage
 
 
 
