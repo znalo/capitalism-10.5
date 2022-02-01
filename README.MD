@@ -6,15 +6,20 @@ General platform for simulating period circuit representations of a capitalist e
 
 A port of [Capitalism 9.0](https://github.com/axfreeman/capitalism-9.0) which was written in JavaFX. Details of the rationale and features are still hosted in the README file of that project
 
-# Production version
-
-At 30 January 2022 this is now running at [this experimental site](www.dascapital.org)
-
 To contact me use alan.freeman@umanitoba.ca: I haven't been able to add this to my github profile, for reasons I don't understand.
+
+## Production version
+At 30 January 2022 this is now running at [this experimental site](www.dascapital.org)
 
 ## Buglist 
 ### Project 1
 Too much money is allocated to industries in the distribution stage
+
+## Changes
+### 1 February 2022
+  * Fixed problems with tables because jquery version was wrong
+  * Fixed trace display did not display all entries
+
 
 
 

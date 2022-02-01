@@ -64,27 +64,36 @@
 <script>
     $(document).ready(function() {
         $('#trace').DataTable({
-            "columns": [{
-                "width": "4%"
-            }, {
-                "width": "2%"
-            }, {
-                "width": "2%"
-            }, {
-                "width": "2%"
-            }, {
-                "width": "5%"
-            }, {
-                "width": "5%"
-            }, {
-                "width": "81%"
-            }, ],
             "paging": false,
-            "info": false,
-            "borders": false,
-            "searching": false
+            "searching": false,
+            "info": false
         });
     });
+
+    // The below produces an error 'col is undefined'
+    // $(document).ready(function() {
+    //     $('#trace').DataTable({
+    //         "columns": [{
+    //             "width": "4%"
+    //         }, {
+    //             "width": "2%"
+    //         }, {
+    //             "width": "2%"
+    //         }, {
+    //             "width": "2%"
+    //         }, {
+    //             "width": "5%"
+    //         }, {
+    //             "width": "5%"
+    //         }, {
+    //             "width": "81%"
+    //         }, ],
+    //         "paging": false,
+    //         "info": false,
+    //         "borders": false,
+    //         "searching": false
+    //     });
+    // });
 </script>
 
 {% endblock %}

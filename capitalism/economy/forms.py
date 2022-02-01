@@ -14,6 +14,8 @@ class UserModelForm(forms.ModelForm):
         )
 
 class SignUpForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+
     class Meta:
         model = User
         fields = ('username', 'password1', 'password2', 'email' )

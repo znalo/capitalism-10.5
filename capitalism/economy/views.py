@@ -127,7 +127,7 @@ class TraceView(ListView):
     template_name='trace_list.html'    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        qs=Trace.objects.filter(time_stamp_id=self.request.user.current_time_stamp.time_stamp)
+        qs=Trace.objects.filter(user=self.request.user)
         context['trace_list']=qs
         return context    
 

@@ -7,11 +7,14 @@
     <title>Capitalism 10.5</title>
     <meta name="description" content="Capitalism 10.5">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <link rel="stylesheet" href="//cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="{% static 'css/static.css' %}">
     <!-- TODO it doesn't seem as if the static.css is being picked up -->
     <link rel="shortcut icon" href="{% static '/img/favicon.ico' %}">
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.js"></script>
 </head>
 
 <body>
@@ -43,7 +46,7 @@
                         <a class="w3-bar-item w3-button w3-small " href="{% url 'all-owners' %}" role="button">All
                             Owners</a>
                         <a class="w3-bar-item w3-button w3-small " href="{% url 'all-stocks' %}" role="button">All
-                                Stocks</a>
+                            Stocks</a>
                         <a class="w3-bar-item w3-button w3-small " href="{% url 'time-stamps' %}" role="button">Time
                             Stamps</a>
                         <a class="w3-bar-item w3-button w3-small " href="{% url 'sandbox' %}" role="button">Sandbox</a>
@@ -68,9 +71,7 @@
         </div>
     </div>
 
-    <script src="https://www.w3schools.com/lib/w3.js"></script>
-    <script src="//code.jquery.com/jquery-1.12.4.js"></script>
-    <script src="//cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+
 
     {% block extra_js %} {% endblock %}
 </body>

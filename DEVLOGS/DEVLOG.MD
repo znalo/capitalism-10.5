@@ -9,3 +9,9 @@ TODO security for this action
 TODO admin should probably not be able to delete self
 
 ## Commit Status page and a short message for new signers
+
+Fixed problems with table display, arising from mismatch of jquery and datatables js scripts
+Fixed problem that Trace table displays only partially
+
+## Commit Bug fixes for Table displays and Trace displays
+
