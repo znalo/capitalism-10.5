@@ -88,10 +88,9 @@ def invest(user):
     calculate_demand(user=user) #! this is required if we are to estimate correctly the replenishment cost
     capitalists=SocialClass.objects.get(time_stamp_FK=user.current_time_stamp, name="Capitalists")    
     industries=Industry.objects.filter(time_stamp_FK=user.current_time_stamp)
+    Trace.enter(user,1, f"Calculate input costs to continue producing at current scales")
     for industry in industries:
-        print(f"looking for the replenishment cost of industry {industry}")
         cost=industry.replenishment_cost
-        print(f"this cost was {cost}")
         Trace.enter(user,1, f"{Trace.sim_object(industry.name)} needs {Trace.sim_quantity(cost)} to produce at its current scale of {Trace.sim_quantity(industry.output_scale)}")
         #! just give them the money
         capitalists_money=capitalists.money_stock

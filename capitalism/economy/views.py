@@ -16,24 +16,24 @@ from django.urls import reverse
 from django.contrib import messages
 
 def get_economy_view_context(request):#TODO change name - this function now not only creates the context but also displays it, so the naming is wrong
-        current_time_stamp=request.user.current_time_stamp
-        industry_stocks = IndustryStock.objects.filter(time_stamp_FK=current_time_stamp)
-        industries=Industry.objects.filter(time_stamp_FK=current_time_stamp)
-        productive_stocks=industry_stocks.filter(usage_type=PRODUCTION).order_by("commodity_FK__display_order")
-        industry_headers=productive_stocks.filter(industry_FK=industries.first()).order_by("commodity_FK__display_order") #!all industries have same choice of productive stocks, even if usage is zero
-        social_classes=SocialClass.objects.filter(time_stamp_FK=current_time_stamp)
-        social_stocks=SocialStock.objects.filter(time_stamp_FK=current_time_stamp)
-        commodities=Commodity.objects.filter(time_stamp_FK=current_time_stamp)
+    current_time_stamp=request.user.current_time_stamp
+    industry_stocks = IndustryStock.objects.filter(time_stamp_FK=current_time_stamp)
+    industries=Industry.objects.filter(time_stamp_FK=current_time_stamp)
+    productive_stocks=industry_stocks.filter(usage_type=PRODUCTION).order_by("commodity_FK__display_order")
+    industry_headers=productive_stocks.filter(industry_FK=industries.first()).order_by("commodity_FK__display_order") #!all industries have same choice of productive stocks, even if usage is zero
+    social_classes=SocialClass.objects.filter(time_stamp_FK=current_time_stamp)
+    social_stocks=SocialStock.objects.filter(time_stamp_FK=current_time_stamp)
+    commodities=Commodity.objects.filter(time_stamp_FK=current_time_stamp)
 
-        context={}
-        context["productive_stocks"]=productive_stocks
-        context["industries"]=industries
-        context["industry_headers"]=industry_headers
-        context["social_classes"]=social_classes
-        context["social_stocks"]=social_stocks
-        context["commodities"]= commodities
-        template = loader.get_template('economy.html')
-        return HttpResponse(template.render(context, request))
+    context={}
+    context["productive_stocks"]=productive_stocks
+    context["industries"]=industries
+    context["industry_headers"]=industry_headers
+    context["social_classes"]=social_classes
+    context["social_stocks"]=social_stocks
+    context["commodities"]= commodities
+    template = loader.get_template('economy.html')
+    return HttpResponse(template.render(context, request))
 
 
 def sandbox(request):
@@ -127,7 +127,7 @@ class TraceView(ListView):
     template_name='trace_list.html'    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        qs=Trace.objects.filter(user=self.request.user)
+        qs=Trace.objects.filter(user=self.request.user).order_by('real_time')
         context['trace_list']=qs
         return context    
 

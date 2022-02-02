@@ -4,6 +4,7 @@ from economy.models.commodity import Commodity
 from economy.models.owners import Industry, SocialClass, StockOwner
 from economy.models.stocks import Stock, IndustryStock, SocialStock
 from ..global_constants import *
+from django.contrib import messages
 
 #! Calculate the unconstrained demand for all stocks
 #! Use this to calculate the total demand for each commodity
@@ -126,6 +127,7 @@ def set_total_value_and_price(user):
     Trace.enter(user,1,"Calculate Total Values, Prices and initial capital")
     logger.info(f"Calculate Total Values, Prices and initial capital for user {user}")
     stocks=Stock.objects.filter(time_stamp_FK=user.current_time_stamp)
+    Trace.enter(user,2,"First calculate the price and value of each individual stock")
     for stock in stocks:
         unit_price=stock.commodity_FK.unit_price
         unit_value=stock.commodity_FK.unit_value
@@ -134,7 +136,8 @@ def set_total_value_and_price(user):
         stock.price=size*unit_price
         owner_name=stock.stock_owner_name
         stock.save()
-        Trace.enter(user,2,f"Size of the stock of {Trace.sim_object(stock.commodity_FK.name)} owned by {Trace.sim_object(owner_name)} is {Trace.sim_quantity(stock.size)}. Its value is {Trace.sim_quantity(stock.value)} and its price is {Trace.sim_quantity(stock.price)}")
+        Trace.enter(user,4,f"Size of the stock of {Trace.sim_object(stock.commodity_FK.name)} owned by {Trace.sim_object(owner_name)} is {Trace.sim_quantity(stock.size)}. Its value is {Trace.sim_quantity(stock.value)} and its price is {Trace.sim_quantity(stock.price)}")
+    Trace.enter(user,2,"Now calculate the price and value of each commodity, by summing over the stocks of that commodity")
     for commodity in Commodity.objects.filter(time_stamp_FK=user.current_time_stamp):
         commodity.total_value=0
         commodity.total_price=0
@@ -145,49 +148,52 @@ def set_total_value_and_price(user):
             commodity.total_price+=stock.price
             commodity.size+=stock.size
         commodity.save()
-        Trace.enter(user,2,f"Total size of the stock of {Trace.sim_object(stock.commodity_FK.name)} is {Trace.sim_quantity(commodity.size)}. Its value is {Trace.sim_quantity(commodity.total_value)} and its price is {Trace.sim_quantity(commodity.total_price)}")
+        Trace.enter(user,3,f"Total size of commodity {Trace.sim_object(stock.commodity_FK.name)} is {Trace.sim_quantity(commodity.size)}. Its value is {Trace.sim_quantity(commodity.total_value)} and its price is {Trace.sim_quantity(commodity.total_price)}")
     #! BOTH unit price and unit value may now have changed
     #! Therefore we:
     #* calculate these unit values and prices
     #* recalculate the value and price of each stock
+    Trace.enter(user,2,"Now unit prices and values have changed. Recalculate them by dividing total price and value by the size, for each commodity")
     for commodity in Commodity.objects.filter(time_stamp_FK=user.current_time_stamp):
-        Trace.enter(user,1, f"There are now {Trace.sim_quantity(commodity. size)} units of Commodity {Trace.sim_object(commodity.name)} with total value {Trace.sim_quantity(commodity.total_value)} and total price {Trace.sim_quantity(commodity.total_price)}")
+        Trace.enter(user,3, f"There are now {Trace.sim_quantity(commodity. size)} units of Commodity {Trace.sim_object(commodity.name)} with total value {Trace.sim_quantity(commodity.total_value)} and total price {Trace.sim_quantity(commodity.total_price)}")
         if commodity.size!=0:
             new_unit_value=commodity.total_value/commodity.size
             new_unit_price=commodity.total_price/commodity.size
         else:
-            Trace.enter(user,0,f"Size of {commodity.name} is zero. This is probably an error")
+            Trace.enter(user,0,f"Note that the size of {commodity.name} is zero")
+            logger.warning(f"In the simulation belonging to {user}, commodity {commodity.name} has zero size")
             new_unit_value=1
             new_unit_price=1
-        Trace.enter(user,1,f"Unit value {Trace.sim_quantity(commodity.unit_value)} will be reset to {Trace.sim_quantity(new_unit_value)} and unit price {Trace.sim_quantity(commodity.unit_price)} and will be reset to {Trace.sim_quantity(new_unit_price)}")
+        Trace.enter(user,3,f"Unit value {Trace.sim_quantity(commodity.unit_value)} will be reset to {Trace.sim_quantity(new_unit_value)} and unit price {Trace.sim_quantity(commodity.unit_price)} and will be reset to {Trace.sim_quantity(new_unit_price)}")
         commodity.unit_value=new_unit_value
         commodity.unit_price=new_unit_price
         commodity.save()
     #! Now we have to revalue and reprice all stocks
+    Trace.enter(user,2,"Now revalue stocks, using these unit values and prices")
     for stock in Stock.objects.filter(time_stamp_FK=user.current_time_stamp):
         unit_price=stock.commodity_FK.unit_price
         unit_value=stock.commodity_FK.unit_value
-        Trace.enter(user,2,f"Size of {Trace.sim_object(stock.commodity_FK.name)} owned by {Trace.sim_object(stock.stock_owner_name)} is {Trace.sim_quantity(stock.size)}, with value {Trace.sim_quantity(stock.value)} and price {Trace.sim_quantity(stock.price)}")
+        Trace.enter(user,4,f"Size of {Trace.sim_object(stock.commodity_FK.name)} owned by {Trace.sim_object(stock.stock_owner_name)} is {Trace.sim_quantity(stock.size)}, with value {Trace.sim_quantity(stock.value)} and price {Trace.sim_quantity(stock.price)}")
         new_value=stock.size*unit_value
         new_price=stock.size*unit_price
-        Trace.enter(user,2,f"Unit value is now {Trace.sim_quantity(unit_value)} so total value be reset to {Trace.sim_quantity(new_value)}; Unit price {Trace.sim_quantity(unit_price)} so total price will be reset to {Trace.sim_quantity(new_price)}")
+        Trace.enter(user,4,f"Unit value is now {Trace.sim_quantity(unit_value)} so total value be reset to {Trace.sim_quantity(new_value)}; Unit price {Trace.sim_quantity(unit_price)} so total price will be reset to {Trace.sim_quantity(new_price)}")
         stock.value=new_value
         stock.price=new_price
         stock.save()
 
 def trade(user):
-    Trace.enter(user,0,"TRADE")
+    Trace.enter(user,1,"TRADE")
     logger.info(f"User {user} is trading")
-    Trace.enter(user,1,"Industries")
+    Trace.enter(user,2,"Industries")
  
     #! iterate over all stocks that want to buy something
     buyer_stocks=Stock.objects.filter(time_stamp_FK=user.current_time_stamp).exclude(usage_type=MONEY).exclude(usage_type=SALES)
     for buyer_stock in buyer_stocks:
         buyer=buyer_stock.stock_owner_FK
         buyer_commodity=buyer_stock.commodity_FK
-        Trace.enter(user,2,f"{Trace.sim_object(buyer.name)} seeks to purchase {Trace.sim_quantity(buyer_stock.demand)} of {Trace.sim_object(buyer_commodity.name)} for stock of usage type {Trace.sim_object(buyer_commodity.usage)} whose origin is {Trace.sim_object(buyer_commodity.origin)}")
+        Trace.enter(user,3,f"{Trace.sim_object(buyer.name)} seeks to purchase {Trace.sim_quantity(buyer_stock.demand)} of {Trace.sim_object(buyer_commodity.name)} for stock of usage type {Trace.sim_object(buyer_commodity.usage)} whose origin is {Trace.sim_object(buyer_commodity.origin)}")
         buyer_money_stock=buyer.money_stock
-        Trace.enter(user,2,f"The buyer has {Trace.sim_quantity(buyer_money_stock.size)} in money and the unit price is {Trace.sim_quantity(buyer_commodity.unit_price)}. Looking for sellers")
+        Trace.enter(user,3,f"The buyer has {Trace.sim_quantity(buyer_money_stock.size)} in money and the unit price is {Trace.sim_quantity(buyer_commodity.unit_price)}. Looking for sellers")
         
         #! iterate over all potential sellers of this commodity
         potential_sellers=StockOwner.objects.filter(time_stamp_FK=user.current_time_stamp)
@@ -196,7 +202,7 @@ def trade(user):
             seller_name=seller.name
             seller_stock=seller.sales_stock
             seller_commodity=seller_stock.commodity_FK
-            Trace.enter(user,2,f"{Trace.sim_object(seller_name)} can offer {Trace.sim_quantity(seller_stock.supply)} of {Trace.sim_object(seller_commodity.name)} for sale to {Trace.sim_object(buyer.name)} who wants {Trace.sim_object(buyer_commodity.name)}")
+            Trace.enter(user,3,f"{Trace.sim_object(seller_name)} can offer {Trace.sim_quantity(seller_stock.supply)} of {Trace.sim_object(seller_commodity.name)} for sale to {Trace.sim_object(buyer.name)} who wants {Trace.sim_object(buyer_commodity.name)}")
             if seller_commodity==buyer_commodity:
                 sale(seller_stock,buyer_stock,seller,buyer)
 
@@ -239,13 +245,14 @@ def set_initial_capital(user):
     # for industry in Industry.objects.filter(time_stamp_FK=current_time_stamp):
     #     Trace.enter(user,1, f"saving industry {industry.name} whose capital is {industry.initial_capital}" )
     #     industry.save()
-    
+    Trace.enter(user,1,f"Calculate initial capitals")
+
     for industry in Industry.objects.filter(time_stamp_FK=user.current_time_stamp):
-        Trace.enter(user,1,f"calculating the initial capital of industry {industry.name}")
+        Trace.enter(user,2,f"calculating the initial capital of industry {industry.name}")
         capital=0
         work_in_progress=0
         for stock in industry.stock_set.filter(time_stamp_FK=user.current_time_stamp):
-            Trace.enter(user,2,f"Adding the price {Trace.sim_quantity(stock.price)} of the stock of {Trace.sim_object(stock.commodity_FK.name)}, type {Trace.sim_object(stock.usage_type)}")
+            Trace.enter(user,3,f"Adding the price {Trace.sim_quantity(stock.price)} of the stock of {Trace.sim_object(stock.commodity_FK.name)}, type {Trace.sim_object(stock.usage_type)}")
             capital+=stock.price
             if stock.usage_type==PRODUCTION:
                 work_in_progress+=stock.price
@@ -258,18 +265,19 @@ def set_initial_capital(user):
 
 def set_current_capital(user):
     #! Calculate the current capital of each industry
+    Trace.enter(user,1,f"Calculate current capitals")
     for industry in Industry.objects.filter(time_stamp_FK=user.current_time_stamp):
-        Trace.enter(user,1,f"calculating the current capital of industry {industry.name}")
+        Trace.enter(user,2,f"calculating the current capital of industry {Trace.sim_object(industry.name)}")
         capital=0
         work_in_progress=0
         for stock in industry.stock_set.filter(time_stamp_FK=user.current_time_stamp):
             capital+=stock.price
             if stock.usage_type==PRODUCTION:
                 work_in_progress+=stock.price
-            Trace.enter(user,2,f"Adding the price {Trace.sim_quantity(stock.price)} of stock of {Trace.sim_object(stock.commodity_FK.name)}, type {Trace.sim_object(stock.usage_type)}. Work in progress is {Trace.sim_quantity(work_in_progress)} and capital is {Trace.sim_quantity(capital)} ")
+            Trace.enter(user,3,f"Adding the price {Trace.sim_quantity(stock.price)} of stock of {Trace.sim_object(stock.commodity_FK.name)}, type {Trace.sim_object(stock.usage_type)}. Work in progress is {Trace.sim_quantity(work_in_progress)} and capital is {Trace.sim_quantity(capital)} ")
         industry.current_capital=capital
         industry.profit=capital-industry.initial_capital
         industry.profit_rate=(industry.profit/industry.initial_capital)*100
-        Trace.enter(user,1,f"Current capital is {Trace.sim_quantity(industry.current_capital)}; initial capital is {Trace.sim_quantity(industry.initial_capital)}; profit is {Trace.sim_quantity(industry.profit)}")
+        Trace.enter(user,2,f"Current capital of industry {Trace.sim_object(industry.name)} is {Trace.sim_quantity(industry.current_capital)}; initial capital is {Trace.sim_quantity(industry.initial_capital)}; profit is {Trace.sim_quantity(industry.profit)}")
         industry.work_in_progress=work_in_progress
         industry.save()

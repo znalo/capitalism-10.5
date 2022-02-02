@@ -34,26 +34,18 @@
 <table id="trace" class="display compact" style="width:80%">
     <thead>
         <tr>
-            <th>Id</th>
-            <th>Level</th>
-            <th>Stamp</th>
-            <th>Project</th>
-            <th>Period</th>
-            <th>Stage</th>
-            <th>Step</th>
+            <th>Time Created</th>
+            <th>Stamp id</th>
+            <th>Period.Stage.Step</th>
             <th>Message</th>
         </tr>
     </thead>
     <tbody>
         {% for trace in trace_list %}
         <tr class="toggle-level{{trace.level}}">
-            <td>{{ trace.id}} </td>
-            <td>{{ trace.level}} </td>
-            <td>{{ trace.time_stamp_id}} </td>
-            <td>{{ trace.project_id}} </td>
-            <td>{{ trace.period }}</td>
-            <td>{{ trace.stage }}</td>
-            <td>{{ trace.step }}</td>
+            <td>{{trace.real_time }} </td>
+            <td>{{ trace.time_stamp_id }} </td>
+            <td>{{ trace.period }}.{{ trace.stage }}.{{ trace.step }}</td>
             <td class="pl-{{trace.level}}"><span class="trace-level{{trace.level}}">{{trace.message|mark_as_safe }}</span> </td>
         </tr>
         {% endfor %}

@@ -4,12 +4,14 @@ from economy.global_constants import *
 from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
-    #! The current_time_stamp represents the current state of the simulation
-    #! Thus, the time_stamp object also has a foreign key relation to the user, because there are many stamps in a simulation
-    #! The current_time_stamp is a particular one of these that represents the current state of the simulation
-    #! A complication is that we cannot cascade this field, because otherwise, when the data is completely re-initialized (actions.initialize), 
-    #! (which involves deleting all the timestamps of the user) the user would get deleted in the process.
-    #! TODO there is probably a more foolproof way to deal with this
+    #! The time_stamp object has a foreign key relation to the user, because there are many stamps in a simulation
+    #! However, the User object also needs to know where it is in this simulation.
+    #! It therefore has a special field, current_time_stamp, that represents the current state of the simulation
+    #! A complication is that we cannot cascade this field. 
+    #! This is because, when the data is completely re-initialized, all the timestamps pointing to the user are deleted.
+    #! This would include the current_time_stamp. If we cascaded the relation, the user would get deleted.
+    #! For the same reason, current_time_stamp allows blank and null (and when deleted, this field is set to null)
+    #! TODO there is probably a more foolproof way to deal with this.
     current_time_stamp= models.OneToOneField("TimeStamp", related_name="current_time_stamp", on_delete=models.SET_NULL, blank=True, null=True, default=None)
 
     @property
@@ -34,12 +36,13 @@ class User(AbstractUser):
 
     #! Set the comparator of the current time stamp to a new comparator
     def set_current_comparator(self,comparator):
+        logger.info(f"User {self} is changing its comparator which is {self.current_time_stamp} from {self.current_time_stamp.current_comparator_time_stamp_FK} to {comparator}")
         self.current_time_stamp.comparator_time_stamp_FK = comparator
         self.current_time_stamp.save()
 
     #! Move forward one time stamp and clone all the associated objects
     def one_step(self):
-        logger.info(f"User {self} is moving one time stamp forward")
+        logger.info(f"User {self} is moving time stamp {self.current_time_stamp} forward one step")
         old_time_stamp_id = self.current_time_stamp.id
         new_time_stamp = self.current_time_stamp
         #! create a new timestamp object by saving with pk=None. Forces Django to create a new database object
@@ -223,6 +226,6 @@ class TimeStamp(models.Model):
         ordering = ['project_number', 'time_stamp', ]
 
     def __str__(self):
-        return f"[Time {self.time_stamp}(id:{self.id}) description: {self.step}] [Project {self.project_number}] "
+        return f"{self.period}.{self.stage}.{self.step}"
 
 

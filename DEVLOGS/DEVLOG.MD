@@ -13,5 +13,6 @@ TODO admin should probably not be able to delete self
 Fixed problems with table display, arising from mismatch of jquery and datatables js scripts
 Fixed problem that Trace table displays only partially
 
-## Commit Bug fixes for Table displays and Trace displays
+## 1 February Commit Bug fixes for Table displays and Trace displays
+## 2 February Commit Bug fixes for Trace display and replenishment_demand
 

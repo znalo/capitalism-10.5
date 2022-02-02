@@ -24,14 +24,10 @@ def initialize_projects(request):
     logger.info(f"Initialise project table {logged_in_user}")
     #! TODO test that this is the admin user
     try:
-        Trace.objects.filter(user=logged_in_user).delete()
-        logger.info( f"User {logged_in_user} is re-initializing the database")
         file_name = staticfiles_storage.path('data/projects.csv')    
         logger.info (f"Initializing projects from file {file_name} for user {logged_in_user}")
         projects=Project.objects.filter(user=logged_in_user)
         projects.delete()
-        if 1==1: #! temp so I can check the table
-            raise Exception ("lunch break")
         df = pd.read_csv(file_name)
         for row in df.itertuples(index=False, name='Pandas'):
             logger.info(f"Reading row number {row}")
@@ -50,10 +46,13 @@ def initialize_projects(request):
 
 def initialize(request):
     logged_in_user=request.user
-    logger.info(f"Initialise user {logged_in_user}")
-    Trace.enter(request.user,0, "+++REDO FROM START+++")
+    logger.info(f"User {logged_in_user} has asked to reinitialize")
+    #TODO 'Do you really want to do this?'
+    #TODO option to re-initialize just one project 
     #! Timestamps    
     #! TODO insist that there is only one time-stamp per project in the CSV file
+    Trace.objects.filter(user=logged_in_user).delete()
+    Trace.enter(request.user,0, "INITIALIZE ENTIRE SIMULATION")
     TimeStamp.objects.filter(user=logged_in_user).delete()
     file_name = staticfiles_storage.path('data/timestamps.csv')    
     logger.info( f"Reading time stamps from {file_name}")

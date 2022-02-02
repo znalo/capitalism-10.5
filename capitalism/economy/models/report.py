@@ -1,9 +1,11 @@
+from enum import auto
 from django.db import models
 from economy.global_constants import *
 from .states import User
 
 class Trace(models.Model):
     time_stamp_id = models.IntegerField(default=0, null=False)
+    real_time=models.DateTimeField(auto_now_add=True)
     period = models.IntegerField(default=0, null=False)
     stage = models.CharField(max_length=25, default=UNDEFINED)
     step = models.CharField(max_length=25, default=UNDEFINED)

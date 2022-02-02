@@ -26,7 +26,9 @@ def step_execute(request,act):
     return get_economy_view_context(request=request)
 
 def step_execute_without_display(request,act):
+    #! carry out the action specified by the key 'act'
     try:
+        #! First a little test to see if the key is meaningful
         action=ACTION_LIST[act]
     except Exception as error:
         #! We reach this point if the timestamp contains some unexpected action
@@ -35,8 +37,9 @@ def step_execute_without_display(request,act):
         #! TODO eventually, we don't want this to happen at all. For now we just trap it and render it harmless.
         #! Then we can study the cause
         logger.error(f"User {request.user} encountered an undefined timestamp action {act}. Nothing was done")
-        messages.warning(request,"There was a minor programming error. Please inform the developer")
+        messages.warning(request,"There was a programming error. Please tell the developer")
         return
+    Trace.enter(request.user, 0,f"Execute step {act}")
     user=request.user
     current_time_stamp=user.current_time_stamp
     user.one_step()#! creates new timestamp, ready for the action

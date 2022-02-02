@@ -78,17 +78,17 @@ class Industry(StockOwner):
     @property
     def replenishment_cost(self):
         #! Requires that demand is correctly set - this must be provided for by the caller 
-        logger.info(f"enter calculation of replenishment cost for industry {self}")
+        logger.info(f"Calculating replenishment cost for industry {self}")
+        Trace.enter(self.user,3,f"Processing industry {Trace.sim_object(self.name)}")
         cost=0
-        productive_stocks=IndustryStock.objects.filter(usage_type=PRODUCTION,time_stamp_FK=self.user.current_time_stamp)
-        print (f"The productive stock query set is {productive_stocks}")
+        productive_stocks=IndustryStock.objects.filter(usage_type=PRODUCTION,time_stamp_FK=self.user.current_time_stamp,stock_owner_FK=self)
+        logger.info (self.user,f"The productive stock query set is {productive_stocks}")
         for stock in productive_stocks:
-            print(f"looking at the stock {stock}")
-            print(f"This cost was found and it is {stock.monetary_demand}")
+            logger.info (f"Stock {stock} has generated an additional cost of {stock.monetary_demand}")
             cost+=stock.monetary_demand
-            print(f"This cost was found and it is {stock.monetary_demand}")
-            Trace.enter(self.user,2,f"Industry {Trace.sim_object(self.name)} will need ${Trace.sim_quantity(stock.monetary_demand)} to replenish its stock of {Trace.sim_object(stock.commodity_name)}")
-        Trace.enter(self.user,2,f"The total money required by {Trace.sim_object(self.name)} is {cost}")
+            logger.info (f"The cumulative total cost to the industry is now {cost}")
+            Trace.enter(self.user,4,f"Industry {Trace.sim_object(self.name)} needs ${Trace.sim_quantity(stock.monetary_demand)} to replenish its stock of {Trace.sim_object(stock.commodity_name)}")
+        Trace.enter(self.user,3,f"The total money required by industry {Trace.sim_object(self.name)} is {cost}")
         return cost
 
     @property
