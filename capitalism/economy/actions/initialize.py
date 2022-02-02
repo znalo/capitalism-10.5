@@ -26,8 +26,7 @@ def initialize_projects(request):
     try:
         file_name = staticfiles_storage.path('data/projects.csv')    
         logger.info (f"Initializing projects from file {file_name} for user {logged_in_user}")
-        projects=Project.objects.filter(user=logged_in_user)
-        projects.delete()
+        Project.objects.all().delete()
         df = pd.read_csv(file_name)
         for row in df.itertuples(index=False, name='Pandas'):
             logger.info(f"Reading row number {row}")

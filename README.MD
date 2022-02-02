@@ -24,7 +24,9 @@ Too much money is allocated to industries in the distribution stage
   * Improvements to trace display
   * Fixed problem in the investment step, in which replenishment demand was incorrectly calculated
   * The above migrated to the live site
-
+## 2 february 2022 pm
+  * Fixed problem that project table needs to be initialized by the administrator, for all users to avail themselves of
+  * Began study of project 3
 
 
 

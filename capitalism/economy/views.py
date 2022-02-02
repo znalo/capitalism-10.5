@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from economy.actions.initialize import initialize_projects
 from economy.actions.initialize import initialize
 from .models.states import Project, TimeStamp, User
 from economy.models.report import Trace
@@ -185,6 +186,10 @@ def initialize_and_redisplay(request):
 
 def disclaimers(request):
     return render(request, 'disclaimers.html')
+
+def rebuild_project_table(request):
+    initialize_projects(request)
+    return render(request, 'dashboard.html')
 
 class Dashboard(ListView):
     model=User

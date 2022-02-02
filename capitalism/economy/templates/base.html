@@ -31,7 +31,7 @@
                 <a href="{% url 'dashboard' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Dashboard</a> {% endif %}
             </div>
             <div class="w3-right">
-                {% if user.is_authenticated %} {% project_list %} {% control_states %}
+                {% if user.is_authenticated %} {% control_states %} {% project_list %}
                 <div class="w3-dropdown-hover">
                     <button class="w3-button w3-small">Tables</button>
                     <div class="w3-dropdown-content w3-bar-block w3-card-4">

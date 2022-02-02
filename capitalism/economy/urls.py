@@ -27,6 +27,7 @@ urlpatterns = [
 
     url('sandbox', views.sandbox, name='sandbox'),
     url('initialize', views.initialize_and_redisplay, name='initialize'),
+    url('project-table-rebuild', views.rebuild_project_table, name='project-table-rebuild'),
     url(r'projects/', views.ProjectView.as_view(), name='projects'),
     url(r'project/(?P<project_number>[\d-]+)', select_project, name='project-select'),
     url(r'stage/(?P<act>[\w-]+)/$', control.stage_execute, name='stage'),

@@ -3,10 +3,11 @@
 <div class="w3-container">
     <div class="w3-medium">
         <ul class="w3-ul w3-card-4">
-            <h3>Users</h3>
+            <a href="{% url 'project-table-rebuild' %}" class="w3-button w3-small w3-round">Rebuild the project table</a>
+            <h4 style="padding-left: 1rem "> Manage Users</h4>
             {% for user in users %}
             <li>
-                <a href="/userdetail/{{ user.pk }}">{{ user }}</a>
+                <a href="/userdetail/{{ user.pk }} ">{{ user }} (Click to delete)</a>
             </li>
             {% endfor %}
         </ul>
