@@ -33,6 +33,7 @@ urlpatterns = [
     url(r'control/(?P<period>[\d-]+)/(?P<stage>[\w-]+)/(?P<step>[\w-]+)/$', control.comparator_select, name='comparator-select'),
     url(r'step/(?P<act>[\w-]+)/$', control.step_execute, name='execute'),
     url(r'disclaimers/', views.disclaimers, name='disclaimers'),
+    path('signup/', views.signup, name='signup'),
     url('dashboard', views.Dashboard.as_view(), name='dashboard'),
     path('userdetail/<int:pk>/', views.UserDetail.as_view(),name='user-detail'),
     

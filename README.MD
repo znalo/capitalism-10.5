@@ -19,10 +19,11 @@ Too much money is allocated to industries in the distribution stage
 ### 1 February 2022
   * Fixed problems with tables because jquery version was wrong
   * Fixed trace display did not display all entries
+  * The above migrated to the live site  
 ## 2 February 2022
   * Improvements to trace display
   * Fixed problem in the investment step, in which replenishment demand was incorrectly calculated
-
+  * The above migrated to the live site
 
 
 
