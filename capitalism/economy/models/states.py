@@ -88,14 +88,8 @@ class Project(models.Model):
     def __str__(self):
         return f"(Project {self.number} {self.description})"
 
-class TimeStamp(models.Model):
-    project_number = models.IntegerField(default=1) #! We don't have a foreign key to the project because the admin might need to rebuild the project table
-    time_stamp = models.IntegerField(default=1) # ! TODO rename this field to avoid confusion
-    step = models.CharField(max_length=50, default=UNDEFINED)
-    stage = models.CharField(max_length=50, default=UNDEFINED)
-    period = models.IntegerField(default=1)
-    comparator_time_stamp_FK = models.ForeignKey("TimeStamp", on_delete=models.DO_NOTHING, null=True, blank=True, default=None)
-    melt = models.CharField(max_length=50, default=UNDEFINED)
+class Simulation_Parameter(models.Model):
+    periods_per_year=models.IntegerField(default=1)
     population_growth_rate = models.IntegerField(default=1)
     investment_ratio = models.IntegerField(default=1)
     labour_supply_response = models.CharField(max_length=50, default=UNDEFINED)
@@ -103,6 +97,18 @@ class TimeStamp(models.Model):
     melt_response_type = models.CharField(max_length=50, null=True, blank=True,default=None)
     currency_symbol = models.CharField(max_length=2, default="$")
     quantity_symbol = models.CharField(max_length=2, default="#")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+
+
+class TimeStamp(models.Model):
+    project_number = models.IntegerField(default=1) #! We don't have a foreign key to the project because the admin might need to rebuild the project table
+    # simulation_parameters=models.ForeignKey(Simulation_Parameters, on_delete=models.CASCADE, default=Simulation_Parameters() )
+    time_stamp = models.IntegerField(default=1) # ! TODO rename this field to avoid confusion
+    step = models.CharField(max_length=50, default=UNDEFINED)
+    stage = models.CharField(max_length=50, default=UNDEFINED)
+    period = models.IntegerField(default=1)
+    comparator_time_stamp_FK = models.ForeignKey("TimeStamp", on_delete=models.DO_NOTHING, null=True, blank=True, default=None)
+    melt = models.CharField(max_length=50, default=UNDEFINED)
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
     def project_FK(self):

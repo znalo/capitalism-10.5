@@ -27,6 +27,22 @@ Too much money is allocated to industries in the distribution stage
 ## 2 february 2022 pm
   * Fixed problem that project table needs to be initialized by the administrator, for all users to avail themselves of
   * Began study of project 3
-
+## 4 February
+  * Created new model 'Simulation Parameters'
+    * Abstracts from 'TimeStamp' all fields that will remain constant throughout a simulation
+    * A single standard parameter object is created at signup, on a per-user basis
+  * TODOs
+    * The next step is to create a Foreign Key in the TimeStamp that points to a simulation parameter object
+      * Then, we plan that the user gets the option, at the start of a simulation, to modify the simulation parameters
+      * This probably means the user will also get the option to re-initialize a single simulation
+    * After that, we want to use the new field 'periods_per_year' (in the simulation parameter model)
+      * This will replace project 3; it will be a general option, in a simulation, to chop it up into arbitrarily small sub-periods
+      * When this happens, capital that was at one time circulating becomes fixed 
+      * Hopefully the transition will be taken care of in a straightforward way, since currently the simulation is driven by stock sizes
+        * the quantities to be traded, used, or produced are all calculated, not hardwired
+        * this is an important departure from the standard Bortkiewicz imposition in which all capital is circulating and is used up in a year
+        * it also allows for genuine stock-flow consistency, which is the principle that animates the project
+      Bortkiewicz models in effect deduce stocks from flows (by wishing them away)
+      We to the contrary deduce flows from stocks
 
 

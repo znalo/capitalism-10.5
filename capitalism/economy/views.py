@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from economy.actions.initialize import initialize_projects
 from economy.actions.initialize import initialize
-from .models.states import Project, TimeStamp, User
+from .models.states import Project, TimeStamp, User, Simulation_Parameter
 from economy.models.report import Trace
 from .models.commodity import Commodity
 from .models.owners import Industry, SocialClass, StockOwner
@@ -157,12 +157,14 @@ def signup(request):
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            user.refresh_from_db()  
-            # load the profile instance created by the signal
+            user.refresh_from_db()  #! TODO Not sure if this is needed but seems to be recommended
             user.save()
             raw_password = form.cleaned_data.get('password1')
             # login user after signing up
             user = authenticate(username=user.username, password=raw_password)
+            #! Create a standard parameter record for the new user. This will be the default
+            p=Simulation_Parameter(user=user) #! Default everything else
+            p.save()
             #! User must have a current time stamp even though the data is not initialized
             #! Because the relation is one to one.
             #! TODO a bit of a design flaw here...

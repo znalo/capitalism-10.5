@@ -18,7 +18,7 @@ def calculate_demand(user):
 
     for commodity in commodities:
         commodity.demand = 0
-        commodity.save()
+        commodity.save() #TODO can probably be dispensed with
 
     for stock in productive_stocks:
         turnover_time = stock.commodity_FK.turnover_time

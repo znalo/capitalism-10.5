@@ -64,13 +64,6 @@ def initialize(request):
             step=row.description,
             stage="M_C", #! projects must start with this stage TODO remove this field from the CSV file
             melt=row.MELT,
-            population_growth_rate=row.population_growth_rate,
-            investment_ratio=row.investment_ratio,
-            labour_supply_response=row.labour_supply_response,
-            price_response_type=row.price_response_type,
-            melt_response_type=row.melt_response_type,
-            currency_symbol=row.currency_symbol,
-            quantity_symbol=row.quantity_symbol,
             user=logged_in_user,
         )
         time_stamp.save()
