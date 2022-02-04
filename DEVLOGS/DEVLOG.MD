@@ -16,3 +16,4 @@ Fixed problem that Trace table displays only partially
 ## 1 February Commit Bug fixes for Table displays and Trace displays
 ## 2 February Commit Bug fixes for Trace display and replenishment_demand
 ## 4 February Commit Introduced Simulation_Parameters Object (before coupling it to the Time Stamp objects)
+## 4 February Commit Scaffolded User Dashboard

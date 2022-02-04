@@ -31,10 +31,16 @@ Too much money is allocated to industries in the distribution stage
   * Created new model 'Simulation Parameters'
     * Abstracts from 'TimeStamp' all fields that will remain constant throughout a simulation
     * A single standard parameter object is created at signup, on a per-user basis
-  * TODOs
-    * The next step is to create a Foreign Key in the TimeStamp that points to a simulation parameter object
-      * Then, we plan that the user gets the option, at the start of a simulation, to modify the simulation parameters
-      * This probably means the user will also get the option to re-initialize a single simulation
+  * Created Scaffolded User Dashboard. Here the user will be able to
+    * Create simulations
+    * Manage existing simulations
+    The User Dashboard replaces the project selection option
+
+  * Next steps
+    * Create a Foreign Key in the TimeStamp that points to a simulation parameter object
+    * Move 'project number' into 'Simulation_Parameters'
+    * Flesh out the user dashboard options
+
     * After that, we want to use the new field 'periods_per_year' (in the simulation parameter model)
       * This will replace project 3; it will be a general option, in a simulation, to chop it up into arbitrarily small sub-periods
       * When this happens, capital that was at one time circulating becomes fixed 

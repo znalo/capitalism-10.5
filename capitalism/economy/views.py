@@ -193,9 +193,9 @@ def rebuild_project_table(request):
     initialize_projects(request)
     return render(request, 'dashboard.html')
 
-class Dashboard(ListView):
+class AdminDashboard(ListView):
     model=User
-    template_name='dashboard.html'    
+    template_name='admin-dashboard.html'    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         qs=User.objects.all()
@@ -203,8 +203,12 @@ class Dashboard(ListView):
         context['users']=qs
         return context    
 
+def userDashboard(request):
+    return render(request,'user-dashboard.html')
+
+
 class UserDetail(DeleteView):
     template_name='user_form.html'    
     model=User
     fields=["username"]
-    success_url='dashboard'
+    success_url='admin-dashboard'

@@ -35,7 +35,8 @@ urlpatterns = [
     url(r'step/(?P<act>[\w-]+)/$', control.step_execute, name='execute'),
     url(r'disclaimers/', views.disclaimers, name='disclaimers'),
     path('signup/', views.signup, name='signup'),
-    url('dashboard', views.Dashboard.as_view(), name='dashboard'),
+    url('admin-dashboard', views.AdminDashboard.as_view(), name='admin-dashboard'),
+    url('user-dashboard', views.userDashboard, name='user-dashboard'),
     path('userdetail/<int:pk>/', views.UserDetail.as_view(),name='user-detail'),
     
 

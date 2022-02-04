@@ -27,11 +27,12 @@
                 <a href="{% url 'trace' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Trace</a>
                 <a href="{% url 'admin:index' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Admin</a>
                 <a href="{% url 'initialize' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Initialize</a>
-                <a href="{% url 'economy' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Economy</a> {% endif %} {% if user.is_superuser %}
-                <a href="{% url 'dashboard' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Dashboard</a> {% endif %}
+                <a href="{% url 'economy' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Economy</a>
+                <a href="{% url 'user-dashboard' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Dashboard</a> {% endif %} {% if user.is_superuser %}
+                <a href="{% url 'admin-dashboard' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Administrator Dashboard</a> {% endif %}
             </div>
             <div class="w3-right">
-                {% if user.is_authenticated %} {% control_states %} {% project_list %}
+                {% if user.is_authenticated %} {% control_states %}
                 <div class="w3-dropdown-hover">
                     <button class="w3-button w3-small">Tables</button>
                     <div class="w3-dropdown-content w3-bar-block w3-card-4">
