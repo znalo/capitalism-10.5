@@ -12,7 +12,7 @@
 <h4>Time Stamps</h4>
 <ul>
     {% for time_stamp in time_stamps %}
-    <li style="list-style-type:none;"> {{ time_stamp.project_number }}; [{{ time_stamp.description }}] Response Type: {{ time_stamp.price_response_type }} </li>
+    <li style="list-style-type:none;"> {{ time_stamp.simulation_FK.project_number }}; [{{ time_stamp.description }}] Response Type: {{ time_stamp.price_response_type }} </li>
     {% endfor %}
 </ul>
 

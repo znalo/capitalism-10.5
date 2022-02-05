@@ -90,8 +90,8 @@ def comparator_select(request, period,stage,step):
     logger.info(f"User wants to select new comparator '{period}-{stage}-{step}'")
     try:
         current_time_stamp=request.user.current_time_stamp
-        current_project_number=request.user.current_project
-        comparator=TimeStamp.objects.get(project_number=current_project_number, period=period, stage=stage,step=step,user=request.user)
+        simulation=request.user.simulation
+        comparator=TimeStamp.objects.get(simulation_FK=simulation, period=period, stage=stage,step=step,user=request.user)
         current_time_stamp.comparator_time_stamp_FK=comparator
         current_time_stamp.save()
     except Exception as error:

@@ -17,7 +17,7 @@
     <tbody>
         {% for stock in stock_list %}
         <tr>
-            <td> {{ stock.time_stamp_FK.project_number }}</td>
+            <td> {{ stock.time_stamp_FK.simulation_FK.project_number }}</td>
             <td> {{ stock.time_stamp_FK.time_stamp }}</td>
             <td> {{ stock.social_class_FK.name}} </td>
             <td> {{ stock.commodity_FK.name }}</td>

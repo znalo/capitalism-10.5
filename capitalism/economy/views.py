@@ -96,7 +96,7 @@ class AllOwnersView(ListView):
     template_name='stockowner_list.html'    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        stock_list=StockOwner.objects.order_by("time_stamp_FK.project_number","time_stamp_FK.time_stamp")
+        stock_list=StockOwner.objects.order_by("time_stamp_FK.simulation_FK.project_number","time_stamp_FK.time_stamp")
         context['stock_list']= stock_list
         return context
 
@@ -163,12 +163,12 @@ def signup(request):
             # login user after signing up
             user = authenticate(username=user.username, password=raw_password)
             #! Create a standard parameter record for the new user. This will be the default
-            p=Simulation_Parameter(user=user) #! Default everything else
-            p.save()
+            simulation=Simulation_Parameter(user=user) #! Default everything else
+            simulation.save()
             #! User must have a current time stamp even though the data is not initialized
             #! Because the relation is one to one.
             #! TODO a bit of a design flaw here...
-            new_time_stamp=TimeStamp(project_number=0, time_stamp=0, step="Initial", stage="Initial", user=user)
+            new_time_stamp=TimeStamp(simulation_FK=simulation, time_stamp=0, step="Initial", stage="Initial", user=user)
             new_time_stamp.save()
             new_time_stamp.comparator_time_stamp_FK=new_time_stamp
             new_time_stamp.save()

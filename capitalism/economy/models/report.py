@@ -20,7 +20,7 @@ class Trace(models.Model):
             current_time_stamp = user.current_time_stamp
             stamp_number = current_time_stamp.time_stamp
             current_step = current_time_stamp.step
-            project_id = current_time_stamp.project_number
+            project_id = current_time_stamp.simulation_FK.project_number
             this_entry = Trace(user=user,time_stamp_id=stamp_number, period=current_time_stamp.period, stage=current_time_stamp.stage, step=current_step, project_id=project_id,level=level, message=(message))
             this_entry.save()
         except Exception as error:

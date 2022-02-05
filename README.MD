@@ -35,20 +35,7 @@ Too much money is allocated to industries in the distribution stage
     * Create simulations
     * Manage existing simulations
     The User Dashboard replaces the project selection option
-
-  * Next steps
-    * Create a Foreign Key in the TimeStamp that points to a simulation parameter object
-    * Move 'project number' into 'Simulation_Parameters'
-    * Flesh out the user dashboard options
-
-    * After that, we want to use the new field 'periods_per_year' (in the simulation parameter model)
-      * This will replace project 3; it will be a general option, in a simulation, to chop it up into arbitrarily small sub-periods
-      * When this happens, capital that was at one time circulating becomes fixed 
-      * Hopefully the transition will be taken care of in a straightforward way, since currently the simulation is driven by stock sizes
-        * the quantities to be traded, used, or produced are all calculated, not hardwired
-        * this is an important departure from the standard Bortkiewicz imposition in which all capital is circulating and is used up in a year
-        * it also allows for genuine stock-flow consistency, which is the principle that animates the project
-      Bortkiewicz models in effect deduce stocks from flows (by wishing them away)
-      We to the contrary deduce flows from stocks
-
-
+## 5 February
+  * New model debugged and tested
+  * Next step is to flesh out the user dashboard
+  

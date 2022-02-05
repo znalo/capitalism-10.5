@@ -16,7 +16,7 @@
         {% for record in industry_list %}
         <tr>
             <td class="w3-center"> {{ record.time_stamp_FK.time_stamp }}</td>
-            <td class="w3-center"> {{ record.time_stamp_FK.project_number}} </td>
+            <td class="w3-center"> {{ record.time_stamp_FK.simulation_FK.project_number}} </td>
             <td> {{ record.name }}</td>
             <td> {{ record.industrystock_set.all|sales_filter }} </td>
             <td> {{ record.industrystock_set.all|money_filter }} </td>

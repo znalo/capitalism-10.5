@@ -22,7 +22,7 @@
     <tbody>
         {% for ts in timestamp_list %}
         <tr>
-            <td>{{ ts.project_number }} </td>
+            <td>{{ ts.simulation_FK.project_number }} </td>
             <td>{{ ts.time_stamp}} ( {{ ts.stage }}.{{ ts.step }}) </td>
             <td>{{ ts.period}} </td>
             <td>{{ ts.id }}</td>
@@ -30,12 +30,12 @@
             <td>{{ ts.step}} </td>
             <td>{{ ts.comparator_time_stamp_FK.id }}({{ ts.comparator_time_stamp_FK.stage}}. {{ ts.comparator_time_stamp_FK.step}}) </td>
             <td>{{ ts.MELT}} </td>
-            <td>{{ ts.population_growth_rate}} </td>
-            <td>{{ ts.investment_ratio}} </td>
-            <td>{{ ts.labour_supply_response}} </td>
-            <td>{{ ts.price_response_type}} </td>
-            <td>{{ ts.melt_response_type}} </td>
-            <td>{{ ts.quantity_symbol}} {{ ts.currency_symbol}} </td>
+            <td>{{ ts.simulation_FK.population_growth_rate}} </td>
+            <td>{{ ts.simulation_FK.investment_ratio}} </td>
+            <td>{{ ts.simulation_FK.labour_supply_response}} </td>
+            <td>{{ ts.simulation_FK.price_response_type}} </td>
+            <td>{{ ts.simulation_FK.melt_response_type}} </td>
+            <td>{{ ts.simulation_FK.quantity_symbol}} {{ ts.currency_symbol}} </td>
         </tr>
         {% endfor %}
     </tbody>
@@ -46,7 +46,17 @@
     $(document).ready(function() {
         $('#timestamps').DataTable({
             "columns": [{
-                "width": "10%"
+                "width": "8%"
+            }, {
+                "width": "15%"
+            }, {
+                "width": "3%"
+            }, {
+                "width": "3%"
+            }, {
+                "width": "8%"
+            }, {
+                "width": "3%"
             }, {
                 "width": "15%"
             }, {
@@ -56,21 +66,13 @@
             }, {
                 "width": "10%"
             }, {
-                "width": "3%"
+                "width": "10%"
             }, {
                 "width": "7%"
             }, {
-                "width": "3%"
+                "width": "7%"
             }, {
-                "width": "3%"
-            }, {
-                "width": "10%"
-            }, {
-                "width": "10%"
-            }, {
-                "width": "9%"
-            }, {
-                "width": "9%"
+                "width": "5%"
             }, ],
             "info": false
         });

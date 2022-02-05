@@ -15,8 +15,12 @@ class User(AbstractUser):
     current_time_stamp= models.OneToOneField("TimeStamp", related_name="current_time_stamp", on_delete=models.SET_NULL, blank=True, null=True, default=None)
 
     @property
-    def current_project(self):
-        return self.current_time_stamp.project_number
+    def simulation(self):
+        return self.current_time_stamp.simulation_FK
+
+    @property
+    def project(self):
+        return self.simulation.project_number
 
     @property
     def current_step(self):
@@ -89,6 +93,7 @@ class Project(models.Model):
         return f"(Project {self.number} {self.description})"
 
 class Simulation_Parameter(models.Model):
+    project_number = models.IntegerField(default=1) #! We don't have a foreign key to the project because the admin might need to rebuild the project table
     periods_per_year=models.IntegerField(default=1)
     population_growth_rate = models.IntegerField(default=1)
     investment_ratio = models.IntegerField(default=1)
@@ -101,8 +106,11 @@ class Simulation_Parameter(models.Model):
 
 
 class TimeStamp(models.Model):
-    project_number = models.IntegerField(default=1) #! We don't have a foreign key to the project because the admin might need to rebuild the project table
-    # simulation_parameters=models.ForeignKey(Simulation_Parameters, on_delete=models.CASCADE, default=Simulation_Parameters() )
+    simulation_FK=models.ForeignKey(Simulation_Parameter, 
+        on_delete=models.CASCADE, 
+        null=True, #! temporary to get the migration done
+        blank=True, #! temporary to get the migration done
+        ) 
     time_stamp = models.IntegerField(default=1) # ! TODO rename this field to avoid confusion
     step = models.CharField(max_length=50, default=UNDEFINED)
     stage = models.CharField(max_length=50, default=UNDEFINED)
@@ -111,9 +119,13 @@ class TimeStamp(models.Model):
     melt = models.CharField(max_length=50, default=UNDEFINED)
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
+    @property
+    def project_number():
+        return 1 #! Very temporary
+    
     def project_FK(self):
         return Project.objects.get(number=self.project_number)
-
+    
     #! create a complete clone of each object from old_time_stamp and assign it to self (which is assumed to be already saved to the database as a new time stamp)
     #! when this is done, pass through the newly-created children linking them to their new parents
     #! (so, for example, connect each stock to its new owner)
@@ -229,7 +241,7 @@ class TimeStamp(models.Model):
             new_social_class.save()
 
     class Meta:
-        ordering = ['project_number', 'time_stamp', ]
+        ordering = ['time_stamp', ]
 
     def __str__(self):
         return f"{self.period}.{self.stage}.{self.step}"
