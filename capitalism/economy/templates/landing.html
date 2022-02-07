@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %} {% block content %} {% load static %}
 
 <!-- Still trying to figure out how to do this with CSS -->
 
@@ -19,7 +19,7 @@
 
 
 <div class="container">
-    <img src="/static/img/capitalism.jpg" alt="Capitalism" width="100%">
+    <img src="{% static 'img/capitalism.jpg' %}" alt="Capitalism" width="100%">
     <div class="w3-text-white center">
         <h1>Welcome to capitalism</h1>
 
