@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'rest_framework_datatables',
     'economy',
     'crispy_forms',
-    'crispy_tailwind',
+    'crispy_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -172,9 +172,9 @@ RECIPIENT_ADDRESS = env('RECIPIENT_ADDRESS')
 
 AUTH_USER_MODEL='economy.User'
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
-CRISPY_TEMPLATE_PACK = "tailwind"
+CRISPY_ALLOWED_TEMPLATE_PACKS= 'bootstrap5'
 
 LOGGING = {
     'version': 1,

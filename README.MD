@@ -38,4 +38,14 @@ Too much money is allocated to industries in the distribution stage
 ## 5 February
   * New model debugged and tested
   * Next step is to flesh out the user dashboard
-  
+## 6 February
+  * Added a form to create a new simulation
+  * Installed crispy with bootstrap5 (NOTE this will require a pip install in production)
+## 7 February
+  * New simulation form is working, but with very primitive validation
+  * Next steps:
+    * better information to the user about which simulation is actually running
+    * switch simulation functionality
+    * delete simulation functionality
+    * restart simulation functionality
+    * debug the actual simulations (ONLY simple reproduction is working)

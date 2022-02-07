@@ -1,31 +1,50 @@
 {% extends "base.html" %} {% block content %}
 
-<div class="w3-container">
-    <div class="w3-medium">
-        <h4>Project Management (Under Development</h4>
-        <div class="w3-card">
-            New Simulation
-        </div>
-        <div class="w3-card">
-            Switch Simulation
-        </div>
-        <div class="w3-card">
-            Restart this Simulation
-        </div>
-        <div class="w3-card">
-            Delete this Simulation
-        </div>
-        <div class="w3-card">
-            Reinitialize all Simulations
-        </div>
-        <div class="w3-card">
-            Download this simulation's details
-        </div>
-        <div class="w3-card">
-            Upload new simulation details
-        </div>
+<p>
+    <div class="w3-container" style="width:50%">
+        <p>
+            <div class="w3-medium ">
+                <h4>Project Management (Under Development: red=done but dangerous; orange = experimental; blue = not done yet)</h4>
 
+                <p>
+                    <div class="w3-btn w3-block w3-round w3-red ">
+                        <a href="{% url 'initialize' %}">Reinitialize all Simulations</a>
+                    </div>
+                </p>
+                <p>
+                    <div class="w3-btn w3-block w3-round w3-orange ">
+                        <a href="{% url 'create-simulation' %} ">New Simulation</a>
+                    </div>
+                </p>
+                <p>
+                    <div class="w3-btn w3-block w3-round w3-blue">
+                        <a href="# ">Switch Simulation</a>
+                    </div>
+                </p>
+                <p>
+                    <div class="w3-btn w3-block w3-round w3-blue ">
+                        <a href="# ">Restart this Simulation</a>
+                    </div>
+                </p>
+                <p>
+                    <div class="w3-btn w3-block w3-round w3-blue ">
+                        <a href="# ">Delete this Simulation</a>
+                    </div>
+                </p>
+                <p>
+                    <div class="w3-btn w3-block w3-round w3-blue ">
+                        <a href="# ">Download this simulation's details</a>
+                    </div>
+                </p>
+                <p>
+                    <div class="w3-btn w3-block w3-round w3-blue ">
+                        <a href="# ">Upload new simulation details</a>
+                    </div>
+                </p>
+
+            </div>
+        </p>
     </div>
-</div>
+</p>
 
 {% endblock %}

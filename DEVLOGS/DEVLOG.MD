@@ -18,3 +18,5 @@ Fixed problem that Trace table displays only partially
 ## 4 February Commit Introduced Simulation_Parameters Object (before coupling it to the Time Stamp objects)
 ## 4 February Commit Scaffolded User Dashboard
 ## 5 February Commit debugged and tested new Simulation_Parameter object and its corresponding structures and actions
+## 7 February Commit create new simulation seems to be working; choice of simulations still to be done; validation very primitive so errors in creating simulations will not be trapped
+

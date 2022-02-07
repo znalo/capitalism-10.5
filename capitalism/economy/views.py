@@ -1,3 +1,6 @@
+from .forms import SimulationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django import forms
 from django.shortcuts import render
 from economy.actions.initialize import initialize_projects
 from economy.actions.initialize import initialize
@@ -8,12 +11,12 @@ from .models.owners import Industry, SocialClass, StockOwner
 from .models.stocks import IndustryStock, SocialStock, Stock
 from django.http import HttpResponse
 from django.template import loader
-from django.views.generic import ListView,UpdateView, DeleteView
+from django.views.generic import ListView,UpdateView, DeleteView, CreateView
 from .global_constants import *
 from .forms import SignUpForm
 from django.contrib.auth import authenticate,login
 from django.http.response import HttpResponseRedirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 
 def get_economy_view_context(request):#TODO change name - this function now not only creates the context but also displays it, so the naming is wrong
@@ -206,9 +209,53 @@ class AdminDashboard(ListView):
 def userDashboard(request):
     return render(request,'user-dashboard.html')
 
-
 class UserDetail(DeleteView):
     template_name='user_form.html'    
     model=User
     fields=["username"]
     success_url='admin-dashboard'
+
+class SimulationView(LoginRequiredMixin, CreateView):
+    form_class=SimulationForm
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'request': self.request})
+        return kwargs
+
+    def form_valid(self, form):
+        logger.info(f"Valid new simulation form submitted by user {self.request.user}")
+        simulation_name=form.cleaned_data['name']
+        user_project_choice=form.cleaned_data['project']
+        logger.info(f"Trying to create a simulation called {simulation_name}")
+        chosen_project_number=user_project_choice.number
+        logger.info(f"Project number is {chosen_project_number}")
+        simulation=form.save(commit=False)
+        simulation.user=self.request.user
+        simulation.project_number=chosen_project_number
+        simulation.save()
+        result=simulation.startup()
+        if result!="success":
+            messages.error(self.request,f"Could not create this simulation because {result}")
+        else:
+            simulation.save()
+        return super(SimulationView, self).form_valid(form)
+        
+
+    def form_invalid(self, form):
+        logger.info(f"Invalid new simulation form submitted by user {self.request.user}")
+        logger.info(f"The non-field errors were {form.non_field_errors}")
+        return self.render_to_response( 
+            self.get_context_data(form=form))
+
+    queryset=Simulation_Parameter.objects.all()
+    template_name='simulation_create.html'
+    success_url=reverse_lazy('user-dashboard')
+
+#! Below function-based view redundant. It was replaced by the generic class-based view above. Retained for reference
+# def simulationView(request):
+#     context ={}
+#     form = SimulationForm(request.POST or None, request.FILES or None, request=request)
+#     if form.is_valid():
+#         form.save()
+#     context['form']= form
+#     return render(request, "simulation_create.html", context)

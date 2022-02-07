@@ -1,7 +1,7 @@
-from multiprocessing.dummy import current_process
 from django.db import models
 from economy.global_constants import *
 from django.contrib.auth.models import AbstractUser
+from django.contrib import messages
 
 class User(AbstractUser):
     #! The time_stamp object has a foreign key relation to the user, because there are many stamps in a simulation
@@ -93,6 +93,7 @@ class Project(models.Model):
         return f"(Project {self.number} {self.description})"
 
 class Simulation_Parameter(models.Model):
+    name=models.CharField(max_length=50,null=False,default = INITIAL)
     project_number = models.IntegerField(default=1) #! We don't have a foreign key to the project because the admin might need to rebuild the project table
     periods_per_year=models.IntegerField(default=1)
     population_growth_rate = models.IntegerField(default=1)
@@ -104,13 +105,38 @@ class Simulation_Parameter(models.Model):
     quantity_symbol = models.CharField(max_length=2, default="#")
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
+    #! Create a new simulation from the embryo of this simulation object
+    #! At this point, we assume that only the bare simulation object exists, and that no time stamps point to it.
+    #! Therefore, we have to create all the objects of a simulation, based on the name and project number of this simulation object
+    def startup(self):
+        try:
+            time_stamp=TimeStamp(simulation_FK=self,step=DEMAND,stage='M_C',user=self.user)
+            logger.info(f"User {self.user} is creating a new simulation called {self.name} whose project number is {self.project_number}")
+            time_stamp.save()
+            time_stamp.comparator_time_stamp_FK=time_stamp
+            time_stamp.save()
+            #! Find the source simulation and clone it to create a new simulation
+            #! The 'initialize' action will have created a template for every project
+            #! This is uniquely defined by the name "Initial" that the initialize action gives to the template
+            #! together with the fact that the time_stamps for all the objects in this simulation will all have the 'time_stamp' field set to 1.
+            #! TODO should be less hard-wired
+            source_simulation=Simulation_Parameter.objects.get(name="Initial",project_number=self.project_number,user=self.user)
+            logger.info(f"Cloning this simulation from {source_simulation.name} with project number {self.project_number}")
+            source_time_stamp=TimeStamp.objects.get(simulation_FK=source_simulation)
+            time_stamp.clone(source_time_stamp)
+            time_stamp.save()
+            self.user.current_time_stamp=time_stamp
+            self.user.save()
+            return "success"
+        except Exception as error:
+            logger.error(f"Could not create the requested simulation because {error}")
+            return error
+
+    def __str__(self):
+        return f"{self.name}.{self.project_number}.{self.user}"
 
 class TimeStamp(models.Model):
-    simulation_FK=models.ForeignKey(Simulation_Parameter, 
-        on_delete=models.CASCADE, 
-        null=True, #! temporary to get the migration done
-        blank=True, #! temporary to get the migration done
-        ) 
+    simulation_FK=models.ForeignKey(Simulation_Parameter, on_delete=models.CASCADE) 
     time_stamp = models.IntegerField(default=1) # ! TODO rename this field to avoid confusion
     step = models.CharField(max_length=50, default=UNDEFINED)
     stage = models.CharField(max_length=50, default=UNDEFINED)
@@ -120,13 +146,13 @@ class TimeStamp(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
     @property
-    def project_number():
-        return 1 #! Very temporary
+    def project_number(self):
+        return self.simulation_FK.project_number 
     
     def project_FK(self):
         return Project.objects.get(number=self.project_number)
     
-    #! create a complete clone of each object from old_time_stamp and assign it to self (which is assumed to be already saved to the database as a new time stamp)
+    #! create a complete clone of each object from source_time_stamp and assign it to self (which is assumed to be already saved to the database as a new time stamp)
     #! when this is done, pass through the newly-created children linking them to their new parents
     #! (so, for example, connect each stock to its new owner)
 
@@ -135,13 +161,13 @@ class TimeStamp(models.Model):
     #! but we must set both .pk and .id to None before it works (see https://www.youtube.com/watch?v=E0oM9r3LhQU)
     #! seems a bit quirky but haven't found another way
 
-    def clone(self, old_time_stamp):
+    def clone(self, source_time_stamp):
        #! import these here to avoid circular imports
         from .commodity import Commodity
         from .stocks import IndustryStock, SocialStock
         from .owners import Industry, SocialClass
 
-        industries = Industry.objects.filter(time_stamp_FK=old_time_stamp)
+        industries = Industry.objects.filter(time_stamp_FK=source_time_stamp)
         for industry in industries:
             industry.time_stamp_FK = self
             industry.pk = None
@@ -149,7 +175,7 @@ class TimeStamp(models.Model):
             industry.save()
             logger.info(f"Created a new Industry record {(industry.name)} with time stamp {industry.time_stamp_FK.time_stamp} which will contain the results of action {industry.time_stamp_FK.step}")
 
-        commodities = Commodity.objects.filter(time_stamp_FK=old_time_stamp)
+        commodities = Commodity.objects.filter(time_stamp_FK=source_time_stamp)
         for commodity in commodities:
             commodity.pk = None
             commodity.id = None
@@ -158,7 +184,7 @@ class TimeStamp(models.Model):
             logger.info(f"Created a new Commodity record {(commodity.name)} with time stamp {commodity.time_stamp_FK.time_stamp} which will contain the results of action {commodity.time_stamp_FK.step}")
 
         social_classes = SocialClass.objects.filter(
-            time_stamp_FK=old_time_stamp)
+            time_stamp_FK=source_time_stamp)
         for social_class in social_classes:
             social_class.pk = None
             social_class.id = None
@@ -167,7 +193,7 @@ class TimeStamp(models.Model):
             logger.info(f"Created a new Social Class record {(social_class.name)} with time stamp {social_class.time_stamp_FK.time_stamp} which will contain the results of action {social_class.time_stamp_FK.step}")
 
         social_stocks = SocialStock.objects.filter(
-            time_stamp_FK=old_time_stamp)
+            time_stamp_FK=source_time_stamp)
         for social_stock in social_stocks:
             social_stock.pk = None
             social_stock.id = None
@@ -176,7 +202,7 @@ class TimeStamp(models.Model):
             logger.info(f"Created a new Social Stock record of usage type {(social_stock.usage_type)} for owner {(social_stock.stock_owner_name)} with time stamp {social_stock.time_stamp_FK.time_stamp} which will contain the results of action {social_stock.time_stamp_FK.step}")
 
         industry_stocks = IndustryStock.objects.filter(
-            time_stamp_FK=old_time_stamp)
+            time_stamp_FK=source_time_stamp)
         for industry_stock in industry_stocks:
             industry_stock.pk = None
             industry_stock.id = None
@@ -188,7 +214,7 @@ class TimeStamp(models.Model):
         #! we now connect each new object to the duplicates of its relevant parent objects
 
     #! connect industries to their related commodities
-        logger.info("Connecting records")
+        logger.info("Connecting cloned records")
         industries = Industry.objects.filter(time_stamp_FK=self)
         for industry in industries:
             commodity_name = industry.commodity_FK.name

@@ -34,6 +34,19 @@ HUGE problem is that Django makes it hard to change the user model midstream. It
 However, the problem is less messy than if the project is already running with users and a database
 In that we should simply be able to remove all the migrations and start over with a clean install.
 
+We did the abover and it worked OK
 
+6 Feb 2022: pip install crispy-bootstrap5
+(and changed:
+  INSTALLED_APPS = (
+    ...
+    "crispy_forms",
+    "crispy_bootstrap5",
+    ...
+)
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+CRISPY_TEMPLATE_PACK = "bootstrap)
 
 
