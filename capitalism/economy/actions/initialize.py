@@ -1,4 +1,4 @@
-from economy.models.states import Project, TimeStamp, Simulation_Parameter
+from economy.models.states import Project, TimeStamp, Simulation
 from economy.models.report import Trace
 from economy.models.commodity import Commodity
 from economy.models.owners import Industry, SocialClass, StockOwner
@@ -55,7 +55,7 @@ def initialize(request):
     #! TODO insist that there is only one time-stamp per project in the CSV file
     Trace.objects.filter(user=logged_in_user).delete()
     Trace.enter(request.user,0, "INITIALIZE ENTIRE SIMULATION")
-    Simulation_Parameter.objects.filter(user=logged_in_user).delete()
+    Simulation.objects.filter(user=logged_in_user).delete()
     Commodity.objects.filter(user=logged_in_user).delete()
     Stock.objects.filter(user=logged_in_user).delete()
     StockOwner.objects.filter(user=logged_in_user).delete()
@@ -66,7 +66,7 @@ def initialize(request):
     df = pd.read_csv(file_name)
 
     for row in df.itertuples(index=False, name='Pandas'):
-        s=Simulation_Parameter(user=request.user, project_number=row.project_FK) #! Default everything else
+        s=Simulation(user=request.user, project_number=row.project_FK) #! Default everything else
         s.save()       
         time_stamp = TimeStamp(
             simulation_FK=s,
@@ -87,7 +87,7 @@ def initialize(request):
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
         logger.info(f"Creating commodity {(row.name)} for user {logged_in_user} and project {row.project} ")
-        simulation=Simulation_Parameter.objects.get(project_number=row.project,user=logged_in_user)
+        simulation=Simulation.objects.get(project_number=row.project,user=logged_in_user)
         time_stamp=TimeStamp.objects.get(simulation_FK=simulation,user=logged_in_user)
         commodity = Commodity(
             time_stamp_FK=time_stamp,
@@ -113,7 +113,7 @@ def initialize(request):
     logger.info( f"Reading industries from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
-        simulation=Simulation_Parameter.objects.get(project_number=row.project,user=logged_in_user)
+        simulation=Simulation.objects.get(project_number=row.project,user=logged_in_user)
         time_stamp=TimeStamp.objects.get(simulation_FK=simulation, user=logged_in_user)
         commodity=Commodity.objects.get(time_stamp_FK=time_stamp, name=row.commodity_name, user=logged_in_user)
         logger.info(f"Creating Industry {(row.industry_name)} with output {commodity} for user {logged_in_user} and project {row.project} with time stamp {time_stamp} in simulation {simulation}")
@@ -137,7 +137,7 @@ def initialize(request):
     logger.info( f"Reading social classes from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
-        simulation=Simulation_Parameter.objects.get(project_number=row.project,user=logged_in_user)
+        simulation=Simulation.objects.get(project_number=row.project,user=logged_in_user)
         time_stamp=TimeStamp.objects.get(simulation_FK=simulation, user=logged_in_user)
         logger.info(f"Creating Social Class {(row.social_class_name)} for user {logged_in_user} and project {row.project} with time stamp {time_stamp}")
         social_class = SocialClass(
@@ -159,7 +159,7 @@ def initialize(request):
     df = pd.read_csv(file_name)
 
     for row in df.itertuples(index=False, name='Pandas'):
-        simulation=Simulation_Parameter.objects.get(project_number=row.project,user=logged_in_user)
+        simulation=Simulation.objects.get(project_number=row.project,user=logged_in_user)
         time_stamp=TimeStamp.objects.get(simulation_FK=simulation, user=logged_in_user)
         if row.owner_type == "CLASS":
             social_class=SocialClass.objects.get(time_stamp_FK=time_stamp, name=row.name,user=logged_in_user)
@@ -204,7 +204,7 @@ def initialize(request):
             logger.error(f"++++UNKNOWN OWNER TYPE++++ {row.owner_type}")
 
 #! set the user up so ta points to project 1
-    simulation=Simulation_Parameter.objects.get(user=logged_in_user, project_number=1)
+    simulation=Simulation.objects.get(user=logged_in_user, project_number=1)
     time_stamp=TimeStamp.objects.get(user=logged_in_user,simulation_FK=simulation)
     logged_in_user.current_time_stamp=time_stamp
     logged_in_user.save()

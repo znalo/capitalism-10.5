@@ -92,7 +92,7 @@ class Project(models.Model):
     def __str__(self):
         return f"(Project {self.number} {self.description})"
 
-class Simulation_Parameter(models.Model):
+class Simulation(models.Model):
     name=models.CharField(max_length=50,null=False,default = INITIAL)
     project_number = models.IntegerField(default=1) #! We don't have a foreign key to the project because the admin might need to rebuild the project table
     periods_per_year=models.IntegerField(default=1)
@@ -120,7 +120,7 @@ class Simulation_Parameter(models.Model):
             #! This is uniquely defined by the name "Initial" that the initialize action gives to the template
             #! together with the fact that the time_stamps for all the objects in this simulation will all have the 'time_stamp' field set to 1.
             #! TODO should be less hard-wired
-            source_simulation=Simulation_Parameter.objects.get(name="Initial",project_number=self.project_number,user=self.user)
+            source_simulation=Simulation.objects.get(name="Initial",project_number=self.project_number,user=self.user)
             logger.info(f"Cloning this simulation from {source_simulation.name} with project number {self.project_number}")
             source_time_stamp=TimeStamp.objects.get(simulation_FK=source_simulation)
             time_stamp.clone(source_time_stamp)
@@ -136,7 +136,7 @@ class Simulation_Parameter(models.Model):
         return f"{self.name}.{self.project_number}.{self.user}"
 
 class TimeStamp(models.Model):
-    simulation_FK=models.ForeignKey(Simulation_Parameter, on_delete=models.CASCADE) 
+    simulation_FK=models.ForeignKey(Simulation, on_delete=models.CASCADE) 
     time_stamp = models.IntegerField(default=1) # ! TODO rename this field to avoid confusion
     step = models.CharField(max_length=50, default=UNDEFINED)
     stage = models.CharField(max_length=50, default=UNDEFINED)

@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UsernameField
-from economy.models.states import Simulation_Parameter, Project
+from economy.models.states import Simulation, Project
 from economy.models.states import User
 from django.forms import ModelChoiceField
 from .global_constants import *
@@ -41,10 +41,10 @@ class SimulationCreateForm(forms.ModelForm):
         self.fields['project'].queryset=Project.objects.all()
 
     #! TODO URGENT - disallow duplicate names
-    project= ProjectChoiceField(queryset=Simulation_Parameter.objects.all(), initial=0)
+    project= ProjectChoiceField(queryset=Simulation.objects.all(), initial=0)
 
     class Meta:
-        model = Simulation_Parameter
+        model = Simulation
         fields=['name','periods_per_year',]
 
 class SimulationChoiceField(ModelChoiceField):
@@ -56,10 +56,10 @@ class SimulationSelectForm(forms.ModelForm):
         request = kwargs.pop('request')
         super(SimulationSelectForm, self).__init__(*args, **kwargs)
         logger.info(f"User {request.user} wants to create a new Simulation") 
-        self.fields['simulations']=SimulationChoiceField(queryset=Simulation_Parameter.objects.filter(user=request.user))
+        self.fields['simulations']=SimulationChoiceField(queryset=Simulation.objects.filter(user=request.user))
 
     class Meta:
-        model = Simulation_Parameter
+        model = Simulation
         exclude=('name',
         'project_number',
         'periods_per_year',

@@ -4,7 +4,7 @@ from django import forms
 from django.shortcuts import render
 from economy.actions.initialize import initialize_projects
 from economy.actions.initialize import initialize
-from .models.states import Project, TimeStamp, User, Simulation_Parameter
+from .models.states import Project, TimeStamp, User, Simulation
 from economy.models.report import Trace
 from .models.commodity import Commodity
 from .models.owners import Industry, SocialClass, StockOwner
@@ -166,7 +166,7 @@ def signup(request):
             # login user after signing up
             user = authenticate(username=user.username, password=raw_password)
             #! Create a standard parameter record for the new user. This will be the default
-            simulation=Simulation_Parameter(user=user) #! Default everything else
+            simulation=Simulation(user=user) #! Default everything else
             simulation.save()
             #! User must have a current time stamp even though the data is not initialized
             #! Because the relation is one to one.
@@ -217,7 +217,7 @@ class UserDetail(DeleteView):
 
 class SimulationCreateView(LoginRequiredMixin, CreateView):
     form_class=SimulationCreateForm
-    queryset=Simulation_Parameter.objects.all()
+    queryset=Simulation.objects.all()
     template_name='simulation_create.html'
     success_url=reverse_lazy('user-dashboard')
 
@@ -265,7 +265,7 @@ class SimulationSelectView(LoginRequiredMixin, CreateView):
         user=self.request.user
         time_stamp=TimeStamp.objects.filter(simulation_FK=simulation_choice).last()
         #! TODO we have to make sure we really have got the latest time stamp
-        #! which probably means it should be a field of the simulation_parameter object
+        #! which probably means it should be a field of the simulation object
         logger.info(f"The time stamp for this simulation is {time_stamp}")
         user.current_time_stamp=time_stamp
         user.save()
@@ -277,7 +277,7 @@ class SimulationSelectView(LoginRequiredMixin, CreateView):
         return self.render_to_response( 
             self.get_context_data(form=form))
 
-    queryset=Simulation_Parameter.objects.all()
+    queryset=Simulation.objects.all()
     template_name='simulation_select.html'
     success_url=reverse_lazy('user-dashboard')
 
