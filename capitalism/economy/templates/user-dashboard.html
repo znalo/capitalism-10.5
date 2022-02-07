@@ -4,7 +4,7 @@
     <div class="w3-container" style="width:50%">
         <p>
             <div class="w3-medium ">
-                <h4>Project Management (Under Development: red=done but dangerous; orange = experimental; blue = not done yet)</h4>
+                <h4>Project Management (Under Development: red=done but dangerous; green=OK; orange = experimental; blue = not done yet)</h4>
 
                 <p>
                     <div class="w3-btn w3-block w3-round w3-red ">
@@ -12,13 +12,13 @@
                     </div>
                 </p>
                 <p>
-                    <div class="w3-btn w3-block w3-round w3-orange ">
+                    <div class="w3-btn w3-block w3-round w3-green ">
                         <a href="{% url 'create-simulation' %} ">New Simulation</a>
                     </div>
                 </p>
                 <p>
-                    <div class="w3-btn w3-block w3-round w3-blue">
-                        <a href="# ">Switch Simulation</a>
+                    <div class="w3-btn w3-block w3-round w3-orange">
+                        <a href="{% url 'select-simulation' %}">Switch Simulation</a>
                     </div>
                 </p>
                 <p>

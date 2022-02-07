@@ -1,4 +1,4 @@
-from .forms import SimulationForm
+from .forms import SimulationCreateForm, SimulationSelectForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django import forms
 from django.shortcuts import render
@@ -215,8 +215,12 @@ class UserDetail(DeleteView):
     fields=["username"]
     success_url='admin-dashboard'
 
-class SimulationView(LoginRequiredMixin, CreateView):
-    form_class=SimulationForm
+class SimulationCreateView(LoginRequiredMixin, CreateView):
+    form_class=SimulationCreateForm
+    queryset=Simulation_Parameter.objects.all()
+    template_name='simulation_create.html'
+    success_url=reverse_lazy('user-dashboard')
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({'request': self.request})
@@ -238,24 +242,42 @@ class SimulationView(LoginRequiredMixin, CreateView):
             messages.error(self.request,f"Could not create this simulation because {result}")
         else:
             simulation.save()
-        return super(SimulationView, self).form_valid(form)
-        
-
+        return super(SimulationCreateView, self).form_valid(form)
+ 
     def form_invalid(self, form):
         logger.info(f"Invalid new simulation form submitted by user {self.request.user}")
         logger.info(f"The non-field errors were {form.non_field_errors}")
         return self.render_to_response( 
             self.get_context_data(form=form))
 
+
+class SimulationSelectView(LoginRequiredMixin, CreateView):
+    form_class=SimulationSelectForm
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'request': self.request})
+        return kwargs
+
+    def form_valid(self, form):
+        logger.info(f"Valid change simulation form submitted by user {self.request.user}")
+        simulation_choice=form.cleaned_data['simulations']
+        logger.info(f"Trying to switch to the simulation called {simulation_choice}")
+        user=self.request.user
+        time_stamp=TimeStamp.objects.filter(simulation_FK=simulation_choice).last()
+        #! TODO we have to make sure we really have got the latest time stamp
+        #! which probably means it should be a field of the simulation_parameter object
+        logger.info(f"The time stamp for this simulation is {time_stamp}")
+        user.current_time_stamp=time_stamp
+        user.save()
+        return super(SimulationSelectView, self).form_valid(form)
+
+    def form_invalid(self, form):
+        logger.info(f"Invalid simulation select form submitted by user {self.request.user}")
+        logger.info(f"The non-field errors were {form.non_field_errors}")
+        return self.render_to_response( 
+            self.get_context_data(form=form))
+
     queryset=Simulation_Parameter.objects.all()
-    template_name='simulation_create.html'
+    template_name='simulation_select.html'
     success_url=reverse_lazy('user-dashboard')
 
-#! Below function-based view redundant. It was replaced by the generic class-based view above. Retained for reference
-# def simulationView(request):
-#     context ={}
-#     form = SimulationForm(request.POST or None, request.FILES or None, request=request)
-#     if form.is_valid():
-#         form.save()
-#     context['form']= form
-#     return render(request, "simulation_create.html", context)

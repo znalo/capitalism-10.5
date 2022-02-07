@@ -27,26 +27,49 @@ class SignUpForm(UserCreationForm):
 #* See http://django.co.zw/en/tutorials/django-forms-overriding-the-queryset-on-a-select-field-to-exclude-options-already-used/
 #* See https://sayari3.com/articles/16-how-to-pass-user-object-to-django-form/
 
-class MyModelChoiceField(ModelChoiceField):
+class ProjectChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return f"{obj.description}"
 
 #! Form for the user to create a new simulation
 #! TODO rename this as SimulationCreateForm or something like that
-class SimulationForm(forms.ModelForm):
+class SimulationCreateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request") # store value of request 
         logger.info(f"User {self.request.user} wants to create a new Simulation") 
         super().__init__(*args, **kwargs)
         self.fields['project'].queryset=Project.objects.all()
- 
-        #* If we wanted to select from a model with a user in it, here is what we would do:
-        #*  self.fields['project'].queryset=Simulation_Parameter.objects.filter(user=self.request.user)
-        #* This will become relevant when we allow users to create their own projects
 
-    project= MyModelChoiceField(queryset=Simulation_Parameter.objects.all(), initial=0)
-#! TODO URGENT - disallow duplicate names
+    #! TODO URGENT - disallow duplicate names
+    project= ProjectChoiceField(queryset=Simulation_Parameter.objects.all(), initial=0)
 
     class Meta:
         model = Simulation_Parameter
         fields=['name','periods_per_year',]
+
+class SimulationChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return f"Project {obj.project_number}.{obj.name}"
+
+class SimulationSelectForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        request = kwargs.pop('request')
+        super(SimulationSelectForm, self).__init__(*args, **kwargs)
+        logger.info(f"User {request.user} wants to create a new Simulation") 
+        self.fields['simulations']=SimulationChoiceField(queryset=Simulation_Parameter.objects.filter(user=request.user))
+
+    class Meta:
+        model = Simulation_Parameter
+        exclude=('name',
+        'project_number',
+        'periods_per_year',
+        'population_growth_rate',
+        'investment_ratio', 
+        'labour_supply_response',
+        'price_response_type',
+        'melt_response_type',
+        'currency_symbol',
+        'quantity_symbol',
+        'user',)    
+
+        
