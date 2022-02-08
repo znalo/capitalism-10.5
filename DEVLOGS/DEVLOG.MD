@@ -24,3 +24,5 @@ Fixed problem that Trace table displays only partially
 ## 7 February Commit transitional - refactoring User and Simulation models so that the time stamp and user are both associated with the simulation. This is a halfway house. There is also now a simulation table
 ## 8 February Commit still transitional. Refactored User and Simulation models so that all actions are conducted by the Simulation, not the User. This works, but user dashboard is not working correctly. Saving as a reference point
 ## 8 February Commit Refactoring complete. Now we start work on debugging the simulations
+## 8 February Commit Refactored version uploaded to production site. Production version is working but development version is generating unexpected errors. Awaiting response to ticket lodged with provider
+

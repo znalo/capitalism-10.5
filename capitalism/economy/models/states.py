@@ -37,14 +37,6 @@ class User(AbstractUser):
     def one_step(self): #! Probably redundant. TODO get rid of it
         self.simulation.one_step()        
 
-#! TODO junk this
-    # def set_project(self,project_number):
-    #     logger.info(f"Changing project of user {self.username} from {self.current_time_stamp.project_number} to {project_number}")
-    #     new_time_stamp=TimeStamp.objects.filter(user=self,project_number=project_number).last() #! pick up wherever the simulation of this project by this user left off
-    #     logger.info(f"The relevant time stamp is {new_time_stamp}")
-    #     self.current_time_stamp=new_time_stamp
-    #     self.save()
-
     def set_current_comparator(self,comparator):
         logger.info(f"User {self} is changing its comparator which is {self.current_time_stamp} from {self.current_time_stamp.current_comparator_time_stamp_FK} to {comparator}")
         self.current_time_stamp.comparator_time_stamp_FK = comparator

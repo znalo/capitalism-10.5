@@ -24,7 +24,8 @@ class Trace(models.Model):
             this_entry = Trace(user=user,time_stamp_id=stamp_number, period=current_time_stamp.period, stage=current_time_stamp.stage, step=current_step, project_id=project_id,level=level, message=(message))
             this_entry.save()
         except Exception as error:
-            logger.error(f"Could not make a trace entry because {error}")
+            logger.error(f"Could not make a trace entry because {error}, for message {message}")
+
 
     @staticmethod
     def sim_object(value):
