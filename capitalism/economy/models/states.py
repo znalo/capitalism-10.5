@@ -76,27 +76,27 @@ class Simulation(models.Model):
     quantity_symbol = models.CharField(max_length=2, default="#")
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
-    #! Create a new simulation from the embryo of this simulation object
-    #! At this point, we assume that only the bare simulation object exists, and that no time stamps point to it.
-    #! Therefore, we have to create all the objects of a simulation, based on the name and project number of this simulation object
+    #! Create a new simulation from the embryo of this simulation object, which was created by SimulationCreateView.
+    #! We now have to create all the objects of this simulation, based on its name.
     def startup(self):
         try:
+            logger.info(f"User {self.user} is populating the simulation {self.name} which has project number {self.project_number}")
+            #! First create my current_time_stamp (as a prelude to cloning it)
             time_stamp=TimeStamp(simulation_FK=self,step=DEMAND,stage='M_C',user=self.user)
-            logger.info(f"User {self.user} is creating a new simulation called {self.name} whose project number is {self.project_number}")
             time_stamp.save()
             time_stamp.comparator_time_stamp_FK=time_stamp
             time_stamp.save()
+            self.current_time_stamp=time_stamp
+            self.save()
             #! Find the source simulation and clone it to create a new simulation
-            #! The 'initialize' action will have created a template for every project
-            #! This is uniquely defined by the name "Initial" that the initialize action gives to the template
-            #! together with the fact that the time_stamps for all the objects in this simulation will all have the 'time_stamp' field set to 1.
-            #! TODO should be less hard-wired
             source_simulation=Simulation.objects.get(name="Initial",project_number=self.project_number,user=self.user)
             logger.info(f"Cloning this simulation from {source_simulation.name} with project number {self.project_number}")
-            source_time_stamp=TimeStamp.objects.get(simulation_FK=source_simulation)
+            source_time_stamp=source_simulation.current_time_stamp
             time_stamp.clone(source_time_stamp)
-            time_stamp.save()
-            self.user.set_current_time_stamp(time_stamp)
+            time_stamp.save() # TODO is this necessary? 'clone' should save it.
+            self.current_time_stamp=time_stamp
+            self.save()
+            self.user.current_simulation=self #! Necessary because my user will not yet know that I am its new simulation
             self.user.save()
             return "success"
         except Exception as error:

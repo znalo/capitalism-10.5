@@ -20,7 +20,8 @@ from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 
 def get_economy_view_context(request):#TODO change name - this function now not only creates the context but also displays it, so the naming is wrong
-    current_time_stamp=request.user.current_time_stamp
+    current_simulation=request.user.current_simulation
+    current_time_stamp=current_simulation.current_time_stamp
     industry_stocks = IndustryStock.objects.filter(time_stamp_FK=current_time_stamp)
     industries=Industry.objects.filter(time_stamp_FK=current_time_stamp)
     productive_stocks=industry_stocks.filter(usage_type=PRODUCTION).order_by("commodity_FK__display_order")
@@ -30,6 +31,7 @@ def get_economy_view_context(request):#TODO change name - this function now not 
     commodities=Commodity.objects.filter(time_stamp_FK=current_time_stamp)
 
     context={}
+    context["simulation"]=current_simulation
     context["productive_stocks"]=productive_stocks
     context["industries"]=industries
     context["industry_headers"]=industry_headers
@@ -238,8 +240,6 @@ class SimulationCreateView(LoginRequiredMixin, CreateView):
         result=simulation.startup()
         if result!="success":
             messages.error(self.request,f"Could not create this simulation because {result}")
-        else:
-            simulation.save()
         return super(SimulationCreateView, self).form_valid(form)
  
     def form_invalid(self, form):
@@ -257,15 +257,11 @@ class SimulationSelectView(LoginRequiredMixin, CreateView):
         return kwargs
 
     def form_valid(self, form):
-        logger.info(f"Valid change simulation form submitted by user {self.request.user}")
-        simulation_choice=form.cleaned_data['simulations']
-        logger.info(f"Trying to switch to the simulation called {simulation_choice}")
         user=self.request.user
-        time_stamp=TimeStamp.objects.filter(simulation_FK=simulation_choice).last()
-        #! TODO we have to make sure we really have got the latest time stamp
-        #! which probably means it should be a field of the simulation object
-        logger.info(f"The time stamp for this simulation is {time_stamp}")
-        user.set_current_time_stamp(time_stamp)
+        simulation_choice=form.cleaned_data['simulations']
+        time_stamp=simulation_choice.current_time_stamp
+        logger.info(f"User {user} submitted valid form to switch to {simulation_choice} with time stamp {time_stamp}")
+        user.current_simulation=simulation_choice
         user.save()
         return super(SimulationSelectView, self).form_valid(form)
 

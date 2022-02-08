@@ -61,6 +61,7 @@ class SimulationSelectForm(forms.ModelForm):
     class Meta:
         model = Simulation
         exclude=('name',
+        'current_time_stamp',
         'project_number',
         'periods_per_year',
         'population_growth_rate',

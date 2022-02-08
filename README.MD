@@ -58,5 +58,7 @@ Too much money is allocated to industries in the distribution stage
     * postpone the delete and restart functionality for now?
 ## 8 February
   * A halfway house: internal changes to the models implemented, but dashboard functionality now needs to be restored
-
+## 8 February
+  * Dashboard functionality restored: user can create and switch simulations, but cannot delete, restart, download or upload yet
+  * We now resume work on debugging the actual projects
   
