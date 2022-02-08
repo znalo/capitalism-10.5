@@ -224,7 +224,9 @@ def initialize(request):
 #! set the user up to point to project 1
     simulation=Simulation.objects.get(user=logged_in_user, project_number=1)
     time_stamp=TimeStamp.objects.get(user=logged_in_user,simulation_FK=simulation)
-    logged_in_user.current_time_stamp=time_stamp
+    logged_in_user.current_simulation=simulation
+    simulation.current_time_stamp=time_stamp
+    simulation.save()
     logged_in_user.save()
  
     set_total_value_and_price(user=logged_in_user)

@@ -172,23 +172,10 @@ def signup(request):
             user.refresh_from_db()  #! TODO Not sure if this is needed but seems to be recommended
             user.save()
             raw_password = form.cleaned_data.get('password1')
-            # login user after signing up
             user = authenticate(username=user.username, password=raw_password)
-            #! Create a standard parameter record for the new user. This will be the default
-            simulation=Simulation(user=user) #! Default everything else
-            simulation.save()
-            #! User must have a current time stamp even though the data is not initialized
-            #! Because the relation is one to one.
-            #! TODO a bit of a design flaw here...
-            new_time_stamp=TimeStamp(simulation_FK=simulation, time_stamp=0, step="Initial", stage="Initial", user=user)
-            new_time_stamp.save()
-            new_time_stamp.comparator_time_stamp_FK=new_time_stamp
-            new_time_stamp.save()
-            user.current_time_stamp=new_time_stamp
-            user.save()
             login(request, user)
-            # Initialise the user's database
-            initialize(request)           
+            #! Initialise the user's database, creating a set of standard simulations for this user
+            initialize(request)         
             return HttpResponseRedirect(reverse("economy"))
     else:
         form = SignUpForm()
@@ -201,6 +188,8 @@ def initialize_and_redisplay(request):
 def disclaimers(request):
     return render(request, 'disclaimers.html')
 
+# TODO administrator should have a button for this, and only the administrator should be able to do it
+# TODO the action should ensure that this doesn't corrupt the existing users' simulations (see comments for 'initialize_projects')
 def rebuild_project_table(request):
     initialize_projects(request)
     return render(request, 'dashboard.html')
@@ -276,7 +265,7 @@ class SimulationSelectView(LoginRequiredMixin, CreateView):
         #! TODO we have to make sure we really have got the latest time stamp
         #! which probably means it should be a field of the simulation object
         logger.info(f"The time stamp for this simulation is {time_stamp}")
-        user.current_time_stamp=time_stamp
+        user.set_current_time_stamp(time_stamp)
         user.save()
         return super(SimulationSelectView, self).form_valid(form)
 

@@ -22,4 +22,4 @@ Fixed problem that Trace table displays only partially
 ## 7 February Commit switch simulation seems to be working; not tested however that we correctly selected the most recent time stamp
 ## 7 February Commit minor change, renamed Simulation_Parameter to Simulation, migrated the change, and tested it
 ## 7 February Commit transitional - refactoring User and Simulation models so that the time stamp and user are both associated with the simulation. This is a halfway house. There is also now a simulation table
-
+## 8 February Commit still transitional. Refactored User and Simulation models so that all actions are conducted by the Simulation, not the User. This works, but user dashboard is not working correctly. Saving as a reference point
