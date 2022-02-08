@@ -20,6 +20,7 @@ urlpatterns = [
     url('tables/social-classes',
         views.SocialClassView.as_view(), name='social-classes'),
     url('tables/all-owners', views.AllOwnersView.as_view(), name='all-owners'),
+    url('tables/simulations', views.SimulationView.as_view(), name='simulations'),
     url('tables/industry-stocks',
         views.IndustryStockView.as_view(), name='industry-stocks'),
     url('tables/social-stocks', views.SocialStockView.as_view(), name='social-stocks'),

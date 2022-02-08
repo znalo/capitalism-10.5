@@ -135,6 +135,15 @@ class TraceView(ListView):
         context['trace_list']=qs
         return context    
 
+class SimulationView(ListView):
+    model=Simulation
+    template_name='simulation_list.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        simulation_list=Simulation.objects.filter(user=self.request.user)
+        context['simulation_list']= simulation_list
+        return context    
+
 def landingPage(request):
     user=request.user
     logger.info(f"User {user} has landed on the home page")

@@ -1,0 +1,46 @@
+{% extends "base.html" %} {% block content %} {% load app_filters %}
+<h3 class="w3-center">Simulations</h3>
+<table id="simulation" class="display compact" style="width:80%">
+    <thead>
+        <tr>
+            <th>Project</th>
+            <th>Name</th>
+            <th>Time Stamp</th>
+            <th>Periods per year</th>
+            <th>Population Growth Rate</th>
+            <th>investment Ratio</th>
+            <th>Labour Supply Response</th>
+            <th>Price Response</th>
+            <th>Melt Response</th>
+            <th>Symbols</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for simulation in simulation_list %}
+        <tr>
+            <td> {{ simulation.project_number }}</td>
+            <td> {{ simulation.name }}</td>
+            <td> {{ simulation.current_time_stamp }}</td>
+            <td> {{ simulation.periods_per_year }}</td>
+            <td> {{ simulation.population_growth_rate }}</td>
+            <td> {{ simulation.investment_ratio }}</td>
+            <td> {{ simulation.labour_supply_response }}</td>
+            <td> {{ simulation.price_response_type }}</td>
+            <td> {{ simulation.melt_response_type }}</td>
+            <td> {{ simulation.currency_symbol }} {{ simulation.quantity_symbol }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %} {% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#simulation').DataTable({
+            "paging": false,
+            "searching": false,
+            "info": false
+        });
+    });
+</script>
+{% endblock %}

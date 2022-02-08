@@ -13,6 +13,7 @@ class User(AbstractUser):
     #! For the same reason, current_time_stamp allows blank and null (and when deleted, this field is set to null)
     #! TODO there is probably a more foolproof way to deal with this.
     current_time_stamp= models.OneToOneField("TimeStamp", related_name="current_time_stamp", on_delete=models.SET_NULL, blank=True, null=True, default=None)
+    current_simulation=models.OneToOneField("Simulation", related_name="simulation_user", on_delete=models.SET_NULL,blank=True, null=True, default=None) 
 
     @property
     def simulation(self):
@@ -94,6 +95,7 @@ class Project(models.Model):
 
 class Simulation(models.Model):
     name=models.CharField(max_length=50,null=False,default = INITIAL)
+    current_time_stamp= models.OneToOneField("TimeStamp", related_name="time_stamp_simulation", on_delete=models.SET_NULL, blank=True, null=True, default=None)
     project_number = models.IntegerField(default=1) #! We don't have a foreign key to the project because the admin might need to rebuild the project table
     periods_per_year=models.IntegerField(default=1)
     population_growth_rate = models.IntegerField(default=1)
