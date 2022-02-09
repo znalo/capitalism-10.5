@@ -49,3 +49,17 @@ Too much money is allocated to industries in the distribution stage
     * delete simulation functionality
     * restart simulation functionality
     * debug the actual simulations (ONLY simple reproduction is working)
+## 7 February
+  * Can now switch simulations
+  * Next steps:
+    * Test that we are returning to the latest state of the selected simulation
+    * Display some information about the selected simulation
+    * debug the actual simulations
+    * postpone the delete and restart functionality for now?
+## 8 February
+  * A halfway house: internal changes to the models implemented, but dashboard functionality now needs to be restored
+## 8 February
+  * Dashboard functionality restored: user can create and switch simulations, but cannot delete, restart, download or upload yet
+  * We now resume work on debugging the actual projects
+## This version now running at www.dascapital.org
+

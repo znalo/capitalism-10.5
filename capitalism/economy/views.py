@@ -1,10 +1,10 @@
-from .forms import SimulationForm
+from .forms import SimulationCreateForm, SimulationSelectForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django import forms
 from django.shortcuts import render
 from economy.actions.initialize import initialize_projects
 from economy.actions.initialize import initialize
-from .models.states import Project, TimeStamp, User, Simulation_Parameter
+from .models.states import Project, TimeStamp, User, Simulation
 from economy.models.report import Trace
 from .models.commodity import Commodity
 from .models.owners import Industry, SocialClass, StockOwner
@@ -20,7 +20,8 @@ from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 
 def get_economy_view_context(request):#TODO change name - this function now not only creates the context but also displays it, so the naming is wrong
-    current_time_stamp=request.user.current_time_stamp
+    current_simulation=request.user.current_simulation
+    current_time_stamp=current_simulation.current_time_stamp
     industry_stocks = IndustryStock.objects.filter(time_stamp_FK=current_time_stamp)
     industries=Industry.objects.filter(time_stamp_FK=current_time_stamp)
     productive_stocks=industry_stocks.filter(usage_type=PRODUCTION).order_by("commodity_FK__display_order")
@@ -30,6 +31,7 @@ def get_economy_view_context(request):#TODO change name - this function now not 
     commodities=Commodity.objects.filter(time_stamp_FK=current_time_stamp)
 
     context={}
+    context["simulation"]=current_simulation
     context["productive_stocks"]=productive_stocks
     context["industries"]=industries
     context["industry_headers"]=industry_headers
@@ -135,6 +137,15 @@ class TraceView(ListView):
         context['trace_list']=qs
         return context    
 
+class SimulationView(ListView):
+    model=Simulation
+    template_name='simulation_list.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        simulation_list=Simulation.objects.filter(user=self.request.user)
+        context['simulation_list']= simulation_list
+        return context    
+
 def landingPage(request):
     user=request.user
     logger.info(f"User {user} has landed on the home page")
@@ -163,23 +174,10 @@ def signup(request):
             user.refresh_from_db()  #! TODO Not sure if this is needed but seems to be recommended
             user.save()
             raw_password = form.cleaned_data.get('password1')
-            # login user after signing up
             user = authenticate(username=user.username, password=raw_password)
-            #! Create a standard parameter record for the new user. This will be the default
-            simulation=Simulation_Parameter(user=user) #! Default everything else
-            simulation.save()
-            #! User must have a current time stamp even though the data is not initialized
-            #! Because the relation is one to one.
-            #! TODO a bit of a design flaw here...
-            new_time_stamp=TimeStamp(simulation_FK=simulation, time_stamp=0, step="Initial", stage="Initial", user=user)
-            new_time_stamp.save()
-            new_time_stamp.comparator_time_stamp_FK=new_time_stamp
-            new_time_stamp.save()
-            user.current_time_stamp=new_time_stamp
-            user.save()
             login(request, user)
-            # Initialise the user's database
-            initialize(request)           
+            #! Initialise the user's database, creating a set of standard simulations for this user
+            initialize(request)         
             return HttpResponseRedirect(reverse("economy"))
     else:
         form = SignUpForm()
@@ -192,6 +190,8 @@ def initialize_and_redisplay(request):
 def disclaimers(request):
     return render(request, 'disclaimers.html')
 
+# TODO administrator should have a button for this, and only the administrator should be able to do it
+# TODO the action should ensure that this doesn't corrupt the existing users' simulations (see comments for 'initialize_projects')
 def rebuild_project_table(request):
     initialize_projects(request)
     return render(request, 'dashboard.html')
@@ -215,8 +215,12 @@ class UserDetail(DeleteView):
     fields=["username"]
     success_url='admin-dashboard'
 
-class SimulationView(LoginRequiredMixin, CreateView):
-    form_class=SimulationForm
+class SimulationCreateView(LoginRequiredMixin, CreateView):
+    form_class=SimulationCreateForm
+    queryset=Simulation.objects.all()
+    template_name='simulation_create.html'
+    success_url=reverse_lazy('user-dashboard')
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({'request': self.request})
@@ -236,26 +240,38 @@ class SimulationView(LoginRequiredMixin, CreateView):
         result=simulation.startup()
         if result!="success":
             messages.error(self.request,f"Could not create this simulation because {result}")
-        else:
-            simulation.save()
-        return super(SimulationView, self).form_valid(form)
-        
-
+        return super(SimulationCreateView, self).form_valid(form)
+ 
     def form_invalid(self, form):
         logger.info(f"Invalid new simulation form submitted by user {self.request.user}")
         logger.info(f"The non-field errors were {form.non_field_errors}")
         return self.render_to_response( 
             self.get_context_data(form=form))
 
-    queryset=Simulation_Parameter.objects.all()
-    template_name='simulation_create.html'
+
+class SimulationSelectView(LoginRequiredMixin, CreateView):
+    form_class=SimulationSelectForm
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'request': self.request})
+        return kwargs
+
+    def form_valid(self, form):
+        user=self.request.user
+        simulation_choice=form.cleaned_data['simulations']
+        time_stamp=simulation_choice.current_time_stamp
+        logger.info(f"User {user} submitted valid form to switch to {simulation_choice} with time stamp {time_stamp}")
+        user.current_simulation=simulation_choice
+        user.save()
+        return super(SimulationSelectView, self).form_valid(form)
+
+    def form_invalid(self, form):
+        logger.info(f"Invalid simulation select form submitted by user {self.request.user}")
+        logger.info(f"The non-field errors were {form.non_field_errors}")
+        return self.render_to_response( 
+            self.get_context_data(form=form))
+
+    queryset=Simulation.objects.all()
+    template_name='simulation_select.html'
     success_url=reverse_lazy('user-dashboard')
 
-#! Below function-based view redundant. It was replaced by the generic class-based view above. Retained for reference
-# def simulationView(request):
-#     context ={}
-#     form = SimulationForm(request.POST or None, request.FILES or None, request=request)
-#     if form.is_valid():
-#         form.save()
-#     context['form']= form
-#     return render(request, "simulation_create.html", context)

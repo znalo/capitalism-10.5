@@ -12,11 +12,15 @@ class User(AbstractUser):
     #! This would include the current_time_stamp. If we cascaded the relation, the user would get deleted.
     #! For the same reason, current_time_stamp allows blank and null (and when deleted, this field is set to null)
     #! TODO there is probably a more foolproof way to deal with this.
-    current_time_stamp= models.OneToOneField("TimeStamp", related_name="current_time_stamp", on_delete=models.SET_NULL, blank=True, null=True, default=None)
+    current_simulation=models.OneToOneField("Simulation", related_name="simulation_user", on_delete=models.SET_NULL,blank=True, null=True, default=None) 
 
     @property
     def simulation(self):
-        return self.current_time_stamp.simulation_FK
+        return self.current_simulation
+
+    @property
+    def current_time_stamp(self):
+        return self.simulation.current_time_stamp
 
     @property
     def project(self):
@@ -30,55 +34,13 @@ class User(AbstractUser):
     def current_stage(self):
         return STEPS[self.current_step].stage_name
 
-    def set_project(self,project_number):
-        logger.info(f"Changing project of user {self.username} from {self.current_time_stamp.project_number} to {project_number}")
-        new_time_stamp=TimeStamp.objects.filter(user=self,project_number=project_number).last() #! pick up wherever the simulation of this project by this user left off
-        logger.info(f"The relevant time stamp is {new_time_stamp}")
-        self.current_time_stamp=new_time_stamp
-        self.save()
+    def one_step(self): #! Probably redundant. TODO get rid of it
+        self.simulation.one_step()        
 
-
-    #! Set the comparator of the current time stamp to a new comparator
     def set_current_comparator(self,comparator):
         logger.info(f"User {self} is changing its comparator which is {self.current_time_stamp} from {self.current_time_stamp.current_comparator_time_stamp_FK} to {comparator}")
         self.current_time_stamp.comparator_time_stamp_FK = comparator
         self.current_time_stamp.save()
-
-    #! Move forward one time stamp and clone all the associated objects
-    def one_step(self):
-        logger.info(f"User {self} is moving time stamp {self.current_time_stamp} forward one step")
-        old_time_stamp_id = self.current_time_stamp.id
-        new_time_stamp = self.current_time_stamp
-        #! create a new timestamp object by saving with pk=None. Forces Django to create a new database object
-        new_time_stamp.pk = None
-        new_time_stamp.time_stamp += 1
-        #! because the new time stamp gets saved to the database, we need to retrieve the old one
-        #!TODO there's probably a better way
-        old_time_stamp = TimeStamp.objects.get(id=old_time_stamp_id)
-        new_time_stamp.save()
-        new_time_stamp.comparator_time_stamp_FK = old_time_stamp
-        new_time_stamp.save() #! just in case
-
-        #! Next five lines of code are just to report what's going on
-        #! Memo:
-            #! States are divided into superstates and steps and this affects the logic
-            #! The user decides whether they wants to execute a single sub-step, or all the steps in a bunch
-            #! We may arrive at this decision either
-                # *  because we're only processing stages (user not interested in the detail), or
-                # *  because user is halfway through a stage and wants to skip to the next stage
-        old_number = new_time_stamp.comparator_time_stamp_FK.time_stamp
-        new_number = new_time_stamp.time_stamp
-        old_step = new_time_stamp.comparator_time_stamp_FK.step
-        new_step = new_time_stamp.step
-        logger.info(f"Stepping from Old Time Stamp {old_number} representing step {old_step} to New Time Stamp {new_number} representing step {new_step}")
-
-        #! Now clone all the objects that were associated with the old time stamp, and create identical copies associated with the new stamp
-        #! Once that's done, the control logic will invoke the action specified by the new stamp, but that's outside this particular procedure
-
-        #! tell the user she has a new current time stamp, namely the one we just created
-        new_time_stamp.clone(old_time_stamp) #! We assume the cloning procedure takes care of saving the new current stamp and all the objects associated with it
-        self.current_time_stamp= new_time_stamp
-        self.save()
 
     def __str__(self):
         return self.username
@@ -92,8 +54,9 @@ class Project(models.Model):
     def __str__(self):
         return f"(Project {self.number} {self.description})"
 
-class Simulation_Parameter(models.Model):
+class Simulation(models.Model):
     name=models.CharField(max_length=50,null=False,default = INITIAL)
+    current_time_stamp= models.OneToOneField("TimeStamp", related_name="time_stamp_simulation", on_delete=models.SET_NULL, blank=True, null=True, default=None)
     project_number = models.IntegerField(default=1) #! We don't have a foreign key to the project because the admin might need to rebuild the project table
     periods_per_year=models.IntegerField(default=1)
     population_growth_rate = models.IntegerField(default=1)
@@ -105,38 +68,63 @@ class Simulation_Parameter(models.Model):
     quantity_symbol = models.CharField(max_length=2, default="#")
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
-    #! Create a new simulation from the embryo of this simulation object
-    #! At this point, we assume that only the bare simulation object exists, and that no time stamps point to it.
-    #! Therefore, we have to create all the objects of a simulation, based on the name and project number of this simulation object
+    #! Create a new simulation from the embryo of this simulation object, which was created by SimulationCreateView.
+    #! We now have to create all the objects of this simulation, based on its name.
     def startup(self):
         try:
+            logger.info(f"User {self.user} is populating the simulation {self.name} which has project number {self.project_number}")
+            #! First create my current_time_stamp (as a prelude to cloning it)
             time_stamp=TimeStamp(simulation_FK=self,step=DEMAND,stage='M_C',user=self.user)
-            logger.info(f"User {self.user} is creating a new simulation called {self.name} whose project number is {self.project_number}")
             time_stamp.save()
             time_stamp.comparator_time_stamp_FK=time_stamp
             time_stamp.save()
+            self.current_time_stamp=time_stamp
+            self.save()
             #! Find the source simulation and clone it to create a new simulation
-            #! The 'initialize' action will have created a template for every project
-            #! This is uniquely defined by the name "Initial" that the initialize action gives to the template
-            #! together with the fact that the time_stamps for all the objects in this simulation will all have the 'time_stamp' field set to 1.
-            #! TODO should be less hard-wired
-            source_simulation=Simulation_Parameter.objects.get(name="Initial",project_number=self.project_number,user=self.user)
+            source_simulation=Simulation.objects.get(name="Initial",project_number=self.project_number,user=self.user)
             logger.info(f"Cloning this simulation from {source_simulation.name} with project number {self.project_number}")
-            source_time_stamp=TimeStamp.objects.get(simulation_FK=source_simulation)
+            source_time_stamp=source_simulation.current_time_stamp
             time_stamp.clone(source_time_stamp)
-            time_stamp.save()
-            self.user.current_time_stamp=time_stamp
+            time_stamp.save() # TODO is this necessary? 'clone' should save it.
+            self.current_time_stamp=time_stamp
+            self.save()
+            self.user.current_simulation=self #! Necessary because my user will not yet know that I am its new simulation
             self.user.save()
             return "success"
         except Exception as error:
             logger.error(f"Could not create the requested simulation because {error}")
             return error
 
+    #! Move forward one time stamp and clone all the associated objects
+    def one_step(self):
+        logger.info(f"User {self.user} of simulation {self} is moving time stamp {self.current_time_stamp} forward one step")
+        old_time_stamp_id = self.current_time_stamp.id
+        new_time_stamp = self.current_time_stamp
+        #! create a new timestamp object by saving with pk=None. Forces Django to create a new database object
+        new_time_stamp.pk = None
+        new_time_stamp.time_stamp += 1
+        #! because the new time stamp gets saved to the database, we need to retrieve the old one
+        #!TODO there's probably a better way
+        old_time_stamp = TimeStamp.objects.get(id=old_time_stamp_id)
+        new_time_stamp.save()
+        new_time_stamp.comparator_time_stamp_FK = old_time_stamp
+        new_time_stamp.save() #! just in case
+        logger.info(f"Stepping from Time Stamp with id {new_time_stamp.comparator_time_stamp_FK.id} and step {new_time_stamp.comparator_time_stamp_FK.step} to new time stamp {new_time_stamp.id} whose step is {new_time_stamp.step}")
+
+        #! Now clone all the objects that were associated with the old time stamp, and create identical copies associated with the new stamp
+        #! Once that's done, the control logic will invoke the action specified by the new stamp, but that's outside this particular procedure
+
+        #! tell the user she has a new current time stamp, namely the one we just created
+        new_time_stamp.clone(old_time_stamp) #! We assume cloning saves the new current stamp and all objects that reference it
+        self.current_time_stamp=new_time_stamp
+        self.save()
+
+
     def __str__(self):
         return f"{self.name}.{self.project_number}.{self.user}"
 
 class TimeStamp(models.Model):
-    simulation_FK=models.ForeignKey(Simulation_Parameter, on_delete=models.CASCADE) 
+    simulation_FK=models.ForeignKey(Simulation, on_delete=models.CASCADE) 
     time_stamp = models.IntegerField(default=1) # ! TODO rename this field to avoid confusion
     step = models.CharField(max_length=50, default=UNDEFINED)
     stage = models.CharField(max_length=50, default=UNDEFINED)

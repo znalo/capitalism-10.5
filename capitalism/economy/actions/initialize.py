@@ -1,4 +1,4 @@
-from economy.models.states import Project, TimeStamp, Simulation_Parameter
+from economy.models.states import Project, TimeStamp, Simulation
 from economy.models.report import Trace
 from economy.models.commodity import Commodity
 from economy.models.owners import Industry, SocialClass, StockOwner
@@ -12,12 +12,11 @@ from django.http.response import HttpResponseRedirect
 from django.urls import reverse
 
 
-#! NOTE NOTE NOTE
 #! The project table is a static table that should only be changed by the admin user
 #! The admin user is responsible for ensuring that simulations are not 'orphaned' thereby.
 #! If this should happen, the simulations will still exist and function, but the user may lose track of which is which
-#! Because the descriptions will either not be accessible or may have changed
 #! TODO make this more foolproof
+
 def initialize_projects(request):
     logged_in_user=request.user
     logger.info(f"Initialise project table {logged_in_user}")
@@ -31,7 +30,6 @@ def initialize_projects(request):
         Project.objects.all().delete()
         df = pd.read_csv(file_name)
         for row in df.itertuples(index=False, name='Pandas'):
-            logger.info(f"Reading row number {row}")
             project = Project(number=row.project_id, description=row.description)
             logger.info(f"saving project {project}")
             project.save()
@@ -49,26 +47,44 @@ def initialize(request):
     logged_in_user=request.user
     logger.info(f"User {logged_in_user} has asked to reinitialize")
     #TODO 'Do you really want to do this?'
-    #TODO option to re-initialize just one project 
 
-#! Timestamps    
-    #! TODO insist that there is only one time-stamp per project in the CSV file
+#! Check that there is at least one project object
+    if Project.objects.all().count() ==0:
+        logger.error("There are no projects")
+        messages.error(request,"No projects have been loaded. Please contact the administrator")
+        return
+
+#! Clear the decks
     Trace.objects.filter(user=logged_in_user).delete()
-    Trace.enter(request.user,0, "INITIALIZE ENTIRE SIMULATION")
-    Simulation_Parameter.objects.filter(user=logged_in_user).delete()
+    Trace.enter(logged_in_user,0, "INITIALIZE ENTIRE SIMULATION")
+    Simulation.objects.filter(user=logged_in_user).delete()
     Commodity.objects.filter(user=logged_in_user).delete()
     Stock.objects.filter(user=logged_in_user).delete()
     StockOwner.objects.filter(user=logged_in_user).delete()
     TimeStamp.objects.filter(user=logged_in_user).delete()
 
+#! Simulations
+#! Also creates time stamps. 
+    #! For historical reasons the data file is called 'time stamps'
+    #  TODO insist there is only one entry per project in the CSV file
     file_name = staticfiles_storage.path('data/timestamps.csv')    
     logger.info( f"Reading time stamps from {file_name}")
     df = pd.read_csv(file_name)
-
     for row in df.itertuples(index=False, name='Pandas'):
-        s=Simulation_Parameter(user=request.user, project_number=row.project_FK) #! Default everything else
+        #! Create a new simulation
+        s=Simulation(user=logged_in_user, 
+            project_number=row.project_FK,
+            population_growth_rate=row.population_growth_rate,
+            investment_ratio=row.investment_ratio,
+            labour_supply_response=row.labour_supply_response,
+            price_response_type=row.price_response_type,
+            melt_response_type=row.melt_response_type,
+            currency_symbol=row.currency_symbol,
+            quantity_symbol=row.quantity_symbol,
+        )
         s.save()       
-        time_stamp = TimeStamp(
+        #! Create a new time stamp
+        t = TimeStamp(
             simulation_FK=s,
             period=row.period,
             step=row.description,
@@ -76,9 +92,11 @@ def initialize(request):
             melt=row.MELT,
             user=logged_in_user,
         )
-        time_stamp.save()
-        time_stamp.comparator_time_stamp_FK=time_stamp #! comparator for the first stamp is itself
-        time_stamp.save()
+        t.save()
+        t.comparator_time_stamp_FK=t #! comparator for the first stamp is itself
+        t.save()
+        s.current_time_stamp=t
+        s.save()
 
 #! Commodities
     Commodity.objects.filter(user=logged_in_user).delete()
@@ -87,7 +105,7 @@ def initialize(request):
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
         logger.info(f"Creating commodity {(row.name)} for user {logged_in_user} and project {row.project} ")
-        simulation=Simulation_Parameter.objects.get(project_number=row.project,user=logged_in_user)
+        simulation=Simulation.objects.get(project_number=row.project,user=logged_in_user)
         time_stamp=TimeStamp.objects.get(simulation_FK=simulation,user=logged_in_user)
         commodity = Commodity(
             time_stamp_FK=time_stamp,
@@ -113,7 +131,7 @@ def initialize(request):
     logger.info( f"Reading industries from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
-        simulation=Simulation_Parameter.objects.get(project_number=row.project,user=logged_in_user)
+        simulation=Simulation.objects.get(project_number=row.project,user=logged_in_user)
         time_stamp=TimeStamp.objects.get(simulation_FK=simulation, user=logged_in_user)
         commodity=Commodity.objects.get(time_stamp_FK=time_stamp, name=row.commodity_name, user=logged_in_user)
         logger.info(f"Creating Industry {(row.industry_name)} with output {commodity} for user {logged_in_user} and project {row.project} with time stamp {time_stamp} in simulation {simulation}")
@@ -137,7 +155,7 @@ def initialize(request):
     logger.info( f"Reading social classes from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
-        simulation=Simulation_Parameter.objects.get(project_number=row.project,user=logged_in_user)
+        simulation=Simulation.objects.get(project_number=row.project,user=logged_in_user)
         time_stamp=TimeStamp.objects.get(simulation_FK=simulation, user=logged_in_user)
         logger.info(f"Creating Social Class {(row.social_class_name)} for user {logged_in_user} and project {row.project} with time stamp {time_stamp}")
         social_class = SocialClass(
@@ -159,7 +177,7 @@ def initialize(request):
     df = pd.read_csv(file_name)
 
     for row in df.itertuples(index=False, name='Pandas'):
-        simulation=Simulation_Parameter.objects.get(project_number=row.project,user=logged_in_user)
+        simulation=Simulation.objects.get(project_number=row.project,user=logged_in_user)
         time_stamp=TimeStamp.objects.get(simulation_FK=simulation, user=logged_in_user)
         if row.owner_type == "CLASS":
             social_class=SocialClass.objects.get(time_stamp_FK=time_stamp, name=row.name,user=logged_in_user)
@@ -201,12 +219,14 @@ def initialize(request):
             )
             industry_stock.save()
         else:
-            logger.error(f"++++UNKNOWN OWNER TYPE++++ {row.owner_type}")
+            logger.error(f"Unknown user type {row.owner_type}")
 
-#! set the user up so ta points to project 1
-    simulation=Simulation_Parameter.objects.get(user=logged_in_user, project_number=1)
+#! set the user up to point to project 1
+    simulation=Simulation.objects.get(user=logged_in_user, project_number=1)
     time_stamp=TimeStamp.objects.get(user=logged_in_user,simulation_FK=simulation)
-    logged_in_user.current_time_stamp=time_stamp
+    logged_in_user.current_simulation=simulation
+    simulation.current_time_stamp=time_stamp
+    simulation.save()
     logged_in_user.save()
  
     set_total_value_and_price(user=logged_in_user)

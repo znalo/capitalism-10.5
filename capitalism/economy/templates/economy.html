@@ -1,4 +1,9 @@
 {% extends "base.html" %} {% block content %} {% load app_filters %}
+
+
+<header class="w3-container w3-sand" style="width:80%;margin:auto">
+    <h5 style="text-align:center">Overview of {{simulation}}</h5>
+</header>
 <table id="industry" class="display compact cell-border" style="width:80%">
     <thead>
         <tr class="w3-text-black">
@@ -67,11 +72,14 @@
         {% for industry in industries %}
         <tr>
             <td>{{industry.name}}</td>
-            <td class='dt-body-right'>${{industry.initial_capital|has_changed:industry.comparator_initial_capital}}</td>
-            <td class='dt-body-right'>${{industry.work_in_progress|has_changed:industry.comparator_work_in_progress}}</td>
+            <td class='dt-body-right'>${{industry.initial_capital|has_changed:industry.comparator_initial_capital}}
+            </td>
+            <td class='dt-body-right'>
+                ${{industry.work_in_progress|has_changed:industry.comparator_work_in_progress}}</td>
             <td class='dt-body-right'>${{ industry.industrystock_set.all|sales_filter }}</td>
             <td class='dt-body-right'>${{ industry.industrystock_set.all|money_filter }}</td>
-            <td class='dt-body-right'>${{ industry.current_capital|has_changed:industry.comparator_current_capital }}</td>
+            <td class='dt-body-right'>${{ industry.current_capital|has_changed:industry.comparator_current_capital }}
+            </td>
             <td class='dt-body-right'>${{ industry.profit|has_changed:industry.comparator_profit }}</td>
             <td class='dt-body-right'>%{{ industry.profit_rate|has_changed:industry.comparator_profit_rate }}</td>
         </tr>

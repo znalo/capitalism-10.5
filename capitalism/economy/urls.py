@@ -20,6 +20,7 @@ urlpatterns = [
     url('tables/social-classes',
         views.SocialClassView.as_view(), name='social-classes'),
     url('tables/all-owners', views.AllOwnersView.as_view(), name='all-owners'),
+    url('tables/simulations', views.SimulationView.as_view(), name='simulations'),
     url('tables/industry-stocks',
         views.IndustryStockView.as_view(), name='industry-stocks'),
     url('tables/social-stocks', views.SocialStockView.as_view(), name='social-stocks'),
@@ -38,7 +39,8 @@ urlpatterns = [
     url('admin-dashboard', views.AdminDashboard.as_view(), name='admin-dashboard'),
     url('user-dashboard', views.userDashboard, name='user-dashboard'),
     path('userdetail/<int:pk>/', views.UserDetail.as_view(),name='user-detail'),
-    path('simulation-create/', views.SimulationView.as_view(), name='create-simulation'),
+    path('simulation-create/', views.SimulationCreateView.as_view(), name='create-simulation'),
+    path('simulation-select/', views.SimulationSelectView.as_view(), name='select-simulation'),
     
 
 # #! The Matt Freire way of authentication and login
