@@ -24,8 +24,8 @@
         <div class="w3-bar w3-light-grey">
             <div class="w3-left">
                 <a href="{% url 'landing-page' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Home</a>
-                <a href="{% url 'disclaimers' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Disclaimer and Privacy Policy</a> {% if user.is_authenticated %}
-                <a href="{% url 'status' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Status Update</a>
+                <a href="{% url 'disclaimers' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Disclaimer and Privacy Policy</a>
+                <a href="{% url 'status' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Status Update</a>{% if user.is_authenticated %}
                 <a href="{% url 'trace' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Trace</a>
                 <a href="{% url 'admin:index' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Admin</a>
                 <a href="{% url 'initialize' %}" class="w3-button w3-small w3-round" style="padding-bottom: 2px" role="button">Initialize</a>

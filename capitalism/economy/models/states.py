@@ -119,6 +119,9 @@ class Simulation(models.Model):
         self.current_time_stamp=new_time_stamp
         self.save()
 
+    @property
+    def project_description(self):
+        return Project.objects.get(number=self.project_number).description
 
     def __str__(self):
         return f"{self.name}.{self.project_number}.{self.user}"

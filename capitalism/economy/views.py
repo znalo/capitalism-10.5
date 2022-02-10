@@ -143,7 +143,9 @@ class SimulationView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         simulation_list=Simulation.objects.filter(user=self.request.user)
+        
         context['simulation_list']= simulation_list
+
         return context    
 
 def landingPage(request):
