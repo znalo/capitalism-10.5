@@ -25,4 +25,6 @@ Fixed problem that Trace table displays only partially
 ## 8 February Commit still transitional. Refactored User and Simulation models so that all actions are conducted by the Simulation, not the User. This works, but user dashboard is not working correctly. Saving as a reference point
 ## 8 February Commit Refactoring complete. Now we start work on debugging the simulations
 ## 8 February Commit Refactored version uploaded to production site. Production version is working but development version is generating unexpected errors. Awaiting response to ticket lodged with provider
-## 9 February Commit Working and tested with multiple periods per year and simple reproduction
+## 10 February Commit Working and tested with multiple periods per year and simple reproduction
+## 10 February Commit added about page
+

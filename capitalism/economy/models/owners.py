@@ -42,11 +42,8 @@ class StockOwner(models.Model): # Base class for Industry and Social Class
     
     def capitalists(self):
         try:
-            print("looking for capitalists")
             capitalists_qs=SocialClass.objects.filter(time_stamp_FK=self.time_stamp_FK, name="Capitalists")
-            print("hunting for capitalists")
             capitalists=capitalists_qs.get()
-            print(f"found the capitalist class and it is {capitalists}")
         except Exception as error:
             logger.error(f"Too many capitalists for user {self.user} because of exception {error}. Giving Up")
             raise Exception("Too many capitalists. Cannot continue. This is either a data error or a programming error")
@@ -82,7 +79,6 @@ class Industry(StockOwner):
         Trace.enter(self.user,3,f"Processing industry {Trace.sim_object(self.name)}")
         cost=0
         productive_stocks=IndustryStock.objects.filter(usage_type=PRODUCTION,time_stamp_FK=self.user.current_time_stamp,stock_owner_FK=self)
-        logger.info (self.user,f"The productive stock query set is {productive_stocks}")
         for stock in productive_stocks:
             logger.info (f"Stock {stock} has generated an additional cost of {stock.monetary_demand}")
             cost+=stock.monetary_demand
