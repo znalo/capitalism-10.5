@@ -9,7 +9,7 @@ urlpatterns = [
     path('', views.landingPage, name='landing-page'),
     path('justlanded/', views.newlyLanded, name='just-landed'),
     path('status/', views.status_update, name='status'),
-    path('about/', views.about, name='about'),
+    path('about-capitalism/', views.about_capitalism, name='about-capitalism'),
     url('^admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')), # new
     url('report/table', views.TraceView.as_view(), name='trace'),

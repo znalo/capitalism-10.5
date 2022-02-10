@@ -158,10 +158,10 @@ def status_update(request):
     logger.info(f"User {user} requested a status update")
     return render(request, 'status.html')
 
-def about(request):
+def about_capitalism(request):
     user=request.user
     logger.info(f"User {user} requested the about page")
-    return render(request, 'about.html')
+    return render(request, 'about-capitalism.html')
 
 #! to display messages to people that just logged in
 def newlyLanded(request):

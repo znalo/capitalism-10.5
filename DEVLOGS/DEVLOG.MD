@@ -27,4 +27,6 @@ Fixed problem that Trace table displays only partially
 ## 8 February Commit Refactored version uploaded to production site. Production version is working but development version is generating unexpected errors. Awaiting response to ticket lodged with provider
 ## 10 February Commit Working and tested with multiple periods per year and simple reproduction
 ## 10 February Commit added about page
+## 10 February Commit this version (with some minor corrections) uploaded to server, where it is now functioning
+
 
