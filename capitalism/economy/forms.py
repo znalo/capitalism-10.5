@@ -73,4 +73,7 @@ class SimulationSelectForm(forms.ModelForm):
         'quantity_symbol',
         'user',)    
 
-        
+class SimulationDeleteForm(forms.ModelForm):
+   class Meta:
+      model=Simulation
+      fields=['name', 'project_number']

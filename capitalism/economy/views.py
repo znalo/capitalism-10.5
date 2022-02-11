@@ -1,4 +1,4 @@
-from .forms import SimulationCreateForm, SimulationSelectForm
+from .forms import SimulationCreateForm, SimulationSelectForm, SimulationDeleteForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django import forms
 from django.shortcuts import render
@@ -214,7 +214,10 @@ class AdminDashboard(ListView):
         return context    
 
 def userDashboard(request):
-    return render(request,'user-dashboard.html')
+    template = loader.get_template('user-dashboard.html')
+    context={}
+    context["simulation_list"]=Simulation.objects.filter(user=request.user)
+    return HttpResponse(template.render(context, request))    
 
 class UserDetail(DeleteView):
     template_name='user_form.html'    
@@ -255,30 +258,16 @@ class SimulationCreateView(LoginRequiredMixin, CreateView):
         return self.render_to_response( 
             self.get_context_data(form=form))
 
+def simulationSelectView(request,pk):
+    user=request.user
+    simulation_choice=Simulation.objects.get(user=user, pk=pk)
+    time_stamp=simulation_choice.current_time_stamp
+    logger.info(f"User {user} is switching to {simulation_choice} with time stamp {time_stamp}")
+    user.current_simulation=simulation_choice
+    user.save()
+    return HttpResponseRedirect(reverse("user-dashboard"))      
 
-class SimulationSelectView(LoginRequiredMixin, CreateView):
-    form_class=SimulationSelectForm
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update({'request': self.request})
-        return kwargs
-
-    def form_valid(self, form):
-        user=self.request.user
-        simulation_choice=form.cleaned_data['simulations']
-        time_stamp=simulation_choice.current_time_stamp
-        logger.info(f"User {user} submitted valid form to switch to {simulation_choice} with time stamp {time_stamp}")
-        user.current_simulation=simulation_choice
-        user.save()
-        return super(SimulationSelectView, self).form_valid(form)
-
-    def form_invalid(self, form):
-        logger.info(f"Invalid simulation select form submitted by user {self.request.user}")
-        logger.info(f"The non-field errors were {form.non_field_errors}")
-        return self.render_to_response( 
-            self.get_context_data(form=form))
-
-    queryset=Simulation.objects.all()
-    template_name='simulation_select.html'
-    success_url=reverse_lazy('user-dashboard')
-
+class SimulationDeleteView(LoginRequiredMixin, DeleteView):
+    model=Simulation
+    template_name='simulation_confirm_delete.html'
+    success_url=reverse_lazy("user-dashboard")

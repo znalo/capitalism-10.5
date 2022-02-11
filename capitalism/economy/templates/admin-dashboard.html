@@ -7,7 +7,7 @@
             <h4 style="padding-left: 1rem "> Manage Users</h4>
             {% for user in users %}
             <li>
-                <a href="/userdetail/{{ user.pk }} ">{{ user }} (Click to delete)</a>
+                <a href="/userdetail/{{ user.pk }}">{{ user }} (Click to delete)</a>
             </li>
             {% endfor %}
         </ul>

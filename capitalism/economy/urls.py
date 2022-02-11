@@ -40,8 +40,9 @@ urlpatterns = [
     url('admin-dashboard', views.AdminDashboard.as_view(), name='admin-dashboard'),
     url('user-dashboard', views.userDashboard, name='user-dashboard'),
     path('userdetail/<int:pk>/', views.UserDetail.as_view(),name='user-detail'),
-    path('simulation-create/', views.SimulationCreateView.as_view(), name='create-simulation'),
-    path('simulation-select/', views.SimulationSelectView.as_view(), name='select-simulation'),
+    path('create-simulation/', views.SimulationCreateView.as_view(), name='create-simulation'),
+    path('select-simulation/<int:pk>/', views.simulationSelectView, name='select-simulation'),
+    path('delete-simulation/<int:pk>/', views.SimulationDeleteView.as_view(),name='delete-simulation'),
     
 
 # #! The Matt Freire way of authentication and login

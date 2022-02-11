@@ -72,6 +72,9 @@ Too much money is allocated to industries in the distribution stage
     * Complete the refactoring by making 'simulation' the parameter for all actions
 ## 10 February
   * Added rudimentary 'about' page
+## 11 February
+  * Cleaner Dashboard with delete simulation facility
+
   
 
 
