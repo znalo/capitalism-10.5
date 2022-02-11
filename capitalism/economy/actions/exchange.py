@@ -10,7 +10,9 @@ from django.contrib import messages
 #! Use this to calculate the total demand for each commodity
 #! Later (in 'allocate') we impose constraints arising from supply and (TODO) money shortages
 def calculate_demand(user):
-    logger.info(f"Calculate demand for user {user}")
+    simulation=user.current_simulation
+    periods_per_year=simulation.periods_per_year
+    logger.info(f"Calculate demand for user {user} in simulation {simulation} with {periods_per_year} periods")
     Trace.enter(user,1,"Calculate Demand")
     productive_stocks = IndustryStock.objects.filter(usage_type=PRODUCTION,time_stamp_FK=user.current_time_stamp)
     social_stocks = SocialStock.objects.filter(time_stamp_FK=user.current_time_stamp).exclude(usage_type=MONEY).exclude(usage_type=SALES)
@@ -21,7 +23,7 @@ def calculate_demand(user):
         commodity.save() #TODO can probably be dispensed with
 
     for stock in productive_stocks:
-        turnover_time = stock.commodity_FK.turnover_time
+        turnover_time = stock.commodity_FK.turnover_time/periods_per_year
         stock.demand = stock.production_requirement*turnover_time
         stock.demand -= stock.size #! We only want to bring the stock size up to what is needed to produce at the current scale
         stock.monetary_demand=stock.demand*commodity.unit_price
@@ -33,7 +35,7 @@ def calculate_demand(user):
 
     for stock in social_stocks:
         social_class = stock.social_class_FK
-        stock.consumption_requirement = social_class.population*social_class.consumption_ratio
+        stock.consumption_requirement = social_class.population*social_class.consumption_ratio/periods_per_year  
         stock.demand = stock.consumption_requirement
         stock.demand -= stock.size #! We only want to bring the stock size up to what is needed to produce at the current scale
         commodity = stock.commodity_FK

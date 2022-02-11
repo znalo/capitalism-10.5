@@ -143,7 +143,9 @@ class SimulationView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         simulation_list=Simulation.objects.filter(user=self.request.user)
+        
         context['simulation_list']= simulation_list
+
         return context    
 
 def landingPage(request):
@@ -155,6 +157,11 @@ def status_update(request):
     user=request.user
     logger.info(f"User {user} requested a status update")
     return render(request, 'status.html')
+
+def about_capitalism(request):
+    user=request.user
+    logger.info(f"User {user} requested the about page")
+    return render(request, 'about-capitalism.html')
 
 #! to display messages to people that just logged in
 def newlyLanded(request):

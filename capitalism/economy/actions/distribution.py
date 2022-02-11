@@ -22,7 +22,6 @@ def revenue(user):
     for industry in Industry.objects.filter(time_stamp_FK=user.current_time_stamp):
         Trace.enter(user,2,f"Industry {Trace.sim_object(industry.name)} has made a profit of {Trace.sim_quantity(industry.profit)} which will be transferred to the capitalists")
         donor_money_stock=industry.money_stock
-        print("hunting for capitalists")
         recipient=SocialClass.objects.get(time_stamp_FK=user.current_time_stamp, name="Capitalists")
         Trace.enter(user,2,f"This will go to {Trace.sim_object(recipient.name)}")
         recipient_money_stock=recipient.money_stock

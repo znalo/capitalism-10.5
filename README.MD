@@ -62,4 +62,17 @@ Too much money is allocated to industries in the distribution stage
   * Dashboard functionality restored: user can create and switch simulations, but cannot delete, restart, download or upload yet
   * We now resume work on debugging the actual projects
 ## This version now running at www.dascapital.org
+## 10 February
+  * Now working for multiple periods (with simple reproduction)
+  * Next steps:
+    * Delete simulation
+    * Restart simulation
+    * Eliminate project 3 (now redundant)
+    * Scaffold an about page
+    * Complete the refactoring by making 'simulation' the parameter for all actions
+## 10 February
+  * Added rudimentary 'about' page
+  
 
+
+    
