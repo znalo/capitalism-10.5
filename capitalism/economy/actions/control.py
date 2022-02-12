@@ -64,7 +64,8 @@ def step_execute_without_display(request,act):
 
 def stage_execute(request,act):
     user=request.user
-    current_time_stamp=user.current_time_stamp
+    simulation=user.current_simulation
+    current_time_stamp=simulation.current_time_stamp
     #! If we are at the start of a stage, execute all the steps within that stage
     #! If we are partway through a stage, this same loop will excecute only the remaining steps in that stage
     #! TODO we should probably create an additional time stamp to record the entry into a new stage.
@@ -73,7 +74,7 @@ def stage_execute(request,act):
     while user.current_stage==act:
         logger.info(f"PROCESSING STAGE {act}, PERFORMING STEP {user.current_step}")
         step_execute_without_display(request=request,act=user.current_step)
-    where_we_are_in_the_mall=user.current_time_stamp
+    where_we_are_in_the_mall=user.current_simulation.current_time_stamp
     #! We have executed all the steps of this stage
     #! Now we have to record the change in stage
     where_we_are_in_the_mall.stage=user.current_stage
@@ -96,7 +97,7 @@ def select_project(request,project_number):
 def comparator_select(request, period,stage,step):
     logger.info(f"User wants to select new comparator '{period}-{stage}-{step}'")
     try:
-        current_time_stamp=request.user.current_time_stamp
+        current_time_stamp=request.user.current_simulation.current_time_stamp
         simulation=request.user.simulation
         comparator=TimeStamp.objects.get(simulation_FK=simulation, period=period, stage=stage,step=step,user=request.user)
         current_time_stamp.comparator_time_stamp_FK=comparator

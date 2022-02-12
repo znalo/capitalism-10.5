@@ -41,9 +41,9 @@ project,time_stamp,name,owner_type,commodity,stock_type,quantity,production_quan
 3,1,Workers,CLASS,Money,Money,750,0,0
 3,1,Workers,CLASS,Labour Power,Sales,1500,0,0
 3,1,Capitalists,CLASS,Labour Power,Sales,0,0,0
-4,1,Capitalists,CLASS,Luxuries,Consumption,0,0,600
+4,1,Capitalists,CLASS,Luxuries,Consumption,0,0,1500
 4,1,Capitalists,CLASS,Money,Money,3000,0,0
-4,1,Capitalists,CLASS,Necessities,Consumption,0,0,900
+4,1,Capitalists,CLASS,Necessities,Consumption,0,0,0
 4,1,Department IIa,INDUSTRY,Labour Power,Production,0,800,0
 4,1,Department IIb,INDUSTRY,Luxuries,Sales,3000,0,0
 4,1,Department IIb,INDUSTRY,Means of Production,Production,0,400,0

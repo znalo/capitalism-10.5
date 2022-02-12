@@ -43,7 +43,8 @@ urlpatterns = [
     path('create-simulation/', views.SimulationCreateView.as_view(), name='create-simulation'),
     path('select-simulation/<int:pk>/', views.simulationSelectView, name='select-simulation'),
     path('delete-simulation/<int:pk>/', views.SimulationDeleteView.as_view(),name='delete-simulation'),
-    
+    path('restart-simulation/<int:pk>/', views.simulationRestartView ,name='restart-simulation'),
+
 
 # #! The Matt Freire way of authentication and login
 #     path('login/',LoginView.as_view(),name='login'),

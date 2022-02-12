@@ -48,7 +48,7 @@
                         <a href="/delete-simulation/{{ simulation.pk }} " class="w3-button w3-round-large w3-red ">Delete</a> {% endif %}
                     </td>
 
-                    <td> <button class="w3-button w3-round-large w3-blue ">Restart</button></td>
+                    <td> <a href="/restart-simulation/{{ simulation.pk}}" class="w3-button w3-round-large w3-blue ">Restart</a></td>
                     <td> <button class="w3-button w3-grey w3-round-large ">Download</button></td>
                 </tr>
                 {% endfor %}

@@ -45,7 +45,7 @@ class Commodity(models.Model):
     def set_commodity_size(self):
         from .stocks import Stock #! have to do this here to avoid circular import. TODO not very happy with this
         Trace.enter(self.user,1,f"Recaculating the size of commodity {self.name}; currently this is {self.size} ")
-        current_time_stamp=self.user.current_time_stamp
+        current_time_stamp=self.user.current_simulation.current_time_stamp
         stocks=Stock.objects.filter(commodity_FK=self,time_stamp_FK=current_time_stamp) 
         #! TODO What a mess
         #! TODO can we resolve this mess by converting all related querysets into methods of the relevant objects
@@ -68,12 +68,12 @@ class Commodity(models.Model):
     def set_commodity_sizes(user):
         Trace.enter(user,1,f"Recalculating all commodity sizes for user {user}")
         logger.info(f"Recalculating all commodity sizes for user {user}")
-        commodities=Commodity.objects.filter(time_stamp_FK=user.current_time_stamp)
+        commodities=Commodity.objects.filter(time_stamp_FK=user.current_simulation.current_time_stamp)
         for commodity in commodities:
             commodity.set_commodity_size()
 
     def current_query_set(self):
-        return Commodity.objects.filter(time_stamp_FK=self.user.current_time_stamp)
+        return Commodity.objects.filter(time_stamp_FK=self.user.current_simulation.current_time_stamp)
 
     def __str__(self):
         return f"[Time Stamp {self.time_stamp_FK.time_stamp}] {self.name}"

@@ -55,8 +55,7 @@ def initialize(request):
         return
 
 #! Clear the decks
-    Trace.objects.filter(user=logged_in_user).delete()
-    Trace.enter(logged_in_user,0, "INITIALIZE ENTIRE SIMULATION")
+    Trace.objects.filter(simulation_FK=logged_in_user.current_simulation).delete()
     Simulation.objects.filter(user=logged_in_user).delete()
     Commodity.objects.filter(user=logged_in_user).delete()
     Stock.objects.filter(user=logged_in_user).delete()
@@ -73,6 +72,7 @@ def initialize(request):
     for row in df.itertuples(index=False, name='Pandas'):
         #! Create a new simulation
         s=Simulation(user=logged_in_user, 
+            name=f"{INITIAL}.{row.project_FK}",
             project_number=row.project_FK,
             population_growth_rate=row.population_growth_rate,
             investment_ratio=row.investment_ratio,
@@ -97,6 +97,9 @@ def initialize(request):
         t.save()
         s.current_time_stamp=t
         s.save()
+        #! Create an initial Trace object to mark the start of the simulation
+        #! We cannot use 'Trace.enter' because the user's current_simulation has not yet been defined
+        Trace.enter_for_simulation(s,0,"INITIALISING")
 
 #! Commodities
     Commodity.objects.filter(user=logged_in_user).delete()
@@ -104,9 +107,9 @@ def initialize(request):
     logger.info( f"Reading commodities from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
-        logger.info(f"Creating commodity {(row.name)} for user {logged_in_user} and project {row.project} ")
         simulation=Simulation.objects.get(project_number=row.project,user=logged_in_user)
         time_stamp=TimeStamp.objects.get(simulation_FK=simulation,user=logged_in_user)
+        logger.info(f"Creating commodity {(row.name)} for simulation {simulation} with time stamp {time_stamp} on behalf of user {logged_in_user}")
         commodity = Commodity(
             time_stamp_FK=time_stamp,
             name=row.name,
@@ -134,7 +137,7 @@ def initialize(request):
         simulation=Simulation.objects.get(project_number=row.project,user=logged_in_user)
         time_stamp=TimeStamp.objects.get(simulation_FK=simulation, user=logged_in_user)
         commodity=Commodity.objects.get(time_stamp_FK=time_stamp, name=row.commodity_name, user=logged_in_user)
-        logger.info(f"Creating Industry {(row.industry_name)} with output {commodity} for user {logged_in_user} and project {row.project} with time stamp {time_stamp} in simulation {simulation}")
+        logger.info(f"Creating Industry {(row.industry_name)} with output {commodity} for simulation {simulation} with time stamp {time_stamp} on behalf of user {logged_in_user} ")
         industry = Industry(
             time_stamp_FK=time_stamp,
             name=row.industry_name,
@@ -157,7 +160,7 @@ def initialize(request):
     for row in df.itertuples(index=False, name='Pandas'):
         simulation=Simulation.objects.get(project_number=row.project,user=logged_in_user)
         time_stamp=TimeStamp.objects.get(simulation_FK=simulation, user=logged_in_user)
-        logger.info(f"Creating Social Class {(row.social_class_name)} for user {logged_in_user} and project {row.project} with time stamp {time_stamp}")
+        logger.info(f"Creating Social Class {(row.social_class_name)} for simulation {simulation} with time stamp {time_stamp} on behalf of user {logged_in_user}")
         social_class = SocialClass(
             time_stamp_FK=time_stamp,
             name=row.social_class_name,
@@ -182,7 +185,7 @@ def initialize(request):
         if row.owner_type == "CLASS":
             social_class=SocialClass.objects.get(time_stamp_FK=time_stamp, name=row.name,user=logged_in_user)
             commodity=Commodity.objects.get(time_stamp_FK=time_stamp, name=row.commodity, user=logged_in_user)
-            logger.info(f"Creating a stock of commodity {(commodity.name)} of usage type {row.stock_type} for class {(social_class.name)} ")
+            logger.info(f"Creating a stock of commodity {(commodity.name)} of usage type {row.stock_type} for class {(social_class.name)} in simulation {simulation} on behalf of user {logged_in_user}")
             social_stock = SocialStock(
                 time_stamp_FK=time_stamp,
                 social_class_FK=social_class,
@@ -221,6 +224,11 @@ def initialize(request):
         else:
             logger.error(f"Unknown user type {row.owner_type}")
 
+    #! Create initial values, prices and capitals for all simulations iof this user
+    for sim in Simulation.objects.filter(user=logged_in_user):
+        set_total_value_and_price(simulation=sim)
+        set_initial_capital(simulation=sim)
+
 #! set the user up to point to project 1
     simulation=Simulation.objects.get(user=logged_in_user, project_number=1)
     time_stamp=TimeStamp.objects.get(user=logged_in_user,simulation_FK=simulation)
@@ -228,7 +236,3 @@ def initialize(request):
     simulation.current_time_stamp=time_stamp
     simulation.save()
     logged_in_user.save()
- 
-    set_total_value_and_price(user=logged_in_user)
-    set_initial_capital(user=logged_in_user)
-

@@ -12,7 +12,6 @@ def control_states(context):
       new_context={}
       try:
             user=context.request.user
-            logger.info(f"User {user} invoked control_states")
       except Exception as error:
             logger.error(f"The user could not be found because {error}")
             raise Exception ("Giving Up")
@@ -52,13 +51,10 @@ def project_list():
 def step_list(context):
       try:
             user=context.request.user
-            logger.info(f"Calculating step list for user {user}")
             simulation=user.current_simulation
-            logger.info(f"The current simulation is {simulation}")
             current_time_stamp=simulation.current_time_stamp
-            logger.info(f"The current time stamp is {current_time_stamp}")
             project_number=simulation.project_number
-            logger.info(f"The project is {project_number}")
+            logger.info(f"Calculating step list for user {user} with simulation {simulation} and time stamp {current_time_stamp} and project {project_number}")
             step_list=TimeStamp.objects.filter(user=user, simulation_FK=simulation)
       except Exception as error:
             logger.error(f"Could not find the step list because of {error}")

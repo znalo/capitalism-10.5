@@ -19,16 +19,12 @@ class User(AbstractUser):
         return self.current_simulation
 
     @property
-    def current_time_stamp(self):
-        return self.simulation.current_time_stamp
-
-    @property
     def project(self):
         return self.simulation.project_number
 
     @property
     def current_step(self):
-        return self.current_time_stamp.step
+        return self.simulation.current_time_stamp.step
 
     @property
     def current_stage(self):
@@ -55,7 +51,7 @@ class Project(models.Model):
         return f"(Project {self.number} {self.description})"
 
 class Simulation(models.Model):
-    name=models.CharField(max_length=50,null=False,default = INITIAL)
+    name=models.CharField(max_length=50,null=False,default = UNDEFINED)
     current_time_stamp= models.OneToOneField("TimeStamp", related_name="time_stamp_simulation", on_delete=models.SET_NULL, blank=True, null=True, default=None)
     project_number = models.IntegerField(default=1) #! We don't have a foreign key to the project because the admin might need to rebuild the project table
     periods_per_year=models.IntegerField(default=1)
@@ -124,7 +120,7 @@ class Simulation(models.Model):
         return Project.objects.get(number=self.project_number).description
 
     def __str__(self):
-        return f"{self.name}.{self.project_number}.{self.user}"
+        return f"{self.name}.{self.user}[{self.id}]"
 
 class TimeStamp(models.Model):
     simulation_FK=models.ForeignKey(Simulation, on_delete=models.CASCADE) 
@@ -261,6 +257,6 @@ class TimeStamp(models.Model):
         ordering = ['time_stamp', ]
 
     def __str__(self):
-        return f"{self.period}.{self.stage}.{self.step}"
+        return f"{self.period}.{self.stage}.{self.step}[{self.id}]"
 
 

@@ -19,10 +19,10 @@ from ..global_constants import *
 
 def revenue(user):
     Trace.enter(user,0,"Calculate capitalist revenue and other property-based entitlements")
-    for industry in Industry.objects.filter(time_stamp_FK=user.current_time_stamp):
+    for industry in Industry.objects.filter(time_stamp_FK=user.current_simulation.current_time_stamp):
         Trace.enter(user,2,f"Industry {Trace.sim_object(industry.name)} has made a profit of {Trace.sim_quantity(industry.profit)} which will be transferred to the capitalists")
         donor_money_stock=industry.money_stock
-        recipient=SocialClass.objects.get(time_stamp_FK=user.current_time_stamp, name="Capitalists")
+        recipient=SocialClass.objects.get(time_stamp_FK=user.current_simulation.current_time_stamp, name="Capitalists")
         Trace.enter(user,2,f"This will go to {Trace.sim_object(recipient.name)}")
         recipient_money_stock=recipient.money_stock
         donor_money_stock.size-=industry.profit
@@ -85,8 +85,8 @@ def revenue(user):
 
 def invest(user):
     calculate_demand(user=user) #! this is required if we are to estimate correctly the replenishment cost
-    capitalists=SocialClass.objects.get(time_stamp_FK=user.current_time_stamp, name="Capitalists")    
-    industries=Industry.objects.filter(time_stamp_FK=user.current_time_stamp)
+    capitalists=SocialClass.objects.get(time_stamp_FK=user.current_simulation.current_time_stamp, name="Capitalists")    
+    industries=Industry.objects.filter(time_stamp_FK=user.current_simulation.current_time_stamp)
     Trace.enter(user,1, f"Calculate input costs to continue producing at current scales")
     for industry in industries:
         cost=industry.replenishment_cost
@@ -100,12 +100,12 @@ def invest(user):
         industry_money.size+=transferred_amount
         industry_money.save()
         capitalists_money.save()
-    set_initial_capital(user=user) #! as soon as we are ready for the next circuit, we should reset the initial capital
+    set_initial_capital(simulation=user.current_simulation) #! as soon as we are ready for the next circuit, we should reset the initial capital
 
 #! Not in current use, preserved here because we may want it.
 def effective_demand(user):
     total_monetarily_effective_demand=0
-    for commodity in Commodity.objects.filter(time_stamp_FK=user.current_time_stamp):
+    for commodity in Commodity.objects.filter(time_stamp_FK=user.current_simulation.current_time_stamp):
         commodity.monetarily_effective_demand=commodity.demand*commodity.unit_price
         Trace.enter(user,1,f"Evaluating money demand from {commodity.name} of origin {commodity.origin}; demand ={commodity.monetarily_effective_demand}")
         if commodity.origin=="INDUSTRIAL": #! filter didn't work, TODO we found out why, change the code

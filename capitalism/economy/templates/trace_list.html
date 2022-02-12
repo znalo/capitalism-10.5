@@ -34,18 +34,18 @@
 <table id="trace" class="display compact" style="width:80%">
     <thead>
         <tr>
-            <th>Time Created</th>
-            <th>Stamp id</th>
-            <th>Period.Stage.Step</th>
+            <th>Created</th>
+            <th>Simulation</th>
+            <th>Period.Stage.Step[stamp]</th>
             <th>Message</th>
         </tr>
     </thead>
     <tbody>
         {% for trace in trace_list %}
         <tr class="toggle-level{{trace.level}}">
-            <td>{{trace.real_time }} </td>
-            <td>{{ trace.time_stamp_id }} </td>
-            <td>{{ trace.period }}.{{ trace.stage }}.{{ trace.step }}</td>
+            <td>{{ trace.real_time }} </td>
+            <td>{{ trace.simulation_FK }} </td>
+            <td>{{ trace.period }}.{{ trace.stage }}.{{ trace.step }}[{{ trace.user.current_simulation.current_time_stamp.id }}]</td>
             <td class="pl-{{trace.level}}"><span class="trace-level{{trace.level}}">{{trace.message|mark_as_safe }}</span> </td>
         </tr>
         {% endfor %}
@@ -54,38 +54,24 @@
 
 {% endblock %} {% block extra_js %}
 <script>
+    // The below produces an error 'col is undefined'
     $(document).ready(function() {
         $('#trace').DataTable({
+            "columns": [{
+                "width": "15%"
+            }, {
+                "width": "10%"
+            }, {
+                "width": "5%"
+            }, {
+                "width": "70%"
+            }, ],
             "paging": false,
-            "searching": false,
-            "info": false
+            "info": false,
+            "borders": false,
+            "searching": false
         });
     });
-
-    // The below produces an error 'col is undefined'
-    // $(document).ready(function() {
-    //     $('#trace').DataTable({
-    //         "columns": [{
-    //             "width": "4%"
-    //         }, {
-    //             "width": "2%"
-    //         }, {
-    //             "width": "2%"
-    //         }, {
-    //             "width": "2%"
-    //         }, {
-    //             "width": "5%"
-    //         }, {
-    //             "width": "5%"
-    //         }, {
-    //             "width": "81%"
-    //         }, ],
-    //         "paging": false,
-    //         "info": false,
-    //         "borders": false,
-    //         "searching": false
-    //     });
-    // });
 </script>
 
 {% endblock %}

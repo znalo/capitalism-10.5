@@ -29,4 +29,4 @@ Fixed problem that Trace table displays only partially
 ## 10 February Commit added about page
 ## 10 February Commit this version (with some minor corrections) uploaded to server, where it is now functioning
 ## 11 February Commit Cleaner Dashboard with delete simulation facility
-
+## 12 February Commit Project 4 (two consumption goods) now seems to run all the way through. Improved reporting

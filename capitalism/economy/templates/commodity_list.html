@@ -17,6 +17,7 @@
             <th>Demand</th>
             <th>Supply</th>
             <th>Allocation Ratio</th>
+            <th>Display Order</th>
         </tr>
     </thead>
     <tbody>
@@ -36,6 +37,8 @@
             <td> {{ commodity.demand }} </td>
             <td> {{ commodity.supply }} </td>
             <td> {{ commodity.allocation_ratio }} </td>
+            <td> {{ commodity.display_order }} </td>
+
         </tr>
         {% endfor %}
     </tbody>

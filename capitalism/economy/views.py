@@ -25,9 +25,13 @@ def get_economy_view_context(request):#TODO change name - this function now not 
     industry_stocks = IndustryStock.objects.filter(time_stamp_FK=current_time_stamp)
     industries=Industry.objects.filter(time_stamp_FK=current_time_stamp)
     productive_stocks=industry_stocks.filter(usage_type=PRODUCTION).order_by("commodity_FK__display_order")
-    industry_headers=productive_stocks.filter(industry_FK=industries.first()).order_by("commodity_FK__display_order") #!all industries have same choice of productive stocks, even if usage is zero
+    #!all industries have the same choice of productive stocks, even if usage is zero, hence get the headers from the first industry
+    industry_headers=productive_stocks.filter(industry_FK=industries.first()).order_by("commodity_FK__display_order") 
     social_classes=SocialClass.objects.filter(time_stamp_FK=current_time_stamp)
     social_stocks=SocialStock.objects.filter(time_stamp_FK=current_time_stamp)
+    consumption_stocks=social_stocks.filter(usage_type=CONSUMPTION)
+    #!all social classes have the same choice of consumption stocks, even if usage is zero, hence get the headers from the first social class
+    consumption_headers=consumption_stocks.filter(social_class_FK=social_classes.first())
     commodities=Commodity.objects.filter(time_stamp_FK=current_time_stamp)
 
     context={}
@@ -37,6 +41,8 @@ def get_economy_view_context(request):#TODO change name - this function now not 
     context["industry_headers"]=industry_headers
     context["social_classes"]=social_classes
     context["social_stocks"]=social_stocks
+    context["consumption_stocks"]=consumption_stocks
+    context["consumption_headers"]=consumption_headers
     context["commodities"]= commodities
     template = loader.get_template('economy.html')
     return HttpResponse(template.render(context, request))
@@ -74,7 +80,7 @@ class IndustryView(ListView):
     template_name='industry_list.html'    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        qs=Industry.objects.filter(time_stamp_FK=self.request.user.current_time_stamp)
+        qs=Industry.objects.filter(time_stamp_FK=self.request.user.current_simulation.current_time_stamp)
         context['industry_list']=qs
         return context    
 
@@ -83,7 +89,7 @@ class CommodityView(ListView):
     template_name='commodity_list.html'    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        qs=Commodity.objects.filter(time_stamp_FK=self.request.user.current_time_stamp)
+        qs=Commodity.objects.filter(time_stamp_FK=self.request.user.current_simulation.current_time_stamp)
         context['commodity_list']=qs
         return context    
 
@@ -92,7 +98,7 @@ class SocialClassView(ListView):
     model=SocialClass
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        qs=SocialClass.objects.filter(time_stamp_FK=self.request.user.current_time_stamp)
+        qs=SocialClass.objects.filter(time_stamp_FK=self.request.user.current_simulation.current_time_stamp)
         context['social_class_list']=qs
         return context
 
@@ -111,7 +117,7 @@ class SocialStockView(ListView):
     template_name='socialstock_list.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        stock_list=SocialStock.objects.filter(time_stamp_FK=self.request.user.current_time_stamp)
+        stock_list=SocialStock.objects.filter(time_stamp_FK=self.request.user.current_simulation.current_time_stamp)
         context['stock_list']= stock_list
         return context    
 
@@ -120,7 +126,7 @@ class IndustryStockView(ListView):
     template_name='industrystock_list.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        stock_list=IndustryStock.objects.filter(time_stamp_FK=self.request.user.current_time_stamp)
+        stock_list=IndustryStock.objects.filter(time_stamp_FK=self.request.user.current_simulation.current_time_stamp)
         context['stock_list']= stock_list
         return context
         
@@ -133,7 +139,7 @@ class TraceView(ListView):
     template_name='trace_list.html'    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        qs=Trace.objects.filter(user=self.request.user).order_by('real_time')
+        qs=Trace.objects.filter(simulation_FK=self.request.user.current_simulation).order_by('real_time')
         context['trace_list']=qs
         return context    
 
@@ -271,3 +277,23 @@ class SimulationDeleteView(LoginRequiredMixin, DeleteView):
     model=Simulation
     template_name='simulation_confirm_delete.html'
     success_url=reverse_lazy("user-dashboard")
+
+def simulationRestartView(request,pk):
+    user=request.user
+    simulation=user.current_simulation
+    #! Find the first time stamp in the simulation. Its period will be 0
+    first_time_stamp=TimeStamp.objects.get(user=user,simulation_FK=simulation,period=0)
+    logger.info(f"User {request.user} is restarting simulation {request.user.current_simulation}")
+    logger.info(f"The time stamp is {first_time_stamp}")
+    try:
+        Commodity.objects.filter(user=user,user__current_simulation=simulation).exclude(time_stamp_FK=first_time_stamp).delete()
+        StockOwner.objects.filter(user=user,user__current_simulation=simulation).exclude(time_stamp_FK=first_time_stamp).delete()
+        Stock.objects.filter(user=user,user__current_simulation=simulation).exclude(time_stamp_FK=first_time_stamp).delete()
+        Trace.objects.filter(user=user,user__current_simulation=simulation).exclude(time_stamp_id=first_time_stamp.time_stamp).delete()
+        TimeStamp.objects.filter(user=user,user__current_simulation=simulation).exclude(time_stamp=first_time_stamp.time_stamp).delete()
+        simulation.current_time_stamp=first_time_stamp
+        simulation.save()
+    except Exception as error:
+        logger.info(f"Failed to restart a simulation because {error}")
+        messages.info(request, f"Failed to restart a simulation because {error}")
+    return HttpResponseRedirect(reverse("user-dashboard"))      

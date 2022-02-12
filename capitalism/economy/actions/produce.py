@@ -58,18 +58,18 @@ def producers(user):
 #! if it does, to prevent negative stocks
     Trace.enter(user,0,"Start Producing")
     #! establish the scale at which production is possible, given the stocks available
-    for industry in Industry.objects.filter(time_stamp_FK=user.current_time_stamp):
+    for industry in Industry.objects.filter(time_stamp_FK=user.current_simulation.current_time_stamp):
         ratio=industry.scale_output()
         Trace.enter(user,1,f"{industry}'s output will be scaled by {ratio} and so will produce {industry.output_scale} units of {industry.commodity_FK.name}")
 #! For each industry, carry out production
-    for industry in Industry.objects.filter(time_stamp_FK=user.current_time_stamp):
+    for industry in Industry.objects.filter(time_stamp_FK=user.current_simulation.current_time_stamp):
         produce(industry, user.current_simulation)
         industry.save()
     Commodity.set_commodity_sizes(user=user)
-    set_current_capital(user=user)    
+    set_current_capital(simulation=user.current_simulation)    
 
 def prices(user):
-    set_total_value_and_price(user=user)
+    set_total_value_and_price(simulation=user.current_simulation)
 
 #! Production determines output values and prices
 #! Once we have a sophisticated pricing model, prices will change as a result of reproduction (in response to demand, etc)
@@ -82,18 +82,18 @@ def reproduce(user):
     simulation=user.current_simulation
     periods_per_year=simulation.periods_per_year
     Trace.enter(user,0,f"Social Consumption")
-    classes=SocialClass.objects.filter(time_stamp_FK=user.current_time_stamp)
+    classes=SocialClass.objects.filter(time_stamp_FK=user.current_simulation.current_time_stamp)
     for social_class in classes:
         Trace.enter(user,1, f"Social Class {social_class.name}")
         #! consumption determined by population and consumption ratio (and periods per year)
         #! (re-)production determined by participation_ratio (and periods per year)
         #! Both constrained by the stock at their disposal but more simply than for industries
 
-        consumption_stocks=SocialStock.objects.filter(time_stamp_FK=user.current_time_stamp, social_class_FK=social_class,usage_type=CONSUMPTION)
+        consumption_stocks=SocialStock.objects.filter(time_stamp_FK=user.current_simulation.current_time_stamp, social_class_FK=social_class,usage_type=CONSUMPTION)
         if consumption_stocks.count()<1:
             Trace.enter(user,0,f"consumption stock of {social_class} does not exist")
 
-        sales_stocks=SocialStock.objects.filter(time_stamp_FK=user.current_time_stamp, social_class_FK=social_class,usage_type=SALES)
+        sales_stocks=SocialStock.objects.filter(time_stamp_FK=user.current_simulation.current_time_stamp, social_class_FK=social_class,usage_type=SALES)
         if sales_stocks.count()<1:
             Trace.enter(user,0,f"Sales stock of {social_class} does not exist")
         elif sales_stocks.count()>1:

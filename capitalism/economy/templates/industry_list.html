@@ -8,6 +8,8 @@
             <th>Industry</th>
             <th>Sales Stocks</th>
             <th>Money Stocks</th>
+            <th>Initial Capital</th>
+            <th>Current Capital</th>
             <th>Scale</th>
             <th>Growth Rate</th>
         </tr>
@@ -20,6 +22,8 @@
             <td> {{ record.name }}</td>
             <td> {{ record.industrystock_set.all|sales_filter }} </td>
             <td> {{ record.industrystock_set.all|money_filter }} </td>
+            <td> {{ record.initial_capital }}</td>
+            <td> {{ record.current_capital }}</td>
             <td> {{ record.output_scale }}</td>
             <td> {{ record.output_growth_rate }}</td>
         </tr>

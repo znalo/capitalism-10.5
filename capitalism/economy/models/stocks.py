@@ -43,6 +43,10 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
         return self.commodity_FK.name
 
     @property
+    def display_order(self):
+        return self.commodity_FK.display_order
+
+    @property
     def old_size(self):
         if self.comparator_stock==None:
             return -1
@@ -66,7 +70,7 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
 
     @property
     def current_query_set(self):
-        return Stock.objects.filter(self.user.current_time_stamp)
+        return Stock.objects.filter(self.user.current_simulation.current_time_stamp)
 
 class IndustryStock(Stock):
     industry_FK = models.ForeignKey("Industry", on_delete=models.CASCADE, null=True) #TODO redundant? the base class has stock_owner_FK
@@ -87,6 +91,7 @@ class SocialStock(Stock):
     class Meta:
         verbose_name = 'Social Stock'
         verbose_name_plural = 'Social Stocks'
+        ordering = ['commodity_FK__display_order']        
 
     def __str__(self):
         return f"[Project {self.time_stamp_FK.simulation_FK.project_number}] [Class {self.social_class_FK.name}] [Commodity: {self.commodity_FK.name}] [Usage Type: {self.usage_type}]"

@@ -65,7 +65,7 @@ class Industry(StockOwner):
 
     @property
     def current_queryset(self):
-        return Industry.objects.filter(time_stamp_FK=self.user.current_time_stamp)
+        return Industry.objects.filter(time_stamp_FK=self.user.current_simulation.current_time_stamp)
 
     # @property
     # def productive_stocks(self):
@@ -78,7 +78,7 @@ class Industry(StockOwner):
         logger.info(f"Calculating replenishment cost for industry {self}")
         Trace.enter(self.user,3,f"Processing industry {Trace.sim_object(self.name)}")
         cost=0
-        productive_stocks=IndustryStock.objects.filter(usage_type=PRODUCTION,time_stamp_FK=self.user.current_time_stamp,stock_owner_FK=self)
+        productive_stocks=IndustryStock.objects.filter(usage_type=PRODUCTION,time_stamp_FK=self.user.current_simulation.current_time_stamp,stock_owner_FK=self)
         for stock in productive_stocks:
             logger.info (f"Stock {stock} has generated an additional cost of {stock.monetary_demand}")
             cost+=stock.monetary_demand
@@ -142,7 +142,7 @@ class SocialClass(StockOwner):
 
     @property
     def current_queryset(self):
-        return SocialClass.objects.filter(time_stamp_FK=self.user.current_time_stamp)
+        return SocialClass.objects.filter(time_stamp_FK=self.user.current_simulation.current_time_stamp)
 
     def consumption_stocks(self):
         qs=SocialStock.objects.socialstock_set.filter(time_stamp_FK=self.time_stamp_FK,usage_type=CONSUMPTION,industry_FK=self)
