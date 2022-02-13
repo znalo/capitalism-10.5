@@ -74,17 +74,18 @@ class Industry(StockOwner):
     #! calculate how much it will cost to purchase sufficient stocks for this industry to produce at its current scale
     @property
     def replenishment_cost(self):
+        simulation=self.user.simulation
         #! Requires that demand is correctly set - this must be provided for by the caller 
         logger.info(f"Calculating replenishment cost for industry {self}")
-        Trace.enter(self.user,3,f"Processing industry {Trace.sim_object(self.name)}")
+        Trace.enter(simulation,3,f"Processing industry {Trace.sim_object(self.name)}")
         cost=0
         productive_stocks=IndustryStock.objects.filter(usage_type=PRODUCTION,time_stamp_FK=self.user.current_simulation.current_time_stamp,stock_owner_FK=self)
         for stock in productive_stocks:
             logger.info (f"Stock {stock} has generated an additional cost of {stock.monetary_demand}")
             cost+=stock.monetary_demand
             logger.info (f"The cumulative total cost to the industry is now {cost}")
-            Trace.enter(self.user,4,f"Industry {Trace.sim_object(self.name)} needs ${Trace.sim_quantity(stock.monetary_demand)} to replenish its stock of {Trace.sim_object(stock.commodity_name)}")
-        Trace.enter(self.user,3,f"The total money required by industry {Trace.sim_object(self.name)} is {cost}")
+            Trace.enter(simulation,4,f"Industry {Trace.sim_object(self.name)} needs ${Trace.sim_quantity(stock.monetary_demand)} to replenish its stock of {Trace.sim_object(stock.commodity_name)}")
+        Trace.enter(simulation,3,f"The total money required by industry {Trace.sim_object(self.name)} is {cost}")
         return cost
 
     @property

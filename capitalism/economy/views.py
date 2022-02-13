@@ -1,4 +1,5 @@
 from .forms import SimulationCreateForm, SimulationSelectForm, SimulationDeleteForm
+from .actions.control import step_execute
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django import forms
 from django.shortcuts import render
@@ -153,6 +154,15 @@ class SimulationView(ListView):
         context['simulation_list']= simulation_list
 
         return context    
+
+#! Executes a single step and then renders the economy
+def step_execute_and_display(request,act):
+    try:
+        step_execute(request=request,act=act)
+    except Exception as error:
+        logger.error(f"could not execute the action {act} because {error}")
+        messages.error(request=request,message=f"could not carry out the step {act} because {error}")
+    return get_economy_view_context(request=request)
 
 def landingPage(request):
     user=request.user

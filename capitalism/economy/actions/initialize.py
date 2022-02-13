@@ -99,7 +99,7 @@ def initialize(request):
         s.save()
         #! Create an initial Trace object to mark the start of the simulation
         #! We cannot use 'Trace.enter' because the user's current_simulation has not yet been defined
-        Trace.enter_for_simulation(s,0,"INITIALISING")
+        Trace.enter(s,0,"INITIALISING")
 
 #! Commodities
     Commodity.objects.filter(user=logged_in_user).delete()

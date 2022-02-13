@@ -17,21 +17,21 @@ from ..global_constants import *
 #? that is, they function as credit instruments
 #? but if there is a family owner, it's more moot. Basically, they have credit (it's called "capital" by the accountants) but it is not monetised
 
-def revenue(user):
-    Trace.enter(user,0,"Calculate capitalist revenue and other property-based entitlements")
-    for industry in Industry.objects.filter(time_stamp_FK=user.current_simulation.current_time_stamp):
-        Trace.enter(user,2,f"Industry {Trace.sim_object(industry.name)} has made a profit of {Trace.sim_quantity(industry.profit)} which will be transferred to the capitalists")
+def calculate_revenue(simulation):
+    current_time_stamp=simulation.current_time_stamp
+    Trace.enter(simulation,0,"Calculate capitalist revenue and other property-based entitlements")
+    for industry in Industry.objects.filter(time_stamp_FK=current_time_stamp):
+        Trace.enter(simulation,2,f"Industry {Trace.sim_object(industry.name)} has made a profit of {Trace.sim_quantity(industry.profit)} which will be transferred to the capitalists")
         donor_money_stock=industry.money_stock
-        recipient=SocialClass.objects.get(time_stamp_FK=user.current_simulation.current_time_stamp, name="Capitalists")
-        Trace.enter(user,2,f"This will go to {Trace.sim_object(recipient.name)}")
+        recipient=SocialClass.objects.get(time_stamp_FK=current_time_stamp, name="Capitalists")
+        Trace.enter(simulation,2,f"This will go to {Trace.sim_object(recipient.name)}")
         recipient_money_stock=recipient.money_stock
         donor_money_stock.size-=industry.profit
         recipient_money_stock.size+=industry.profit
         donor_money_stock.save()
         recipient_money_stock.save()
 
-
-#! Here, the capitalists decide what to do with their money
+#! In the 'invest' step, the capitalists decide what to do with their money
 #! There are two fundamentally different simulation scenarios which go to the heart of the divisions in economics
 #! that have been around since Say and Proudhon
 
@@ -83,38 +83,40 @@ def revenue(user):
 #! Then explore the effect of supply shortages using the simulation itself.
 
 
-def invest(user):
-    calculate_demand(user=user) #! this is required if we are to estimate correctly the replenishment cost
-    capitalists=SocialClass.objects.get(time_stamp_FK=user.current_simulation.current_time_stamp, name="Capitalists")    
-    industries=Industry.objects.filter(time_stamp_FK=user.current_simulation.current_time_stamp)
-    Trace.enter(user,1, f"Calculate input costs to continue producing at current scales")
+def calculate_investment(simulation):
+    current_time_stamp=simulation.current_time_stamp
+    calculate_demand(simulation=simulation) #! this is required if we are to estimate correctly the replenishment cost
+    capitalists=SocialClass.objects.get(time_stamp_FK=current_time_stamp, name="Capitalists")    
+    industries=Industry.objects.filter(time_stamp_FK=current_time_stamp)
+    Trace.enter(simulation,1, f"Calculate input costs to continue producing at current scales")
     for industry in industries:
         cost=industry.replenishment_cost
-        Trace.enter(user,1, f"{Trace.sim_object(industry.name)} needs {Trace.sim_quantity(cost)} to produce at its current scale of {Trace.sim_quantity(industry.output_scale)}")
+        Trace.enter(simulation,1, f"{Trace.sim_object(industry.name)} needs {Trace.sim_quantity(cost)} to produce at its current scale of {Trace.sim_quantity(industry.output_scale)}")
         #! just give them the money
         capitalists_money=capitalists.money_stock
         industry_money=industry.money_stock
         transferred_amount=cost-industry_money.size
-        Trace.enter(user,1, f"{Trace.sim_object(industry.name)} already has {Trace.sim_quantity(industry_money.size)} and will receive {Trace.sim_quantity(transferred_amount)}")
+        Trace.enter(simulation,1, f"{Trace.sim_object(industry.name)} already has {Trace.sim_quantity(industry_money.size)} and will receive {Trace.sim_quantity(transferred_amount)}")
         capitalists_money.size-=transferred_amount
         industry_money.size+=transferred_amount
         industry_money.save()
         capitalists_money.save()
-    set_initial_capital(simulation=user.current_simulation) #! as soon as we are ready for the next circuit, we should reset the initial capital
+    set_initial_capital(simulation=simulation) #! as soon as we are ready for the next circuit, we should reset the initial capital
 
 #! Not in current use, preserved here because we may want it.
-def effective_demand(user):
+def effective_demand(simulation):
+    current_time_stamp=simulation.current_time_stamp
     total_monetarily_effective_demand=0
-    for commodity in Commodity.objects.filter(time_stamp_FK=user.current_simulation.current_time_stamp):
+    for commodity in Commodity.objects.filter(time_stamp_FK=current_time_stamp):
         commodity.monetarily_effective_demand=commodity.demand*commodity.unit_price
-        Trace.enter(user,1,f"Evaluating money demand from {commodity.name} of origin {commodity.origin}; demand ={commodity.monetarily_effective_demand}")
+        Trace.enter(simulation,1,f"Evaluating money demand from {commodity.name} of origin {commodity.origin}; demand ={commodity.monetarily_effective_demand}")
         if commodity.origin=="INDUSTRIAL": #! filter didn't work, TODO we found out why, change the code
             total_monetarily_effective_demand+=commodity.monetarily_effective_demand
             commodity.save()
-    Trace.enter(user,1,f"Total money demand is {Trace.sim_object(total_monetarily_effective_demand)}")
+    Trace.enter(simulation,1,f"Total money demand is {Trace.sim_object(total_monetarily_effective_demand)}")
     for commodity in Commodity.current_queryset():
         if commodity.origin=="INDUSTRIAL": #! filter didn't work, TODO we found out why, change the code
             commodity.investment_proportion=commodity.monetarily_effective_demand/total_monetarily_effective_demand
-            Trace.enter(user,2,f"Investment proportion for {Trace.sim_object(commodity.name)} is {Trace.sim_quantity(commodity.investment_proportion)}")
+            Trace.enter(simulation,2,f"Investment proportion for {Trace.sim_object(commodity.name)} is {Trace.sim_quantity(commodity.investment_proportion)}")
             commodity.save()
 

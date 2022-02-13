@@ -43,8 +43,9 @@ class Commodity(models.Model):
             return comparator_qs.first()
 
     def set_commodity_size(self):
+        simulation=self.user.current_simulation
         from .stocks import Stock #! have to do this here to avoid circular import. TODO not very happy with this
-        Trace.enter(self.user,1,f"Recaculating the size of commodity {self.name}; currently this is {self.size} ")
+        Trace.enter(simulation,1,f"Recaculating the size of commodity {self.name}; currently this is {self.size} ")
         current_time_stamp=self.user.current_simulation.current_time_stamp
         stocks=Stock.objects.filter(commodity_FK=self,time_stamp_FK=current_time_stamp) 
         #! TODO What a mess
@@ -54,7 +55,7 @@ class Commodity(models.Model):
             size+=stock.size
         self.size=size
         self.save()
-        Trace.enter(self.user,2,f"Commodity {Trace.sim_object(self.name)} size is {Trace.sim_quantity(size)} ")
+        Trace.enter(simulation,2,f"Commodity {Trace.sim_object(self.name)} size is {Trace.sim_quantity(size)} ")
 
     @property
     def comparator_demand(self):
@@ -66,7 +67,8 @@ class Commodity(models.Model):
 
     @staticmethod
     def set_commodity_sizes(user):
-        Trace.enter(user,1,f"Recalculating all commodity sizes for user {user}")
+        simulation=user.simulation
+        Trace.enter(simulation,1,f"Recalculating all commodity sizes for user {user}")
         logger.info(f"Recalculating all commodity sizes for user {user}")
         commodities=Commodity.objects.filter(time_stamp_FK=user.current_simulation.current_time_stamp)
         for commodity in commodities:

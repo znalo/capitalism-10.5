@@ -35,7 +35,7 @@
     <thead>
         <tr>
             <th>Created</th>
-            <th>Simulation</th>
+            <th>Simulation [id]</th>
             <th>Period.Stage.Step[stamp]</th>
             <th>Message</th>
         </tr>
@@ -45,7 +45,7 @@
         <tr class="toggle-level{{trace.level}}">
             <td>{{ trace.real_time }} </td>
             <td>{{ trace.simulation_FK }} </td>
-            <td>{{ trace.period }}.{{ trace.stage }}.{{ trace.step }}[{{ trace.user.current_simulation.current_time_stamp.id }}]</td>
+            <td>{{ trace.period }}.{{ trace.stage }}.{{ trace.step }}[{{ trace.simulation_FK.current_time_stamp.id }}]</td>
             <td class="pl-{{trace.level}}"><span class="trace-level{{trace.level}}">{{trace.message|mark_as_safe }}</span> </td>
         </tr>
         {% endfor %}

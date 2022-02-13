@@ -15,19 +15,7 @@ class Trace(models.Model):
     message = models.CharField(max_length=250, null=False)
 
     @staticmethod
-    def enter(user, level, message): 
-        try:
-            current_time_stamp = user.current_simulation.current_time_stamp
-            stamp_number = current_time_stamp.time_stamp
-            current_step = current_time_stamp.step
-            project_id = current_time_stamp.simulation_FK.project_number
-            this_entry = Trace(simulation_FK=user.current_simulation, time_stamp_id=stamp_number, period=current_time_stamp.period, stage=current_time_stamp.stage, step=current_step, project_id=project_id,level=level, message=(message))
-            this_entry.save()
-        except Exception as error:
-            logger.error(f"Could not make a trace entry because {error}, for message {message}")
-
-    @staticmethod
-    def enter_for_simulation(simulation, level, message): #!TODO this should replace Trace.enter
+    def enter(simulation, level, message): 
         try:
             current_time_stamp = simulation.current_time_stamp
             stamp_number = current_time_stamp.time_stamp
@@ -37,8 +25,6 @@ class Trace(models.Model):
             this_entry.save()
         except Exception as error:
             logger.error(f"Could not make a trace entry because {error}, for message {message}")
-
-
 
     @staticmethod
     def sim_object(value):
