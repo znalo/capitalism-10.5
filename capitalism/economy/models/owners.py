@@ -10,7 +10,7 @@ class StockOwner(models.Model): # Base class for Industry and Social Class
     name = models.CharField(max_length=50, default=UNDEFINED)
     commodity_FK = models.ForeignKey(Commodity, related_name='%(app_label)s_%(class)s_related', on_delete=models.CASCADE)
     stock_owner_type=models.CharField(max_length=20,choices=STOCK_OWNER_TYPES,default=UNDEFINED)
-    simulation = models.ForeignKey(Simulation, on_delete=models.CASCADE, null=True)
+    simulation = models.ForeignKey(Simulation, on_delete=models.CASCADE)
 
     class meta:     #! helps view the objects in time stamp order in admin
         ordering = ['time_stamp_FK.time_stamp']

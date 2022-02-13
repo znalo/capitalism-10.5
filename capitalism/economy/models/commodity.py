@@ -22,7 +22,7 @@ class Commodity(models.Model):
     tooltip = models.CharField(max_length=50, default=UNDEFINED)
     monetarily_effective_demand=models.FloatField(default=0)
     investment_proportion=models.FloatField(default=0)
-    simulation = models.ForeignKey(Simulation, on_delete=models.CASCADE, null=True, default=None)
+    simulation = models.ForeignKey(Simulation, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Commodity'
