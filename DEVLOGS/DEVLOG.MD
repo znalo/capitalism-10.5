@@ -31,3 +31,4 @@ Fixed problem that Trace table displays only partially
 ## 11 February Commit Cleaner Dashboard with delete simulation facility
 ## 12 February Commit Project 4 (two consumption goods) now seems to run all the way through. Improved reporting
 ## 13 February Commit Halfway House to refactoring in which objects are owned by simulations, not users. Saved at this point because, well, it's working
+## 13 February Commit Yet Another Halfway House. All objects are now owned by the simulation except the Time Stamp, but have funky defaults

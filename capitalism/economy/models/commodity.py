@@ -1,5 +1,5 @@
 from django.db import models
-from .states import TimeStamp, User
+from .states import TimeStamp, Simulation
 from ..global_constants import ORIGIN_CHOICES, USAGE_CHOICES, UNDEFINED, logger
 from .report import Trace
 
@@ -22,7 +22,7 @@ class Commodity(models.Model):
     tooltip = models.CharField(max_length=50, default=UNDEFINED)
     monetarily_effective_demand=models.FloatField(default=0)
     investment_proportion=models.FloatField(default=0)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    simulation = models.ForeignKey(Simulation, on_delete=models.CASCADE, null=True)
 
     class Meta:
         verbose_name = 'Commodity'
@@ -43,10 +43,10 @@ class Commodity(models.Model):
             return comparator_qs.first()
 
     def set_commodity_size(self):
-        simulation=self.user.current_simulation
+        simulation=self.simulation
+        current_time_stamp=simulation.current_time_stamp
         from .stocks import Stock #! have to do this here to avoid circular import. TODO not very happy with this
         Trace.enter(simulation,1,f"Recaculating the size of commodity {self.name}; currently this is {self.size} ")
-        current_time_stamp=self.user.current_simulation.current_time_stamp
         stocks=Stock.objects.filter(commodity_FK=self,time_stamp_FK=current_time_stamp) 
         #! TODO What a mess
         #! TODO can we resolve this mess by converting all related querysets into methods of the relevant objects

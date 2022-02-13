@@ -142,8 +142,7 @@ def calculate_trade(simulation):
     set_current_capital(simulation=simulation)
 
 def sale(seller_stock, buyer_stock, seller, buyer):
-    user=seller.user #! TODO we might want to have a little consistency check that all objects have the same user
-    simulation=user.current_simulation
+    simulation=seller.simulation
     transferred_stock=min(buyer_stock.demand,seller_stock.supply)
     commodity=buyer_stock.commodity_FK
     cost=transferred_stock*commodity.unit_price

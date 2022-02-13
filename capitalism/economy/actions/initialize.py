@@ -16,7 +16,6 @@ from django.urls import reverse
 #! The admin user is responsible for ensuring that simulations are not 'orphaned' thereby.
 #! If this should happen, the simulations will still exist and function, but the user may lose track of which is which
 #! TODO make this more foolproof
-
 def initialize_projects(request):
     logged_in_user=request.user
     logger.info(f"Initialise project table {logged_in_user}")
@@ -55,11 +54,11 @@ def initialize(request):
         return
 
 #! Clear the decks
-    Trace.objects.filter(simulation_FK=logged_in_user.current_simulation).delete()
+    Trace.objects.filter(simulation_FK__user=logged_in_user).delete()
     Simulation.objects.filter(user=logged_in_user).delete()
-    Commodity.objects.filter(user=logged_in_user).delete()
-    Stock.objects.filter(user=logged_in_user).delete()
-    StockOwner.objects.filter(user=logged_in_user).delete()
+    Commodity.objects.filter(simulation__user=logged_in_user).delete()
+    Stock.objects.filter(simulation__user=logged_in_user).delete()
+    StockOwner.objects.filter(simulation__user=logged_in_user).delete()
     TimeStamp.objects.filter(user=logged_in_user).delete()
 
 #! Simulations
@@ -102,7 +101,6 @@ def initialize(request):
         Trace.enter(s,0,"INITIALISING")
 
 #! Commodities
-    Commodity.objects.filter(user=logged_in_user).delete()
     file_name = staticfiles_storage.path('data/commodities.csv')    
     logger.info( f"Reading commodities from {file_name}")
     df = pd.read_csv(file_name)
@@ -124,19 +122,18 @@ def initialize(request):
             display_order=row.display_order,
             image_name=row.image_name,
             tooltip=row.tooltip,
-            user=logged_in_user,
+            simulation=simulation,
         )
         commodity.save()
     
 #!Industries
-    Industry.objects.filter(user=logged_in_user).delete()
     file_name = staticfiles_storage.path('data/industries.csv')    
     logger.info( f"Reading industries from {file_name}")
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
         simulation=Simulation.objects.get(project_number=row.project,user=logged_in_user)
         time_stamp=TimeStamp.objects.get(simulation_FK=simulation, user=logged_in_user)
-        commodity=Commodity.objects.get(time_stamp_FK=time_stamp, name=row.commodity_name, user=logged_in_user)
+        commodity=Commodity.objects.get(time_stamp_FK=time_stamp, name=row.commodity_name, simulation=simulation)
         logger.info(f"Creating Industry {(row.industry_name)} with output {commodity} for simulation {simulation} with time stamp {time_stamp} on behalf of user {logged_in_user} ")
         industry = Industry(
             time_stamp_FK=time_stamp,
@@ -148,12 +145,11 @@ def initialize(request):
             stock_owner_type=INDUSTRY,
             initial_capital=0,
             work_in_progress=0,
-            user=logged_in_user,
+            simulation=simulation,
         )
         industry.save()
 
 #! Social Classes
-    SocialClass.objects.filter(user=logged_in_user).delete()
     file_name = staticfiles_storage.path('data/social_classes.csv')
     logger.info( f"Reading social classes from {file_name}")
     df = pd.read_csv(file_name)
@@ -164,13 +160,13 @@ def initialize(request):
         social_class = SocialClass(
             time_stamp_FK=time_stamp,
             name=row.social_class_name,
-            commodity_FK=Commodity.objects.get(time_stamp_FK=time_stamp, name="Labour Power", user=logged_in_user),
+            commodity_FK=Commodity.objects.get(time_stamp_FK=time_stamp, name="Labour Power", simulation=simulation),
             stock_owner_type=SOCIAL_CLASS,
             population=row.population,
             participation_ratio=row.participation_ratio,
             consumption_ratio=row.consumption_ratio,
             revenue=row.revenue,
-            user=logged_in_user,
+            simulation=simulation,
         )
         social_class.save()
 
@@ -183,8 +179,8 @@ def initialize(request):
         simulation=Simulation.objects.get(project_number=row.project,user=logged_in_user)
         time_stamp=TimeStamp.objects.get(simulation_FK=simulation, user=logged_in_user)
         if row.owner_type == "CLASS":
-            social_class=SocialClass.objects.get(time_stamp_FK=time_stamp, name=row.name,user=logged_in_user)
-            commodity=Commodity.objects.get(time_stamp_FK=time_stamp, name=row.commodity, user=logged_in_user)
+            social_class=SocialClass.objects.get(time_stamp_FK=time_stamp, name=row.name,simulation=simulation)
+            commodity=Commodity.objects.get(time_stamp_FK=time_stamp, name=row.commodity, simulation=simulation)
             logger.info(f"Creating a stock of commodity {(commodity.name)} of usage type {row.stock_type} for class {(social_class.name)} in simulation {simulation} on behalf of user {logged_in_user}")
             social_stock = SocialStock(
                 time_stamp_FK=time_stamp,
@@ -198,13 +194,13 @@ def initialize(request):
                 size=row.quantity,
                 demand=0,
                 supply=0,
-                user=logged_in_user,
+                simulation=simulation,
             )
             
             social_stock.save()
         elif row.owner_type == "INDUSTRY":
-            industry=Industry.objects.get(time_stamp_FK=time_stamp, name=row.name, user=logged_in_user)
-            commodity=Commodity.objects.get(time_stamp_FK=time_stamp, name=row.commodity, user=logged_in_user)
+            industry=Industry.objects.get(time_stamp_FK=time_stamp, name=row.name, simulation=simulation)
+            commodity=Commodity.objects.get(time_stamp_FK=time_stamp, name=row.commodity, simulation=simulation)
             logger.info(f"Creating a stock of {(commodity.name)} of usage type {row.stock_type} for industry {(industry.name)}")
             industry_stock = IndustryStock(
                 time_stamp_FK=time_stamp,
@@ -218,16 +214,16 @@ def initialize(request):
                 size=row.quantity,
                 demand=0,
                 supply=0,
-                user=logged_in_user,
+                simulation=simulation,
             )
             industry_stock.save()
         else:
             logger.error(f"Unknown user type {row.owner_type}")
 
     #! Create initial values, prices and capitals for all simulations iof this user
-    for sim in Simulation.objects.filter(user=logged_in_user):
-        set_total_value_and_price(simulation=sim)
-        set_initial_capital(simulation=sim)
+    for simulation in Simulation.objects.filter(user=logged_in_user):
+        set_total_value_and_price(simulation=simulation)
+        set_initial_capital(simulation=simulation)
 
 #! set the user up to point to project 1
     simulation=Simulation.objects.get(user=logged_in_user, project_number=1)

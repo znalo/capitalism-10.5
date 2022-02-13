@@ -1,5 +1,5 @@
 from django.db import models
-from .states import TimeStamp, User
+from .states import TimeStamp, Simulation
 from .commodity import Commodity
 from ..global_constants import *
 
@@ -17,7 +17,7 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
     demand=models.FloatField( default=0)
     supply=models.FloatField( default=0)
     monetary_demand=models.FloatField(default=0) #! Convenience field - should normally be simply set to demand * commodity.unit_price
-    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    simulation = models.ForeignKey(Simulation, on_delete=models.CASCADE, null=True, default=None)
 
     class meta:     #! helps view the objects in time stamp order in admin
         ordering = ['time_stamp_FK.time_stamp']

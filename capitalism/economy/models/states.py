@@ -1,7 +1,8 @@
 from django.db import models
 from economy.global_constants import *
 from django.contrib.auth.models import AbstractUser
-from django.contrib import messages
+from django.contrib.auth.models import User
+
 
 class User(AbstractUser):
     #! The time_stamp object has a foreign key relation to the user, because there are many stamps in a simulation
@@ -52,7 +53,7 @@ class Project(models.Model):
 
 class Simulation(models.Model):
     name=models.CharField(max_length=50,null=False,default = UNDEFINED)
-    current_time_stamp= models.OneToOneField("TimeStamp", related_name="time_stamp_simulation", on_delete=models.SET_NULL, blank=True, null=True, default=None)
+    current_time_stamp= models.OneToOneField("TimeStamp", on_delete=models.SET_NULL, blank=True, null=True, default=None)
     project_number = models.IntegerField(default=1) #! We don't have a foreign key to the project because the admin might need to rebuild the project table
     periods_per_year=models.IntegerField(default=1)
     population_growth_rate = models.IntegerField(default=1)

@@ -296,11 +296,11 @@ def simulationRestartView(request,pk):
     logger.info(f"User {request.user} is restarting simulation {request.user.current_simulation}")
     logger.info(f"The time stamp is {first_time_stamp}")
     try:
-        Commodity.objects.filter(user=user,user__current_simulation=simulation).exclude(time_stamp_FK=first_time_stamp).delete()
-        StockOwner.objects.filter(user=user,user__current_simulation=simulation).exclude(time_stamp_FK=first_time_stamp).delete()
-        Stock.objects.filter(user=user,user__current_simulation=simulation).exclude(time_stamp_FK=first_time_stamp).delete()
-        Trace.objects.filter(user=user,user__current_simulation=simulation).exclude(time_stamp_id=first_time_stamp.time_stamp).delete()
-        TimeStamp.objects.filter(user=user,user__current_simulation=simulation).exclude(time_stamp=first_time_stamp.time_stamp).delete()
+        Commodity.objects.filter(simulation=simulation).exclude(time_stamp_FK=first_time_stamp).delete()
+        StockOwner.objects.filter(simulation=simulation).exclude(time_stamp_FK=first_time_stamp).delete()
+        Stock.objects.filter(simulation=simulation).exclude(time_stamp_FK=first_time_stamp).delete()
+        Trace.objects.filter(simulation=simulation).exclude(time_stamp_id=first_time_stamp.time_stamp).delete()
+        TimeStamp.objects.filter(simulation=simulation).exclude(time_stamp=first_time_stamp.time_stamp).delete()
         simulation.current_time_stamp=first_time_stamp
         simulation.save()
     except Exception as error:
