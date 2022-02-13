@@ -27,7 +27,7 @@ def step_execute(request,act):
     Trace.enter(simulation, 0,f"Executing action {act}")
     logger.info(f"Preparing to execute step {act} in simulation {simulation} with time stamp {current_time_stamp} (id={current_time_stamp.id})")
     simulation.one_step()#! creates new timestamp, ready for the action
-    action(user=user) #! perform the action
+    action(simulation=simulation) #! perform the action
     next_step=STEPS[act].next_step
     current_time_stamp.step=next_step
     logger.info(f"The next planned action will be {current_time_stamp.step}")

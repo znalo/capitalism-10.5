@@ -9,50 +9,46 @@ from economy.models.report import Trace
 #! TODO a bit of DRY abstraction for the code lines that are repeated in every case below 
 #! TODO all these should be defined with respect to a simulation, not a user
 
-def revalue(user):
-    simulation=user.current_simulation
+def revalue(simulation):
     Trace.enter(simulation,1,"EVALUATE DEMAND AND SUPPLY")
-    logger.info(f"Calculate demand and supply in simulation {simulation} for user {user}")
+    logger.info(f"Calculate demand and supply in simulation {simulation} for user {simulation.user}")
     set_initial_capital(simulation=simulation)
     calculate_demand(simulation=simulation)
     calculate_supply(simulation=simulation)
 
-def allocate(user):
-    simulation=user.current_simulation
+def allocate(simulation):
     Trace.enter(simulation,1,"ALLOCATE SUPPLY")
-    logger.info(f"Allocate supply in simulation {simulation} for user {user}")
+    logger.info(f"Allocate supply in simulation {simulation} for user {simulation.user}")
     allocate_supply(simulation)
 
-def trade(user):
-    simulation=user.current_simulation
+def trade(simulation):
     Trace.enter(simulation,1,"TRADE")
-    logger.info(f"Trade in simulation {simulation} for user {user}")
+    logger.info(f"Trade in simulation {simulation} for user {simulation.user}")
     calculate_trade(simulation)
 
-def production(user):
-    simulation=user.current_simulation
+def production(simulation):
     Trace.enter(simulation,1,"PRODUCE")  
-    logger.info(f"Produce in simulation {simulation} for user {user}")
+    logger.info(f"Produce in simulation {simulation} for user {simulation.user}")
     calculate_production(simulation=simulation)
 
-def values_and_prices(user):
-    simulation=user.current_simulation
+def values_and_prices(simulation):
     Trace.enter(simulation,1,"PRICES AND VALUES ARISING FROM PRODUCTION")  
+    logger.info(f"Calculate values and prices in simulation {simulation} for user {simulation.user}")
     set_total_value_and_price(simulation=simulation)
 
-def reproduce(user):
-    simulation=user.current_simulation
+def reproduce(simulation):
     Trace.enter(simulation,1,"SOCIAL REPRODUCTION")  
+    logger.info(f"Social Reproduction in simulation {simulation} for user {simulation.user}")
     calculate_reproduction(simulation)
 
-def revenue(user):
-    simulation=user.current_simulation
+def revenue(simulation):
     Trace.enter(simulation,1,"REVENUES")  
+    logger.info(f"Calculate revenues in simulation {simulation} for user {simulation.user}")
     calculate_revenue(simulation)
 
-def invest(user):
-    simulation=user.current_simulation
+def invest(simulation):
     Trace.enter(simulation,1,"INVESTMENT")  
+    logger.info(f"Investment in simulation {simulation} for user {simulation.user}")
     calculate_investment(simulation)
 
 ACTION_LIST={
