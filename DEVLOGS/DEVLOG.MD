@@ -56,12 +56,16 @@ Then I will report here
 
 ## Commit Shoot the Tortoise
 Hey, it worked
-
  * No animals were injured in the course of this experiment
   * First, because it was a purely mental experiment
   * Second, because Tortoises have shells
 
 ## Commit The Tortoise has Landed
+
+Now for the big test which is an install on a new site
+We had to fix one line in the url file and the install worked
+
+## Commit ONE LAST CHANGE MADE AND IT WORKS
 
 
 

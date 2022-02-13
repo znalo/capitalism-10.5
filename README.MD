@@ -77,6 +77,8 @@ Too much money is allocated to industries in the distribution stage
 ## 12 February
   * Gradually moving all the activities associated with a user, to the current_simulation of a user
   * This is not quite complete, but got us to the point where we can run project 4 though we haven't fully checked the result
+## 13 February
+  * Check it out: [Capitalism 10.5](www.dascapital.org)
   
 
   
