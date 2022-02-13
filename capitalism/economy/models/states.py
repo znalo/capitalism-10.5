@@ -131,7 +131,6 @@ class TimeStamp(models.Model):
     period = models.IntegerField(default=1)
     comparator_time_stamp_FK = models.ForeignKey("TimeStamp", on_delete=models.DO_NOTHING, null=True, blank=True, default=None)
     melt = models.CharField(max_length=50, default=UNDEFINED)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
     @property
     def project_number(self):

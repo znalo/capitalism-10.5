@@ -217,7 +217,7 @@ def disclaimers(request):
 # TODO the action should ensure that this doesn't corrupt the existing users' simulations (see comments for 'initialize_projects')
 def rebuild_project_table(request):
     initialize_projects(request)
-    return render(request, 'dashboard.html')
+    return HttpResponseRedirect(reverse("landing-page"))    
 
 class AdminDashboard(ListView):
     model=User

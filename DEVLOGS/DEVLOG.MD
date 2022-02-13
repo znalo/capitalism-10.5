@@ -32,3 +32,28 @@ Fixed problem that Trace table displays only partially
 ## 12 February Commit Project 4 (two consumption goods) now seems to run all the way through. Improved reporting
 ## 13 February Commit Halfway House to refactoring in which objects are owned by simulations, not users. Saved at this point because, well, it's working
 ## 13 February Commit Yet Another Halfway House. All objects are now owned by the simulation except the Time Stamp, but have funky defaults
+
+Here's what we are trying to do. I'm going to call it the 'big bang' problem
+Everything works OK (ish) when the simulation is going
+But I need to be able to start the whole thing from scratch
+From scratch means
+  * Start with a clean database
+  * Delete all migrations
+  * Create a superuser
+  * Go
+
+Now, I've restricted the administrator to create the projects, which is a kind of set-up operation
+But, the database objects have no defaults, because nothing exists but they reference each other
+Now, the 'initialize' procedure creates all the objects in a rational order, so that is taken care of
+However, I don't like defining these objects with null=True and no default. This allows them to exist, for however short a halflife, in a corrupt state
+Therefore, I'd like to migrate them, on a new install, with no default and null=False
+
+First I will save everything with a commit called 'shoot the tortoise' which signifies there seems to be an infinite sequence of halfway houses but eventually I hope to get there
+Then I will delete the database
+Then I will change all the Simulation Foreign Keys so there is no null and no default
+Then I will see what happens
+Then I will report here
+
+## Commit Shoot the Tortoise
+
+
