@@ -38,7 +38,7 @@
             <th colspan="2">Industry</th>
             {% for stock in industry_headers %}
             <th colspan=2>
-                {{ stock.commodity_FK.name}}
+                {{ stock.commodity.name}}
             </th>
             {% endfor %}
             <th colspan=2>Other Assets</th>
@@ -65,8 +65,8 @@
         {% for industry in industries %}
         <tr>
             <td>{{ industry.name }}</td>
-            <td>{{ industry.commodity_FK.name }}</td>
-            {% for stock in productive_stocks %} {% if stock.industry_FK.name == industry.name %}
+            <td>{{ industry.commodity.name }}</td>
+            {% for stock in productive_stocks %} {% if stock.industry.name == industry.name %}
             <td class='dt-body-right'>
                 {{ stock.size|has_changed:stock.old_size}}
             </td>
@@ -154,7 +154,7 @@
         <tr>
             <td>{{social_class.name}}</td>
             <td>{{social_class.population}}</td>
-            {% for stock in consumption_stocks %} {% if stock.social_class_FK.name == social_class.name %}
+            {% for stock in consumption_stocks %} {% if stock.social_class.name == social_class.name %}
             <td class='dt-body-right'>
                 {{ stock.size|has_changed:stock.old_size}}
             </td>

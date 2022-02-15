@@ -6,13 +6,10 @@ from django.contrib.auth.models import User
 
 class User(AbstractUser):
     #! The time_stamp object has a foreign key relation to the user, because there are many stamps in a simulation
-    #! However, the User object also needs to know where it is in this simulation.
-    #! It therefore has a special field, current_time_stamp, that represents the current state of the simulation
-    #! A complication is that we cannot cascade this field. 
-    #! This is because, when the data is completely re-initialized, all the timestamps pointing to the user are deleted.
-    #! This would include the current_time_stamp. If we cascaded the relation, the user would get deleted.
-    #! For the same reason, current_time_stamp allows blank and null (and when deleted, this field is set to null)
-    #! TODO there is probably a more foolproof way to deal with this.
+    #! However, the User object also needs to know which simulation it is currently connected to
+    #! It therefore has a special field, current_simulation, that represents the simulation. We cannot cascade this field. 
+    #! This is because, when the data is completely re-initialized, all the simulations owned by this user are deleted whether or not they are current
+    #! (via the user attribute of the Simulation object) This would include the current simulation
     current_simulation=models.OneToOneField("Simulation", related_name="simulation_user", on_delete=models.SET_NULL,blank=True, null=True, default=None) 
 
     @property
@@ -156,102 +153,102 @@ class TimeStamp(models.Model):
         from .stocks import IndustryStock, SocialStock
         from .owners import Industry, SocialClass
 
-        industries = Industry.objects.filter(time_stamp_FK=source_time_stamp)
+        industries = Industry.objects.filter(time_stamp=source_time_stamp)
         for industry in industries:
-            industry.time_stamp_FK = self
+            industry.time_stamp = self
             industry.pk = None
             industry.id = None
             industry.save()
-            logger.info(f"Created a new Industry record {(industry.name)} with time stamp {industry.time_stamp_FK.time_stamp} which will contain the results of action {industry.time_stamp_FK.step}")
+            logger.info(f"Created a new Industry record {(industry.name)} with time stamp {industry.time_stamp.time_stamp} which will contain the results of action {industry.time_stamp.step}")
 
-        commodities = Commodity.objects.filter(time_stamp_FK=source_time_stamp)
+        commodities = Commodity.objects.filter(time_stamp=source_time_stamp)
         for commodity in commodities:
             commodity.pk = None
             commodity.id = None
-            commodity.time_stamp_FK = self
+            commodity.time_stamp = self
             commodity.save()
-            logger.info(f"Created a new Commodity record {(commodity.name)} with time stamp {commodity.time_stamp_FK.time_stamp} which will contain the results of action {commodity.time_stamp_FK.step}")
+            logger.info(f"Created a new Commodity record {(commodity.name)} with time stamp {commodity.time_stamp.time_stamp} which will contain the results of action {commodity.time_stamp.step}")
 
         social_classes = SocialClass.objects.filter(
-            time_stamp_FK=source_time_stamp)
+            time_stamp=source_time_stamp)
         for social_class in social_classes:
             social_class.pk = None
             social_class.id = None
-            social_class.time_stamp_FK = self
+            social_class.time_stamp = self
             social_class.save()
-            logger.info(f"Created a new Social Class record {(social_class.name)} with time stamp {social_class.time_stamp_FK.time_stamp} which will contain the results of action {social_class.time_stamp_FK.step}")
+            logger.info(f"Created a new Social Class record {(social_class.name)} with time stamp {social_class.time_stamp.time_stamp} which will contain the results of action {social_class.time_stamp.step}")
 
         social_stocks = SocialStock.objects.filter(
-            time_stamp_FK=source_time_stamp)
+            time_stamp=source_time_stamp)
         for social_stock in social_stocks:
             social_stock.pk = None
             social_stock.id = None
-            social_stock.time_stamp_FK = self
+            social_stock.time_stamp = self
             social_stock.save()
-            logger.info(f"Created a new Social Stock record of usage type {(social_stock.usage_type)} for owner {(social_stock.stock_owner_name)} with time stamp {social_stock.time_stamp_FK.time_stamp} which will contain the results of action {social_stock.time_stamp_FK.step}")
+            logger.info(f"Created a new Social Stock record of usage type {(social_stock.usage_type)} for owner {(social_stock.stock_owner_name)} with time stamp {social_stock.time_stamp.time_stamp} which will contain the results of action {social_stock.time_stamp.step}")
 
         industry_stocks = IndustryStock.objects.filter(
-            time_stamp_FK=source_time_stamp)
+            time_stamp=source_time_stamp)
         for industry_stock in industry_stocks:
             industry_stock.pk = None
             industry_stock.id = None
-            industry_stock.time_stamp_FK = self
+            industry_stock.time_stamp = self
             industry_stock.save()
-            logger.info(f"Created a new Industry Stock record of usage type {(industry_stock.usage_type)} for owner {(industry_stock.stock_owner_name)} with time stamp {industry_stock.time_stamp_FK.time_stamp} which will contain the results of action {industry_stock.time_stamp_FK.step}")
+            logger.info(f"Created a new Industry Stock record of usage type {(industry_stock.usage_type)} for owner {(industry_stock.stock_owner_name)} with time stamp {industry_stock.time_stamp.time_stamp} which will contain the results of action {industry_stock.time_stamp.step}")
 
         #! send in the clones
         #! we now connect each new object to the duplicates of its relevant parent objects
 
     #! connect industries to their related commodities
         logger.info("Connecting cloned records")
-        industries = Industry.objects.filter(time_stamp_FK=self)
+        industries = Industry.objects.filter(time_stamp=self)
         for industry in industries:
-            commodity_name = industry.commodity_FK.name
+            commodity_name = industry.commodity.name
             logger.info(f"Connecting Industry {(industry.name)} to its output commodity {(commodity_name)}")
     #! find the commodity with the same name but the new time stamp
             candidates = Commodity.objects.filter(
-                name=commodity_name, time_stamp_FK=self)
+                name=commodity_name, time_stamp=self)
             if candidates.count() > 1:
                 logger.info( f"+++DUPLICATE COMMODITIES {candidates}+++")
             else:
-                industry.commodity_FK = candidates.get()
+                industry.commodity = candidates.get()
             industry.save()
     #! connect industry stocks to their commodities and owners
         industry_stocks = IndustryStock.objects.filter(
-            time_stamp_FK=self)
+            time_stamp=self)
         for industry_stock in industry_stocks:
-            commodity_name = industry_stock.commodity_FK.name
+            commodity_name = industry_stock.commodity.name
             logger.info(f"Connecting Industry Stock of usage type {(industry_stock.usage_type)} to commodity {(commodity_name)}")
     #! find the commodity that has the same name but the new time stamp
             new_commodity = Commodity.objects.get(
-                name=commodity_name, time_stamp_FK=self)
-            industry_stock.commodity_FK = new_commodity
+                name=commodity_name, time_stamp=self)
+            industry_stock.commodity = new_commodity
     #! find the owner industry
-            industry_name = industry_stock.industry_FK.name
+            industry_name = industry_stock.industry.name
             new_industry = Industry.objects.get(
-                name=industry_name, time_stamp_FK=self)
+                name=industry_name, time_stamp=self)
             logger.info(f"Connecting Industry Stock of usage type {(industry_stock.usage_type)} to its industry {(industry_name)}")
-            industry_stock.industry_FK = new_industry
-            industry_stock.stock_owner_FK = new_industry
+            industry_stock.industry = new_industry
+            industry_stock.stock_owner = new_industry
             industry_stock.save()
             new_industry.save()
     #! connect social stocks to their commodities and owners
         social_stocks = SocialStock.objects.filter(
-            time_stamp_FK=self)
+            time_stamp=self)
         for social_stock in social_stocks:
-            commodity_name = social_stock.commodity_FK.name
+            commodity_name = social_stock.commodity.name
             logger.info(f"Connecting Social Stock of usage type {(social_stock.usage_type)} to commodity {(commodity_name)}")
     #! find the commodity that has the same name but the new time stamp
             new_commodity = Commodity.objects.get(
-                name=commodity_name, time_stamp_FK=self)
-            social_stock.commodity_FK = new_commodity
+                name=commodity_name, time_stamp=self)
+            social_stock.commodity = new_commodity
     #! find the owner social class
-            social_class_name = social_stock.social_class_FK.name
+            social_class_name = social_stock.social_class.name
             new_social_class = SocialClass.objects.get(
-                name=social_class_name, time_stamp_FK=self)
+                name=social_class_name, time_stamp=self)
             logger.info(f"Connecting Social Stock of usage_type {(social_stock.usage_type)} to its social class {(social_class_name)}")
-            social_stock.social_class_FK = new_social_class
-            social_stock.stock_owner_FK = new_social_class
+            social_stock.social_class = new_social_class
+            social_stock.stock_owner = new_social_class
             social_stock.save()
             new_social_class.save()
 

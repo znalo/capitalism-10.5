@@ -19,21 +19,21 @@
 <h4>Commodities</h4>
 <ul>
     {% for commodity in commodities %}
-    <li style="list-style-type:none;"> {{ commodity.time_stamp_FK }}; [{{ commodity.name }}] </li>
+    <li style="list-style-type:none;"> {{ commodity.time_stamp }}; [{{ commodity.name }}] </li>
     {% endfor %}
 </ul>
 
 <h4>Industries</h4>
 <ul>
     {% for industry in industries %}
-    <li style="list-style-type:none;"> {{ industry.time_stamp_FK }}; [{{ industry.name }}]</li>
+    <li style="list-style-type:none;"> {{ industry.time_stamp }}; [{{ industry.name }}]</li>
     {% endfor %}
 </ul>
 
 <h4>Social Classes</h4>
 <ul>
     {% for social_class in social_classes%}
-    <li style="list-style-type:none;"> {{ social_class.time_stamp_FK }}; [{{ social_class.name }}]</li>
+    <li style="list-style-type:none;"> {{ social_class.time_stamp }}; [{{ social_class.name }}]</li>
     {% endfor %}
 </ul>
 

@@ -106,7 +106,7 @@ def initialize(request):
         time_stamp=TimeStamp.objects.get(simulation=simulation)
         logger.info(f"Creating commodity {(row.name)} for simulation {simulation} with time stamp {time_stamp} on behalf of user {logged_in_user}")
         commodity = Commodity(
-            time_stamp_FK=time_stamp,
+            time_stamp=time_stamp,
             name=row.name,
             origin=row.origin_type,
             unit_value=row.unit_value,
@@ -130,12 +130,12 @@ def initialize(request):
     for row in df.itertuples(index=False, name='Pandas'):
         simulation=Simulation.objects.get(project_number=row.project,user=logged_in_user)
         time_stamp=TimeStamp.objects.get(simulation=simulation)
-        commodity=Commodity.objects.get(time_stamp_FK=time_stamp, name=row.commodity_name, simulation=simulation)
+        commodity=Commodity.objects.get(time_stamp=time_stamp, name=row.commodity_name, simulation=simulation)
         logger.info(f"Creating Industry {(row.industry_name)} with output {commodity} for simulation {simulation} with time stamp {time_stamp} on behalf of user {logged_in_user} ")
         industry = Industry(
-            time_stamp_FK=time_stamp,
+            time_stamp=time_stamp,
             name=row.industry_name,
-            commodity_FK=commodity,
+            commodity=commodity,
             output_scale=row.output,
             output_growth_rate=row.growth_rate,
             current_capital=0,
@@ -155,9 +155,9 @@ def initialize(request):
         time_stamp=TimeStamp.objects.get(simulation=simulation)
         logger.info(f"Creating Social Class {(row.social_class_name)} for simulation {simulation} with time stamp {time_stamp} on behalf of user {logged_in_user}")
         social_class = SocialClass(
-            time_stamp_FK=time_stamp,
+            time_stamp=time_stamp,
             name=row.social_class_name,
-            commodity_FK=Commodity.objects.get(time_stamp_FK=time_stamp, name="Labour Power", simulation=simulation),
+            commodity=Commodity.objects.get(time_stamp=time_stamp, name="Labour Power", simulation=simulation),
             stock_owner_type=SOCIAL_CLASS,
             population=row.population,
             participation_ratio=row.participation_ratio,
@@ -176,14 +176,14 @@ def initialize(request):
         simulation=Simulation.objects.get(project_number=row.project,user=logged_in_user)
         time_stamp=TimeStamp.objects.get(simulation=simulation)
         if row.owner_type == "CLASS":
-            social_class=SocialClass.objects.get(time_stamp_FK=time_stamp, name=row.name,simulation=simulation)
-            commodity=Commodity.objects.get(time_stamp_FK=time_stamp, name=row.commodity, simulation=simulation)
+            social_class=SocialClass.objects.get(time_stamp=time_stamp, name=row.name,simulation=simulation)
+            commodity=Commodity.objects.get(time_stamp=time_stamp, name=row.commodity, simulation=simulation)
             logger.info(f"Creating a stock of commodity {(commodity.name)} of usage type {row.stock_type} for class {(social_class.name)} in simulation {simulation} on behalf of user {logged_in_user}")
             social_stock = SocialStock(
-                time_stamp_FK=time_stamp,
-                social_class_FK=social_class,
-                stock_owner_FK=social_class,
-                commodity_FK=commodity,
+                time_stamp=time_stamp,
+                social_class=social_class,
+                stock_owner=social_class,
+                commodity=commodity,
                 stock_owner_name=social_class.name,
                 consumption_requirement=row.consumption_quantity,
                 usage_type=row.stock_type,
@@ -196,14 +196,14 @@ def initialize(request):
             
             social_stock.save()
         elif row.owner_type == "INDUSTRY":
-            industry=Industry.objects.get(time_stamp_FK=time_stamp, name=row.name, simulation=simulation)
-            commodity=Commodity.objects.get(time_stamp_FK=time_stamp, name=row.commodity, simulation=simulation)
+            industry=Industry.objects.get(time_stamp=time_stamp, name=row.name, simulation=simulation)
+            commodity=Commodity.objects.get(time_stamp=time_stamp, name=row.commodity, simulation=simulation)
             logger.info(f"Creating a stock of {(commodity.name)} of usage type {row.stock_type} for industry {(industry.name)}")
             industry_stock = IndustryStock(
-                time_stamp_FK=time_stamp,
-                industry_FK=industry,
-                stock_owner_FK=industry,
-                commodity_FK=commodity,
+                time_stamp=time_stamp,
+                industry=industry,
+                stock_owner=industry,
+                commodity=commodity,
                 stock_owner_name=industry.name,
                 production_requirement=row.production_quantity,
                 usage_type=row.stock_type,

@@ -23,17 +23,17 @@ from django.contrib import messages
 def get_economy_view_context(request):#TODO change name - this function now not only creates the context but also displays it, so the naming is wrong
     current_simulation=request.user.current_simulation
     current_time_stamp=current_simulation.current_time_stamp
-    industry_stocks = IndustryStock.objects.filter(time_stamp_FK=current_time_stamp)
-    industries=Industry.objects.filter(time_stamp_FK=current_time_stamp)
-    productive_stocks=industry_stocks.filter(usage_type=PRODUCTION).order_by("commodity_FK__display_order")
+    industry_stocks = IndustryStock.objects.filter(time_stamp=current_time_stamp)
+    industries=Industry.objects.filter(time_stamp=current_time_stamp)
+    productive_stocks=industry_stocks.filter(usage_type=PRODUCTION).order_by("commodity__display_order")
     #!all industries have the same choice of productive stocks, even if usage is zero, hence get the headers from the first industry
-    industry_headers=productive_stocks.filter(industry_FK=industries.first()).order_by("commodity_FK__display_order") 
-    social_classes=SocialClass.objects.filter(time_stamp_FK=current_time_stamp)
-    social_stocks=SocialStock.objects.filter(time_stamp_FK=current_time_stamp)
+    industry_headers=productive_stocks.filter(industry=industries.first()).order_by("commodity__display_order") 
+    social_classes=SocialClass.objects.filter(time_stamp=current_time_stamp)
+    social_stocks=SocialStock.objects.filter(time_stamp=current_time_stamp)
     consumption_stocks=social_stocks.filter(usage_type=CONSUMPTION)
     #!all social classes have the same choice of consumption stocks, even if usage is zero, hence get the headers from the first social class
-    consumption_headers=consumption_stocks.filter(social_class_FK=social_classes.first())
-    commodities=Commodity.objects.filter(time_stamp_FK=current_time_stamp)
+    consumption_headers=consumption_stocks.filter(social_class=social_classes.first())
+    commodities=Commodity.objects.filter(time_stamp=current_time_stamp)
 
     context={}
     context["simulation"]=current_simulation
@@ -82,7 +82,7 @@ class IndustryView(ListView):
     def get_context_data(self, **kwargs):
         current_time_stamp=self.request.user.current_simulation.current_time_stamp        
         context = super().get_context_data(**kwargs)
-        qs=Industry.objects.filter(time_stamp_FK=current_time_stamp)
+        qs=Industry.objects.filter(time_stamp=current_time_stamp)
         context['industry_list']=qs
         return context    
 
@@ -92,7 +92,7 @@ class CommodityView(ListView):
     def get_context_data(self, **kwargs):
         current_time_stamp=self.request.user.current_simulation.current_time_stamp
         context = super().get_context_data(**kwargs)
-        qs=Commodity.objects.filter(time_stamp_FK=current_time_stamp).order_by('display_order')
+        qs=Commodity.objects.filter(time_stamp=current_time_stamp).order_by('display_order')
         context['commodity_list']=qs
         return context    
 
@@ -102,7 +102,7 @@ class SocialClassView(ListView):
     def get_context_data(self, **kwargs):
         current_time_stamp=self.request.user.current_simulation.current_time_stamp
         context = super().get_context_data(**kwargs)
-        qs=SocialClass.objects.filter(time_stamp_FK=current_time_stamp)
+        qs=SocialClass.objects.filter(time_stamp=current_time_stamp)
         context['social_class_list']=qs
         return context
 
@@ -111,7 +111,7 @@ class AllOwnersView(ListView):
     template_name='stockowner_list.html'    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        stock_list=StockOwner.objects.order_by("time_stamp_FK.simulation.project_number","time_stamp_FK.time_stamp")
+        stock_list=StockOwner.objects.order_by("time_stamp.simulation.project_number","time_stamp.time_stamp")
         context['stock_list']= stock_list
         return context
 
@@ -122,7 +122,7 @@ class SocialStockView(ListView):
     def get_context_data(self, **kwargs):
         current_time_stamp=self.request.user.current_simulation.current_time_stamp
         context = super().get_context_data(**kwargs)
-        stock_list=SocialStock.objects.filter(time_stamp_FK=current_time_stamp)
+        stock_list=SocialStock.objects.filter(time_stamp=current_time_stamp)
         context['stock_list']= stock_list
         return context    
 
@@ -132,7 +132,7 @@ class IndustryStockView(ListView):
     def get_context_data(self, **kwargs):
         current_time_stamp=self.request.user.current_simulation.current_time_stamp
         context = super().get_context_data(**kwargs)
-        stock_list=IndustryStock.objects.filter(time_stamp_FK=current_time_stamp)
+        stock_list=IndustryStock.objects.filter(time_stamp=current_time_stamp)
         context['stock_list']= stock_list
         return context
         
@@ -300,9 +300,9 @@ def simulationRestartView(request,pk):
     logger.info(f"User {request.user} is restarting simulation {request.user.current_simulation}")
     logger.info(f"The time stamp is {first_time_stamp}")
     try:
-        Commodity.objects.filter(simulation=simulation).exclude(time_stamp_FK=first_time_stamp).delete()
-        StockOwner.objects.filter(simulation=simulation).exclude(time_stamp_FK=first_time_stamp).delete()
-        Stock.objects.filter(simulation=simulation).exclude(time_stamp_FK=first_time_stamp).delete()
+        Commodity.objects.filter(simulation=simulation).exclude(time_stamp=first_time_stamp).delete()
+        StockOwner.objects.filter(simulation=simulation).exclude(time_stamp=first_time_stamp).delete()
+        Stock.objects.filter(simulation=simulation).exclude(time_stamp=first_time_stamp).delete()
         Trace.objects.filter(simulation=simulation).exclude(time_stamp_id=first_time_stamp.time_stamp).delete()
         TimeStamp.objects.filter(simulation=simulation).exclude(time_stamp=first_time_stamp.time_stamp).delete()
         simulation.current_time_stamp=first_time_stamp

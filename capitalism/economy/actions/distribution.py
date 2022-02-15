@@ -20,10 +20,10 @@ from ..global_constants import *
 def calculate_revenue(simulation):
     current_time_stamp=simulation.current_time_stamp
     Trace.enter(simulation,0,"Calculate capitalist revenue and other property-based entitlements")
-    for industry in Industry.objects.filter(time_stamp_FK=current_time_stamp):
+    for industry in Industry.objects.filter(time_stamp=current_time_stamp):
         Trace.enter(simulation,2,f"Industry {Trace.sim_object(industry.name)} has made a profit of {Trace.sim_quantity(industry.profit)} which will be transferred to the capitalists")
         donor_money_stock=industry.money_stock
-        recipient=SocialClass.objects.get(time_stamp_FK=current_time_stamp, name="Capitalists")
+        recipient=SocialClass.objects.get(time_stamp=current_time_stamp, name="Capitalists")
         Trace.enter(simulation,2,f"This will go to {Trace.sim_object(recipient.name)}")
         recipient_money_stock=recipient.money_stock
         donor_money_stock.size-=industry.profit
@@ -86,8 +86,8 @@ def calculate_revenue(simulation):
 def calculate_investment(simulation):
     current_time_stamp=simulation.current_time_stamp
     calculate_demand(simulation=simulation) #! this is required if we are to estimate correctly the replenishment cost
-    capitalists=SocialClass.objects.get(time_stamp_FK=current_time_stamp, name="Capitalists")    
-    industries=Industry.objects.filter(time_stamp_FK=current_time_stamp)
+    capitalists=SocialClass.objects.get(time_stamp=current_time_stamp, name="Capitalists")    
+    industries=Industry.objects.filter(time_stamp=current_time_stamp)
     Trace.enter(simulation,1, f"Calculate input costs to continue producing at current scales")
     for industry in industries:
         cost=industry.replenishment_cost
@@ -107,7 +107,7 @@ def calculate_investment(simulation):
 def effective_demand(simulation):
     current_time_stamp=simulation.current_time_stamp
     total_monetarily_effective_demand=0
-    for commodity in Commodity.objects.filter(time_stamp_FK=current_time_stamp):
+    for commodity in Commodity.objects.filter(time_stamp=current_time_stamp):
         commodity.monetarily_effective_demand=commodity.demand*commodity.unit_price
         Trace.enter(simulation,1,f"Evaluating money demand from {commodity.name} of origin {commodity.origin}; demand ={commodity.monetarily_effective_demand}")
         if commodity.origin=="INDUSTRIAL": #! filter didn't work, TODO we found out why, change the code

@@ -112,7 +112,7 @@ Migration couldn't cope with it. Steps taken:
 It would be really nice if the last two steps could be automated, so that it becomes impossible to start in a corrupt state
 
 ## Commit removed _FK suffix from simulation_FK attribute of TimeStamp and started from scratch
-
+## Commit removed _FK suffix from most objects (and had to start from scratch)
 
 
 
