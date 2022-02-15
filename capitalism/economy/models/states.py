@@ -61,11 +61,47 @@ class Simulation(models.Model):
     currency_symbol = models.CharField(max_length=2, default="$")
     quantity_symbol = models.CharField(max_length=2, default="#")
     melt=models.FloatField(null=False, blank=False,default=1)
-    initial_capital=models.FloatField(null=False, blank=False,default=-1)#! By setting negative default I hope programming errors will be easy to spot
-    current_capital=models.FloatField(null=False, blank=False,default=1)
-    profit=models.FloatField(null=False, blank=False,default=1)
-    profit_rate=models.FloatField(null=False, blank=False,default=1)
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+
+    @property
+    def comparator(self):
+        comparator_time_stamp=self.comparator_time_stamp
+       
+        comparator=Simulation.objects.filter(
+            current_time_stamp=comparator_time_stamp,
+            name=self.name,
+            user=self.user
+            )
+        if comparator.count()>1: #! primitive error-checking (there should be only and exactly one comparator) TODO more sophisticated error trapping
+            return self
+        elif comparator.count()<1:
+            return None
+        else:
+            return comparator.first()    
+
+    @property
+    def comparator_initial_capital(self):
+        if self.comparator==None:
+            return 0
+        return self.comparator.initial_capital
+
+    @property
+    def comparator_current_capital(self):
+        if self.comparator==None:
+            return 0
+        return self.comparator.current_capital
+
+    @property
+    def comparator_profit(self):
+        if self.comparator==None:
+            return 0
+        return self.comparator.profit
+
+    @property
+    def comparator_profit_rate(self):
+        if self.comparator==None:
+            return 0
+        return self.comparator.profit_rate
 
     #! Create a new simulation from the embryo of this simulation object, which was created by SimulationCreateView.
     #! We now have to create all the objects of this simulation, based on its name.
@@ -126,13 +162,14 @@ class TimeStamp(models.Model):
     step = models.CharField(max_length=50, default=UNDEFINED)
     stage = models.CharField(max_length=50, default=UNDEFINED)
     period = models.IntegerField(default=1)
+    initial_capital=models.FloatField(null=False, blank=False,default=-1)#! By setting negative default I hope programming errors will be easy to spot
+    current_capital=models.FloatField(null=False, blank=False,default=1)
+    profit=models.FloatField(null=False, blank=False,default=1)
+    profit_rate=models.FloatField(null=False, blank=False,default=1)    
 
     @property
     def project_number(self):
         return self.simulation.project_number 
-    
-    def project_FK(self):
-        return Project.objects.get(number=self.project_number)
     
     #! create a complete clone of each object from source_time_stamp and assign it to self (which is assumed to be already saved to the database as a new time stamp)
     #! when this is done, pass through the newly-created children linking them to their new parents

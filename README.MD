@@ -83,6 +83,7 @@ Too much money is allocated to industries in the distribution stage
   * price response variable incorporated, along with economy-wide profit rate. However this is not yet displayed. It is Traced, however.
 ## 15 February
   * refactored to simplify comparator logic
+  * we now display the economy-wide data (initial capital, current capital, profit, profit rate)
   
 
   

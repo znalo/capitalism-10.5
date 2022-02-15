@@ -24,10 +24,10 @@
     </thead>
     <tbody>
         <tr>
-            <td>{{ simulation.initial_capital}}</td>
-            <td>{{ simulation.current_capital}}</td>
-            <td>{{ simulation.profit}}</td>
-            <td>{{ simulation.profit_rate}}</td>
+            <td>{{ simulation.current_time_stamp.initial_capital|has_changed:simulation.comparator_time_stamp.initial_capital }}</td>
+            <td>{{ simulation.current_time_stamp.current_capital|has_changed:simulation.comparator_time_stamp.current_capital }}</td>
+            <td>{{ simulation.current_time_stamp.profit|has_changed:simulation.current_time_stamp.profit }}</td>
+            <td>{{ simulation.current_time_stamp.profit_rate|has_changed:simulation.current_time_stamp.profit_rate }}</td>
         </tr>
     </tbody>
 </table>

@@ -249,7 +249,7 @@ def set_initial_capital(simulation):
 
     user=simulation.user
     current_time_stamp=simulation.current_time_stamp
-    simulation.initial_capital=0
+    current_time_stamp.initial_capital=0
     Trace.enter(simulation,1,f"Calculate initial capitals for user {user} studying {simulation} with time stamp {current_time_stamp}")
     logger.info(f"Calculate initial capitals for user {user} who is currently studying {simulation} with time stamp {current_time_stamp}")
 
@@ -267,16 +267,17 @@ def set_initial_capital(simulation):
         industry.current_capital=capital
         industry.work_in_progress=work_in_progress
         industry.save() 
-        simulation.initial_capital+=industry.initial_capital
-        Trace.enter(simulation,2,f"Economy-wide initialcapital hs grown to {Trace.sim_quantity(simulation.initial_capital)} ")
-    Trace.enter(simulation,1,f"Economy-wide initialcapital is {Trace.sim_quantity(simulation.initial_capital)} ")
+        current_time_stamp.initial_capital+=industry.initial_capital
+        Trace.enter(simulation,2,f"Economy-wide initialcapital hs grown to {Trace.sim_quantity(current_time_stamp.initial_capital)} ")
+    Trace.enter(simulation,1,f"Economy-wide initialcapital is {Trace.sim_quantity(current_time_stamp.initial_capital)} ")
 
 def set_current_capital(simulation):
     #! Calculate the current capital of each industry and thence of the whole economy
     Trace.enter(simulation,1,f"Calculate current capitals")
-    simulation.current_capital=0
-    simulation.profit=0
-    simulation.profit_rate=0
+    current_time_stamp=simulation.current_time_stamp
+    current_time_stamp.current_capital=0    
+    current_time_stamp.profit=0
+    current_time_stamp.profit_rate=0
     for industry in Industry.objects.filter(time_stamp=simulation.current_time_stamp):
         Trace.enter(simulation,2,f"calculating the current capital of industry {Trace.sim_object(industry.name)}")
         capital=0
@@ -288,16 +289,16 @@ def set_current_capital(simulation):
             Trace.enter(simulation,3,f"Adding the price {Trace.sim_quantity(stock.price)} of stock of {Trace.sim_object(stock.commodity.name)}, type {Trace.sim_object(stock.usage_type)}. Work in progress is {Trace.sim_quantity(work_in_progress)} and capital is {Trace.sim_quantity(capital)} ")
         industry.current_capital=capital
         industry.profit=capital-industry.initial_capital
-        simulation.current_capital+=capital
-        simulation.profit+=industry.profit
+        current_time_stamp.current_capital+=capital
+        current_time_stamp.profit+=industry.profit
         if industry.initial_capital<=0:
             raise Exception(f"The initial capital of industry {industry} has not been correctly set")
         else:
             industry.profit_rate=(industry.profit/industry.initial_capital)*100
         Trace.enter(simulation,2,f"Current capital of industry {Trace.sim_object(industry.name)} is {Trace.sim_quantity(industry.current_capital)}; initial capital is {Trace.sim_quantity(industry.initial_capital)}; profit is {Trace.sim_quantity(industry.profit)}")
-        Trace.enter(simulation, 2, f"Economy wide capital has grown to {Trace.sim_object(simulation.current_capital)} and profit to {Trace.sim_object(simulation.profit)}")
+        Trace.enter(simulation, 2, f"Economy wide capital has grown to {Trace.sim_object(current_time_stamp.current_capital)} and profit to {Trace.sim_object(current_time_stamp.profit)}")
         industry.work_in_progress=work_in_progress
         industry.save()
-    simulation.profit_rate=simulation.profit/simulation.initial_capital
-    Trace.enter(simulation, 1, f"Economy wide capital is {Trace.sim_object(simulation.current_capital)}, profit is {Trace.sim_object(simulation.profit)} and the profit rate is {Trace.sim_object(simulation.profit_rate)}")
+    current_time_stamp.profit_rate=current_time_stamp.profit/current_time_stamp.initial_capital
+    Trace.enter(simulation, 1, f"Economy wide capital is {Trace.sim_object(current_time_stamp.current_capital)}, profit is {Trace.sim_object(current_time_stamp.profit)} and the profit rate is {Trace.sim_object(current_time_stamp.profit_rate)}")
 

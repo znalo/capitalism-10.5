@@ -66,6 +66,12 @@ class ProjectView(ListView):
 class TimeStampView(ListView):
     model=TimeStamp
     template_name='timestamp_list.html'    
+    def get_context_data(self, **kwargs):
+        simulation=self.request.user.current_simulation
+        context = super().get_context_data(**kwargs)
+        qs=TimeStamp.objects.filter(simulation=simulation)
+        context['timestamp_list']=qs
+        return context
  
 class EconomyView(ListView):
     model=IndustryStock

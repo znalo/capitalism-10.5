@@ -88,6 +88,10 @@ def initialize(request):
             period=row.period,
             step=row.description,
             stage="M_C", #! projects must start with this stage TODO remove this field from the CSV file
+            initial_capital=0,
+            current_capital=0,
+            profit=0,
+            profit_rate=0,
         )
         t.save()
         s.current_time_stamp=t

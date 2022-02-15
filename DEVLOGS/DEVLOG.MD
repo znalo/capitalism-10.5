@@ -115,6 +115,15 @@ It would be really nice if the last two steps could be automated, so that it bec
 ## Commit removed _FK suffix from most objects (and had to start from scratch)
 ## Commit minor tidy
 
+Shifted economy-wide data (initial_capital, profit, etc) into the TimeStamp Object
+Rebuild from scratch (Delete Database, etc) so we have the basis for a clean install
+Display economy-wide data with comparisons
+Tested perfunctorily
+
+## Commit Economy-wide data recorded and displayed
+
+
+
 
 
 
