@@ -67,6 +67,27 @@ We had to fix one line in the url file and the install worked
 
 ## Commit ONE LAST CHANGE MADE AND IT WORKS
 
+We now start work on the actual price-value relation, which is at the heart of treatments to date.
+The ultimate aim is to allow prices to change independent of values.
+  * Historically, there have been three concepts of the way values affect prices, of which the first two are as widespread as they are idiotic. They are
+    * prices are simply equal to values
+    * prices are equal to the rates of exchange that would equalize profit rates in all industries
+    * prices vary dynamically and are driven on the one hand by the relation between demand and supply, and on the other by the movement of capital
+  * It is however important to study cases (1) and (2) not as representations of reality but as the abstract basis that allows us to theorise (3) correctly
+    * 'correctly' means 'in such a way that it is inductively possible for these prices to correspond to reality'
+  * The 'price_response_type' variable allows the user to choose any one of the above three options
+
+In this commit, we 
+  * allow the user to create simulations with each of the above three options
+  * introduce economy-wide capital, profit, and profit rate
+
+At this point we've calculated this rate and the model doesn't simply break (ie collapse with an error)
+Next, we're going to display it.
+
+## Commit prelude to a critique of price-value dynamics...
+
+
+
 
 
 

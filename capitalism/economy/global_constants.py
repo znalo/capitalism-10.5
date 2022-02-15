@@ -25,6 +25,11 @@ M_C = "M-C (exchange)"
 C_P = "C-P-C' (produce)"
 C_M = "C'-M' (distribute)"
 INITIAL="Initial"
+VALUES='Values',
+EQUALISED='Equal Profit Rate',
+DYNAMIC='Dynamic'
+
+
 
 ORIGIN_CHOICES = [
     (SOCIAL, 'Social'),
@@ -51,6 +56,12 @@ STOCK_OWNER_TYPES = [
     (INDUSTRY, 'Industry'),
     (SOCIAL_CLASS, 'Social Class'),
     (UNDEFINED, 'UNDEFINED')
+]
+
+PRICE_RESPONSE_TYPES =[
+    (VALUES,'Values'),
+    (EQUALISED, 'Equal Profit Rate'),
+    (DYNAMIC, 'Dynamic')
 ]
 
 class Step:

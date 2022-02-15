@@ -79,6 +79,8 @@ Too much money is allocated to industries in the distribution stage
   * This is not quite complete, but got us to the point where we can run project 4 though we haven't fully checked the result
 ## 13 February
   * Check it out: [Capitalism 10.5](www.dascapital.org)
+## 14 February
+  * price response variable incorporated, along with economy-wide profit rate. However this is not yet displayed. It is Traced, however.
   
 
   

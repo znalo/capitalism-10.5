@@ -6,6 +6,7 @@ from economy.models.owners import Industry, SocialClass
 from economy.models.stocks import Stock, IndustryStock, SocialStock
 
 #! Actions for the 'production' phase
+
 #! scale output down if constrained by stock size. Normally should not happen, but we have to catch this to ensure stocks don't go negative
 #TODO should this be a method of the Industry object?
 def scale_output(industry):
@@ -24,6 +25,8 @@ def scale_output(industry):
     industry.output_scale*=scale_ratio
     return scale_ratio #! probably superfluous
 
+#! Produce for one industry. Invoked by 'calculate_production'
+#! TODO should be a method of Industry class?
 def produce(industry, simulation):
     periods_per_year=simulation.periods_per_year
     logger.info(f"Start production for Industry {industry} in simulation {simulation} with {periods_per_year} periods per year")

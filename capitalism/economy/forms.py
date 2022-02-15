@@ -45,7 +45,8 @@ class SimulationCreateForm(forms.ModelForm):
 
     class Meta:
         model = Simulation
-        fields=['name','periods_per_year',]
+        fields=['name','periods_per_year', 'price_response_type']
+        widgets={'price_response_type': forms.Select(choices=PRICE_RESPONSE_TYPES,attrs={'class': 'form-control'})}
 
 class SimulationChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):

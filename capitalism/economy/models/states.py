@@ -63,6 +63,11 @@ class Simulation(models.Model):
     melt_response_type = models.CharField(max_length=50, null=True, blank=True,default=None)
     currency_symbol = models.CharField(max_length=2, default="$")
     quantity_symbol = models.CharField(max_length=2, default="#")
+    melt=models.FloatField(null=False, blank=False,default=1)
+    initial_capital=models.FloatField(null=False, blank=False,default=-1)#! By setting negative default I hope programming errors will be easy to spot
+    current_capital=models.FloatField(null=False, blank=False,default=1)
+    profit=models.FloatField(null=False, blank=False,default=1)
+    profit_rate=models.FloatField(null=False, blank=False,default=1)
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
     #! Create a new simulation from the embryo of this simulation object, which was created by SimulationCreateView.

@@ -80,17 +80,19 @@ class IndustryView(ListView):
     model=Industry
     template_name='industry_list.html'    
     def get_context_data(self, **kwargs):
+        current_time_stamp=self.request.user.current_simulation.current_time_stamp        
         context = super().get_context_data(**kwargs)
-        qs=Industry.objects.filter(time_stamp_FK=self.request.user.current_simulation.current_time_stamp)
+        qs=Industry.objects.filter(time_stamp_FK=current_time_stamp)
         context['industry_list']=qs
         return context    
 
 class CommodityView(ListView):
     model=Commodity
-    template_name='commodity_list.html'    
+    template_name='commodity_list.html'
     def get_context_data(self, **kwargs):
+        current_time_stamp=self.request.user.current_simulation.current_time_stamp
         context = super().get_context_data(**kwargs)
-        qs=Commodity.objects.filter(time_stamp_FK=self.request.user.current_simulation.current_time_stamp)
+        qs=Commodity.objects.filter(time_stamp_FK=current_time_stamp).order_by('display_order')
         context['commodity_list']=qs
         return context    
 
@@ -98,8 +100,9 @@ class SocialClassView(ListView):
     template_name='socialclass_list.html'
     model=SocialClass
     def get_context_data(self, **kwargs):
+        current_time_stamp=self.request.user.current_simulation.current_time_stamp
         context = super().get_context_data(**kwargs)
-        qs=SocialClass.objects.filter(time_stamp_FK=self.request.user.current_simulation.current_time_stamp)
+        qs=SocialClass.objects.filter(time_stamp_FK=current_time_stamp)
         context['social_class_list']=qs
         return context
 
@@ -117,8 +120,9 @@ class SocialStockView(ListView):
     model=SocialStock
     template_name='socialstock_list.html'
     def get_context_data(self, **kwargs):
+        current_time_stamp=self.request.user.current_simulation.current_time_stamp
         context = super().get_context_data(**kwargs)
-        stock_list=SocialStock.objects.filter(time_stamp_FK=self.request.user.current_simulation.current_time_stamp)
+        stock_list=SocialStock.objects.filter(time_stamp_FK=current_time_stamp)
         context['stock_list']= stock_list
         return context    
 
@@ -126,8 +130,9 @@ class IndustryStockView(ListView):
     model=IndustryStock
     template_name='industrystock_list.html'
     def get_context_data(self, **kwargs):
+        current_time_stamp=self.request.user.current_simulation.current_time_stamp
         context = super().get_context_data(**kwargs)
-        stock_list=IndustryStock.objects.filter(time_stamp_FK=self.request.user.current_simulation.current_time_stamp)
+        stock_list=IndustryStock.objects.filter(time_stamp_FK=current_time_stamp)
         context['stock_list']= stock_list
         return context
         
@@ -213,7 +218,6 @@ def initialize_and_redisplay(request):
 def disclaimers(request):
     return render(request, 'disclaimers.html')
 
-# TODO administrator should have a button for this, and only the administrator should be able to do it
 # TODO the action should ensure that this doesn't corrupt the existing users' simulations (see comments for 'initialize_projects')
 def rebuild_project_table(request):
     initialize_projects(request)

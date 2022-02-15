@@ -169,10 +169,9 @@ def sale(seller_stock, buyer_stock, seller, buyer):
 #! SEE ALSO the documentation for trade(), produce() and reproduce()
 #TODO ideally we should do both, as a check.
 def set_total_value_and_price(simulation):
-    Trace.enter(simulation,1,f"Calculate Total Values, Prices and initial capital in simulation {simulation} for user {simulation.user}")
-    logger.info(f"Calculate Total Values, Prices and initial capital for  simulation {simulation}")
     current_time_stamp=simulation.current_time_stamp
-    logger.info(f"Time stamp is {current_time_stamp}")
+    Trace.enter(simulation,1,f"Calculate Total Values, Prices and initial capital in simulation {simulation} for user {simulation.user}")
+    logger.info(f"Calculate Total Values, Prices and initial capital for  simulation {simulation} at time stamp {current_time_stamp}")
     stocks=Stock.objects.filter(time_stamp_FK=current_time_stamp)
     Trace.enter(simulation,2,"First calculate the price and value of each individual stock")
     for stock in stocks:
@@ -250,7 +249,7 @@ def set_initial_capital(simulation):
 
     user=simulation.user
     current_time_stamp=simulation.current_time_stamp
-
+    simulation.initial_capital=0
     Trace.enter(simulation,1,f"Calculate initial capitals for user {user} studying {simulation} with time stamp {current_time_stamp}")
     logger.info(f"Calculate initial capitals for user {user} who is currently studying {simulation} with time stamp {current_time_stamp}")
 
@@ -268,10 +267,16 @@ def set_initial_capital(simulation):
         industry.current_capital=capital
         industry.work_in_progress=work_in_progress
         industry.save() 
+        simulation.initial_capital+=industry.initial_capital
+        Trace.enter(simulation,2,f"Economy-wide initialcapital hs grown to {Trace.sim_quantity(simulation.initial_capital)} ")
+    Trace.enter(simulation,1,f"Economy-wide initialcapital is {Trace.sim_quantity(simulation.initial_capital)} ")
 
 def set_current_capital(simulation):
-    #! Calculate the current capital of each industry
+    #! Calculate the current capital of each industry and thence of the whole economy
     Trace.enter(simulation,1,f"Calculate current capitals")
+    simulation.current_capital=0
+    simulation.profit=0
+    simulation.profit_rate=0
     for industry in Industry.objects.filter(time_stamp_FK=simulation.current_time_stamp):
         Trace.enter(simulation,2,f"calculating the current capital of industry {Trace.sim_object(industry.name)}")
         capital=0
@@ -283,11 +288,16 @@ def set_current_capital(simulation):
             Trace.enter(simulation,3,f"Adding the price {Trace.sim_quantity(stock.price)} of stock of {Trace.sim_object(stock.commodity_FK.name)}, type {Trace.sim_object(stock.usage_type)}. Work in progress is {Trace.sim_quantity(work_in_progress)} and capital is {Trace.sim_quantity(capital)} ")
         industry.current_capital=capital
         industry.profit=capital-industry.initial_capital
-        if industry.initial_capital==0:
-            logger.error(f"The initial capital of industry {industry} has not been correctly set")
-            Trace.enter(simulation,0,f"ERROR: the initial capital of industry {industry} is zero. Cannot calculate the profit rate")
+        simulation.current_capital+=capital
+        simulation.profit+=industry.profit
+        if industry.initial_capital<=0:
+            raise Exception(f"The initial capital of industry {industry} has not been correctly set")
         else:
             industry.profit_rate=(industry.profit/industry.initial_capital)*100
         Trace.enter(simulation,2,f"Current capital of industry {Trace.sim_object(industry.name)} is {Trace.sim_quantity(industry.current_capital)}; initial capital is {Trace.sim_quantity(industry.initial_capital)}; profit is {Trace.sim_quantity(industry.profit)}")
+        Trace.enter(simulation, 2, f"Economy wide capital has grown to {Trace.sim_object(simulation.current_capital)} and profit to {Trace.sim_object(simulation.profit)}")
         industry.work_in_progress=work_in_progress
         industry.save()
+    simulation.profit_rate=simulation.profit/simulation.initial_capital
+    Trace.enter(simulation, 1, f"Economy wide capital is {Trace.sim_object(simulation.current_capital)}, profit is {Trace.sim_object(simulation.profit)} and the profit rate is {Trace.sim_object(simulation.profit_rate)}")
+

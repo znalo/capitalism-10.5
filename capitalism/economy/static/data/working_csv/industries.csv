@@ -1,4 +1,4 @@
-project_FK,time_stamp,industry_name,commodity_name,output,growth_rate
+project,time_stamp,industry_name,commodity_name,output,growth_rate
 1,1,Department I,Means of Production,6000,0
 1,1,Department II,Consumption,3000,0
 2,1,DII,Consumption,3000,0

@@ -27,7 +27,6 @@ class Commodity(models.Model):
     class Meta:
         verbose_name = 'Commodity'
         verbose_name_plural = 'Commodities'
-        ordering = ['time_stamp_FK']
 
     def comparator_commodity(self):
         comparator_time_stamp=self.time_stamp_FK.comparator_time_stamp_FK
