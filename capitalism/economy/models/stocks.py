@@ -24,14 +24,14 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
 
     @property
     def comparator_stock(self):
-        comparator_time_stamp=self.time_stamp_FK.comparator_time_stamp_FK
+        comparator_time_stamp=self.simulation.comparator_time_stamp
         comparator_stock=Stock.objects.filter(
             time_stamp_FK=comparator_time_stamp,
             stock_owner_name=self.stock_owner_name,
             commodity_FK__name=self.commodity_FK.name,
             usage_type=self.usage_type
             )
-        if comparator_stock.count()>1:
+        if comparator_stock.count()!=1:
             return self
         elif comparator_stock.count()<1:
             return None

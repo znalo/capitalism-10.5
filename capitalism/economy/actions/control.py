@@ -72,6 +72,8 @@ def select_comparator(request, period,stage,step):
         comparator=TimeStamp.objects.get(simulation_FK=simulation, period=period, stage=stage,step=step,user=request.user)
         current_time_stamp.comparator_time_stamp_FK=comparator
         current_time_stamp.save()
+        simulation.comparator_time_stamp=comparator
+        simulation.save()
     except Exception as error:
         logger.error(f"Comparator could not be found {period}-{stage}-{step} because {error}")
         messages.error (request, f"Comparator could not be found")

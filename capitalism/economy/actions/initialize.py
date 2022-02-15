@@ -94,6 +94,7 @@ def initialize(request):
         t.comparator_time_stamp_FK=t #! comparator for the first stamp is itself
         t.save()
         s.current_time_stamp=t
+        s.comparator_time_stamp=t #! comparator for the first stamp is itself
         s.save()
         #! Create an initial Trace object to mark the start of the simulation
         #! We cannot use 'Trace.enter' because the user's current_simulation has not yet been defined

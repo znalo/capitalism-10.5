@@ -86,7 +86,16 @@ Next, we're going to display it.
 
 ## Commit prelude to a critique of price-value dynamics...
 
+Removed quite a bit of historical stuff, specifically past datasets and Development Logs. They can be retrieved from the record if 
+of historical interest but aren't really useful so carving them out.
 
+Removed 'Initialize' from the main navbar since it's now incorporated in the user dashboard
+
+Digression: refactor so that comparator_time_stamp is an attribute of 'simulation' not of 'time_stamp'
+This works for stocks but we haven't applied it to other magnitudes.
+We'll track these down by removing the field from the TimeStamp object, but this might not work, so we'll make an interim commit at this point
+
+## Commit interim commit of partially refactored comparator logic
 
 
 

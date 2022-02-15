@@ -37,16 +37,6 @@ def consumption_filter(value):
 def multiply(value, arg):
     return value * arg
 
-@register.filter(name='current_step')
-def current_step(value):
-    sub_state= State.current_stamp.sub_state_name
-    return sub_state
-
-@register.filter(name='current_control_super_state')
-def current_control_super_state(value):
-    super_state= State.current_control_superstate()
-    return super_state.URL
-
 @register.filter
 def has_changed(new,old):
     if old==new:

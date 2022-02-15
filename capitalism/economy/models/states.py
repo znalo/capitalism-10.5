@@ -53,7 +53,8 @@ class Project(models.Model):
 
 class Simulation(models.Model):
     name=models.CharField(max_length=50,null=False,default = UNDEFINED)
-    current_time_stamp= models.OneToOneField("TimeStamp", on_delete=models.SET_NULL, blank=True, null=True, default=None)
+    current_time_stamp= models.OneToOneField("TimeStamp", related_name="current_time_stamp",on_delete=models.SET_NULL, blank=True, null=True, default=None)
+    comparator_time_stamp=models.OneToOneField("TimeStamp", related_name="comparator_time_stamp",on_delete=models.SET_NULL, blank=True, null=True, default=None)
     project_number = models.IntegerField(default=1) #! We don't have a foreign key to the project because the admin might need to rebuild the project table
     periods_per_year=models.IntegerField(default=1)
     population_growth_rate = models.IntegerField(default=1)
@@ -81,6 +82,7 @@ class Simulation(models.Model):
             time_stamp.comparator_time_stamp_FK=time_stamp
             time_stamp.save()
             self.current_time_stamp=time_stamp
+            self.comparator_time_stamp=time_stamp
             self.save()
             #! Find the source simulation and clone it to create a new simulation
             source_simulation=Simulation.objects.get(name="Initial",project_number=self.project_number,user=self.user)
@@ -119,6 +121,7 @@ class Simulation(models.Model):
         #! tell the user she has a new current time stamp, namely the one we just created
         new_time_stamp.clone(old_time_stamp) #! We assume cloning saves the new current stamp and all objects that reference it
         self.current_time_stamp=new_time_stamp
+        self.comparator_time_stamp=old_time_stamp
         self.save()
 
     @property
