@@ -88,10 +88,7 @@ def initialize(request):
             period=row.period,
             step=row.description,
             stage="M_C", #! projects must start with this stage TODO remove this field from the CSV file
-            melt=row.MELT,
         )
-        t.save()
-        t.comparator_time_stamp_FK=t #! comparator for the first stamp is itself
         t.save()
         s.current_time_stamp=t
         s.comparator_time_stamp=t #! comparator for the first stamp is itself

@@ -96,6 +96,10 @@ This works for stocks but we haven't applied it to other magnitudes.
 We'll track these down by removing the field from the TimeStamp object, but this might not work, so we'll make an interim commit at this point
 
 ## Commit interim commit of partially refactored comparator logic
+## Commit refactoring complete
+
+Will tidy up by removing some of the '_FK' suffixes which don't seem to be the Django way these things are done
+
 
 
 

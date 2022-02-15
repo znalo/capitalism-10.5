@@ -35,8 +35,8 @@ class User(AbstractUser):
         self.simulation.one_step()        
 
     def set_current_comparator(self,comparator):
-        logger.info(f"User {self} is changing its comparator which is {self.current_time_stamp} from {self.current_time_stamp.current_comparator_time_stamp_FK} to {comparator}")
-        self.current_time_stamp.comparator_time_stamp_FK = comparator
+        logger.info(f"User {self} is changing its comparator which is {self.current_time_stamp} from {self.simulation.current_comparator_time_stamp} to {comparator}")
+        self.simulation.comparator_time_stamp = comparator
         self.current_time_stamp.save()
 
     def __str__(self):
@@ -79,8 +79,6 @@ class Simulation(models.Model):
             #! First create my current_time_stamp (as a prelude to cloning it)
             time_stamp=TimeStamp(simulation_FK=self,step=DEMAND,stage='M_C',user=self.user)
             time_stamp.save()
-            time_stamp.comparator_time_stamp_FK=time_stamp
-            time_stamp.save()
             self.current_time_stamp=time_stamp
             self.comparator_time_stamp=time_stamp
             self.save()
@@ -111,9 +109,7 @@ class Simulation(models.Model):
         #!TODO there's probably a better way
         old_time_stamp = TimeStamp.objects.get(id=old_time_stamp_id)
         new_time_stamp.save()
-        new_time_stamp.comparator_time_stamp_FK = old_time_stamp
-        new_time_stamp.save() #! just in case
-        logger.info(f"Stepping from Time Stamp with id {new_time_stamp.comparator_time_stamp_FK.id} and step {new_time_stamp.comparator_time_stamp_FK.step} to new time stamp {new_time_stamp.id} whose step is {new_time_stamp.step}")
+        logger.info(f"Stepping from Time Stamp with id {new_time_stamp.id} and step {new_time_stamp.step} to new time stamp {new_time_stamp.id} whose step is {new_time_stamp.step}")
 
         #! Now clone all the objects that were associated with the old time stamp, and create identical copies associated with the new stamp
         #! Once that's done, the control logic will invoke the action specified by the new stamp, but that's outside this particular procedure
@@ -137,8 +133,7 @@ class TimeStamp(models.Model):
     step = models.CharField(max_length=50, default=UNDEFINED)
     stage = models.CharField(max_length=50, default=UNDEFINED)
     period = models.IntegerField(default=1)
-    comparator_time_stamp_FK = models.ForeignKey("TimeStamp", on_delete=models.DO_NOTHING, null=True, blank=True, default=None)
-    melt = models.CharField(max_length=50, default=UNDEFINED)
+    # melt = models.CharField(max_length=50, default=UNDEFINED) #! removed 15 Feb because it is an attribute of 'simulation'
 
     @property
     def project_number(self):

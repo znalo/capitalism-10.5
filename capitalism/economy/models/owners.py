@@ -90,7 +90,7 @@ class Industry(StockOwner):
 
     @property
     def comparator(self):
-        comparator_time_stamp=self.time_stamp_FK.comparator_time_stamp_FK
+        comparator_time_stamp=self.simulation.comparator_time_stamp
        
         comparator=Industry.objects.filter(
             time_stamp_FK=comparator_time_stamp,

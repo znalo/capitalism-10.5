@@ -29,7 +29,7 @@ class Commodity(models.Model):
         verbose_name_plural = 'Commodities'
 
     def comparator_commodity(self):
-        comparator_time_stamp=self.time_stamp_FK.comparator_time_stamp_FK
+        comparator_time_stamp=self.simulation.comparator_time_stamp
         comparator_qs=Commodity.objects.filter(
             time_stamp_FK=comparator_time_stamp,
             name=self.name,

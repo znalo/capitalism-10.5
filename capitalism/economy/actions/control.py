@@ -37,7 +37,7 @@ def step_execute(request,act):
         current_time_stamp.period+=1        
         logger.info(f"Moving forward one period to {current_time_stamp.period}")
     current_time_stamp.save()
-    logger.info(f"Saved a time stamp whose id is {current_time_stamp.id}, with comparator {current_time_stamp.comparator_time_stamp_FK.id}")
+    logger.info(f"Saved the time stamp {current_time_stamp}")
 
 def stage_execute(request,act):
     #! Executes an entire stage or, if the user is partway through a stage, executes the remaining steps of that stage
@@ -70,8 +70,6 @@ def select_comparator(request, period,stage,step):
         current_time_stamp=request.user.current_simulation.current_time_stamp
         simulation=request.user.simulation
         comparator=TimeStamp.objects.get(simulation_FK=simulation, period=period, stage=stage,step=step,user=request.user)
-        current_time_stamp.comparator_time_stamp_FK=comparator
-        current_time_stamp.save()
         simulation.comparator_time_stamp=comparator
         simulation.save()
     except Exception as error:

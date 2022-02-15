@@ -81,6 +81,8 @@ Too much money is allocated to industries in the distribution stage
   * Check it out: [Capitalism 10.5](www.dascapital.org)
 ## 14 February
   * price response variable incorporated, along with economy-wide profit rate. However this is not yet displayed. It is Traced, however.
+## 15 February
+  * refactored to simplify comparator logic
   
 
   
