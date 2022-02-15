@@ -99,6 +99,19 @@ We'll track these down by removing the field from the TimeStamp object, but this
 ## Commit refactoring complete
 
 Will tidy up by removing some of the '_FK' suffixes which don't seem to be the Django way these things are done
+Removed the '_FK' suffix from the 'simulation_FK' attribute of Time Stamp
+Migration couldn't cope with it. Steps taken:
+  * Delete the database
+  * Delete all the migrations
+  * Create admin as a superuser
+  * Restart
+  * Login as admin
+  * Go to the administrator dashboard
+  * Rebuild the project table
+
+It would be really nice if the last two steps could be automated, so that it becomes impossible to start in a corrupt state
+
+## Commit removed _FK suffix from simulation_FK attribute of TimeStamp and started from scratch
 
 
 

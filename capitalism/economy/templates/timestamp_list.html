@@ -22,20 +22,20 @@
     <tbody>
         {% for ts in timestamp_list %}
         <tr>
-            <td>{{ ts.simulation_FK.project_number }} </td>
+            <td>{{ ts.simulation.project_number }} </td>
             <td>{{ ts }} </td>
             <td>{{ ts.period}} </td>
             <td>{{ ts.id }}</td>
             <td>{{ ts.stage}} </td>
             <td>{{ ts.step}} </td>
-            <td>{{ ts.simulation_FK.comparator_time_stamp.id }}({{ ts.simulation.comparator_time_stamp.stage}}. {{ ts.simulation.comparator_time_stamp.step}}) </td>
+            <td>{{ ts.simulation.comparator_time_stamp.id }}({{ ts.simulation.comparator_time_stamp.stage}}. {{ ts.simulation.comparator_time_stamp.step}}) </td>
             <td>{{ ts.MELT}} </td>
-            <td>{{ ts.simulation_FK.population_growth_rate}} </td>
-            <td>{{ ts.simulation_FK.investment_ratio}} </td>
-            <td>{{ ts.simulation_FK.labour_supply_response}} </td>
-            <td>{{ ts.simulation_FK.price_response_type}} </td>
-            <td>{{ ts.simulation_FK.melt_response_type}} </td>
-            <td>{{ ts.simulation_FK.quantity_symbol}} {{ ts.currency_symbol}} </td>
+            <td>{{ ts.simulation.population_growth_rate}} </td>
+            <td>{{ ts.simulation.investment_ratio}} </td>
+            <td>{{ ts.simulation.labour_supply_response}} </td>
+            <td>{{ ts.simulation.price_response_type}} </td>
+            <td>{{ ts.simulation.melt_response_type}} </td>
+            <td>{{ ts.simulation.quantity_symbol}} {{ ts.currency_symbol}} </td>
         </tr>
         {% endfor %}
     </tbody>

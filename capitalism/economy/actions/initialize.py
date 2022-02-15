@@ -54,12 +54,12 @@ def initialize(request):
         return
 
 #! Clear the decks
-    Trace.objects.filter(simulation_FK__user=logged_in_user).delete()
+    Trace.objects.filter(simulation__user=logged_in_user).delete()
     Simulation.objects.filter(user=logged_in_user).delete()
     Commodity.objects.filter(simulation__user=logged_in_user).delete()
     Stock.objects.filter(simulation__user=logged_in_user).delete()
     StockOwner.objects.filter(simulation__user=logged_in_user).delete()
-    TimeStamp.objects.filter(simulation_FK__user=logged_in_user).delete()
+    TimeStamp.objects.filter(simulation__user=logged_in_user).delete()
 
 #! Simulations
 #! Also creates time stamps. 
@@ -84,7 +84,7 @@ def initialize(request):
         s.save()       
         #! Create a new time stamp
         t = TimeStamp(
-            simulation_FK=s,
+            simulation=s,
             period=row.period,
             step=row.description,
             stage="M_C", #! projects must start with this stage TODO remove this field from the CSV file
@@ -103,7 +103,7 @@ def initialize(request):
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
         simulation=Simulation.objects.get(project_number=row.project,user=logged_in_user)
-        time_stamp=TimeStamp.objects.get(simulation_FK=simulation)
+        time_stamp=TimeStamp.objects.get(simulation=simulation)
         logger.info(f"Creating commodity {(row.name)} for simulation {simulation} with time stamp {time_stamp} on behalf of user {logged_in_user}")
         commodity = Commodity(
             time_stamp_FK=time_stamp,
@@ -129,7 +129,7 @@ def initialize(request):
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
         simulation=Simulation.objects.get(project_number=row.project,user=logged_in_user)
-        time_stamp=TimeStamp.objects.get(simulation_FK=simulation)
+        time_stamp=TimeStamp.objects.get(simulation=simulation)
         commodity=Commodity.objects.get(time_stamp_FK=time_stamp, name=row.commodity_name, simulation=simulation)
         logger.info(f"Creating Industry {(row.industry_name)} with output {commodity} for simulation {simulation} with time stamp {time_stamp} on behalf of user {logged_in_user} ")
         industry = Industry(
@@ -152,7 +152,7 @@ def initialize(request):
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
         simulation=Simulation.objects.get(project_number=row.project,user=logged_in_user)
-        time_stamp=TimeStamp.objects.get(simulation_FK=simulation)
+        time_stamp=TimeStamp.objects.get(simulation=simulation)
         logger.info(f"Creating Social Class {(row.social_class_name)} for simulation {simulation} with time stamp {time_stamp} on behalf of user {logged_in_user}")
         social_class = SocialClass(
             time_stamp_FK=time_stamp,
@@ -174,7 +174,7 @@ def initialize(request):
 
     for row in df.itertuples(index=False, name='Pandas'):
         simulation=Simulation.objects.get(project_number=row.project,user=logged_in_user)
-        time_stamp=TimeStamp.objects.get(simulation_FK=simulation)
+        time_stamp=TimeStamp.objects.get(simulation=simulation)
         if row.owner_type == "CLASS":
             social_class=SocialClass.objects.get(time_stamp_FK=time_stamp, name=row.name,simulation=simulation)
             commodity=Commodity.objects.get(time_stamp_FK=time_stamp, name=row.commodity, simulation=simulation)
@@ -224,7 +224,7 @@ def initialize(request):
 
 #! set the user up to point to project 1
     simulation=Simulation.objects.get(user=logged_in_user, project_number=1)
-    time_stamp=TimeStamp.objects.get(simulation_FK=simulation)
+    time_stamp=TimeStamp.objects.get(simulation=simulation)
     logged_in_user.current_simulation=simulation
     simulation.current_time_stamp=time_stamp
     simulation.save()

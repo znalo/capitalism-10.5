@@ -81,7 +81,7 @@ class IndustryStock(Stock):
         verbose_name_plural = 'Industry Stocks'
 
     def __str__(self):
-        return f"[Project {self.time_stamp_FK.simulation_FK.project_number}] [Industry {self.industry_FK.name}] [Commodity: {self.commodity_FK.name}] [Usage Type: {self.usage_type}]"
+        return f"[Project {self.time_stamp_FK.simulation.project_number}] [Industry {self.industry_FK.name}] [Commodity: {self.commodity_FK.name}] [Usage Type: {self.usage_type}]"
 
 
 class SocialStock(Stock):
@@ -94,5 +94,5 @@ class SocialStock(Stock):
         ordering = ['commodity_FK__display_order']        
 
     def __str__(self):
-        return f"[Project {self.time_stamp_FK.simulation_FK.project_number}] [Class {self.social_class_FK.name}] [Commodity: {self.commodity_FK.name}] [Usage Type: {self.usage_type}]"
+        return f"[Project {self.time_stamp_FK.simulation.project_number}] [Class {self.social_class_FK.name}] [Commodity: {self.commodity_FK.name}] [Usage Type: {self.usage_type}]"
 

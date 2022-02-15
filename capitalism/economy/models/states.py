@@ -77,7 +77,7 @@ class Simulation(models.Model):
         try:
             logger.info(f"User {self.user} is populating the simulation {self.name} which has project number {self.project_number}")
             #! First create my current_time_stamp (as a prelude to cloning it)
-            time_stamp=TimeStamp(simulation_FK=self,step=DEMAND,stage='M_C',user=self.user)
+            time_stamp=TimeStamp(simulation=self,step=DEMAND,stage='M_C',user=self.user)
             time_stamp.save()
             self.current_time_stamp=time_stamp
             self.comparator_time_stamp=time_stamp
@@ -128,16 +128,15 @@ class Simulation(models.Model):
         return f"{self.name}.{self.user}[{self.id}]"
 
 class TimeStamp(models.Model):
-    simulation_FK=models.ForeignKey(Simulation, on_delete=models.CASCADE) 
+    simulation=models.ForeignKey(Simulation, on_delete=models.CASCADE) 
     time_stamp = models.IntegerField(default=1) # ! TODO rename this field to avoid confusion
     step = models.CharField(max_length=50, default=UNDEFINED)
     stage = models.CharField(max_length=50, default=UNDEFINED)
     period = models.IntegerField(default=1)
-    # melt = models.CharField(max_length=50, default=UNDEFINED) #! removed 15 Feb because it is an attribute of 'simulation'
 
     @property
     def project_number(self):
-        return self.simulation_FK.project_number 
+        return self.simulation.project_number 
     
     def project_FK(self):
         return Project.objects.get(number=self.project_number)

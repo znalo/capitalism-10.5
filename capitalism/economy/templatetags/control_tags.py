@@ -57,7 +57,7 @@ def step_list(context):
             current_time_stamp=simulation.current_time_stamp
             project_number=simulation.project_number
             logger.info(f"Calculating step list for user {user} with simulation {simulation} and time stamp {current_time_stamp} and project {project_number}")
-            step_list=TimeStamp.objects.filter(simulation_FK=simulation)
+            step_list=TimeStamp.objects.filter(simulation=simulation)
       except Exception as error:
             logger.error(f"Could not find the step list because of {error}")
             request = context['request']

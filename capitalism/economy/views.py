@@ -111,7 +111,7 @@ class AllOwnersView(ListView):
     template_name='stockowner_list.html'    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        stock_list=StockOwner.objects.order_by("time_stamp_FK.simulation_FK.project_number","time_stamp_FK.time_stamp")
+        stock_list=StockOwner.objects.order_by("time_stamp_FK.simulation.project_number","time_stamp_FK.time_stamp")
         context['stock_list']= stock_list
         return context
 
@@ -145,7 +145,7 @@ class TraceView(ListView):
     template_name='trace_list.html'    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        qs=Trace.objects.filter(simulation_FK=self.request.user.current_simulation).order_by('real_time')
+        qs=Trace.objects.filter(simulation=self.request.user.current_simulation).order_by('real_time')
         context['trace_list']=qs
         return context    
 
@@ -296,7 +296,7 @@ def simulationRestartView(request,pk):
     user=request.user
     simulation=user.current_simulation
     #! Find the first time stamp in the simulation. Its period will be 0
-    first_time_stamp=TimeStamp.objects.get(user=user,simulation_FK=simulation,period=0)
+    first_time_stamp=TimeStamp.objects.get(user=user,simulation=simulation,period=0)
     logger.info(f"User {request.user} is restarting simulation {request.user.current_simulation}")
     logger.info(f"The time stamp is {first_time_stamp}")
     try:

@@ -5,7 +5,7 @@ from .states import User, Simulation
 
 class Trace(models.Model):
     time_stamp_id = models.IntegerField(default=0, null=False)
-    simulation_FK=models.ForeignKey(Simulation, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    simulation=models.ForeignKey(Simulation, on_delete=models.CASCADE, null=True, blank=True, default=None)
     real_time=models.DateTimeField(auto_now_add=True)
     period = models.IntegerField(default=0, null=False)
     stage = models.CharField(max_length=25, default=UNDEFINED)
@@ -21,7 +21,7 @@ class Trace(models.Model):
             stamp_number = current_time_stamp.time_stamp
             current_step = current_time_stamp.step
             project_id = simulation.project_number
-            this_entry = Trace(simulation_FK=simulation, time_stamp_id=stamp_number, period=current_time_stamp.period, stage=current_time_stamp.stage, step=current_step, project_id=project_id,level=level, message=(message))
+            this_entry = Trace(simulation=simulation, time_stamp_id=stamp_number, period=current_time_stamp.period, stage=current_time_stamp.stage, step=current_step, project_id=project_id,level=level, message=(message))
             this_entry.save()
         except Exception as error:
             logger.error(f"Could not make a trace entry because {error}, for message {message}")

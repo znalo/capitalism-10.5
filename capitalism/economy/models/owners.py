@@ -150,5 +150,5 @@ class SocialClass(StockOwner):
         return qs
 
     def __str__(self):
-        return f"[Project {self.time_stamp_FK.simulation_FK.project_number}] {self.name}"
+        return f"[Project {self.time_stamp_FK.simulation.project_number}] {self.name}"
 

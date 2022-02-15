@@ -69,7 +69,7 @@ def select_comparator(request, period,stage,step):
     try:
         current_time_stamp=request.user.current_simulation.current_time_stamp
         simulation=request.user.simulation
-        comparator=TimeStamp.objects.get(simulation_FK=simulation, period=period, stage=stage,step=step,user=request.user)
+        comparator=TimeStamp.objects.get(simulation=simulation, period=period, stage=stage,step=step,user=request.user)
         simulation.comparator_time_stamp=comparator
         simulation.save()
     except Exception as error:
