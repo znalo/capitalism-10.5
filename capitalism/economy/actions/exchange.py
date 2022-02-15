@@ -31,7 +31,7 @@ def calculate_demand(simulation):
         stock.save()
         commodity = stock.commodity
         commodity.demand += stock.demand
-        Trace.enter(simulation,2,f"{Trace.sim_object(stock.stock_owner_name)}'s stock of {Trace.sim_object(stock.commodity.name)} is {Trace.sim_quantity(stock.size)}; production requirement is {Trace.sim_quantity(stock.production_requirement)} and turnover time is {Trace.sim_quantity(turnover_time)}. Demand is increased by {Trace.sim_quantity(stock.demand)} to {Trace.sim_quantity(commodity.demand)}")
+        Trace.enter(simulation,2,f"{Trace.sim_object(stock.stock_owner.name)}'s stock of {Trace.sim_object(stock.commodity.name)} is {Trace.sim_quantity(stock.size)}; production requirement is {Trace.sim_quantity(stock.production_requirement)} and turnover time is {Trace.sim_quantity(turnover_time)}. Demand is increased by {Trace.sim_quantity(stock.demand)} to {Trace.sim_quantity(commodity.demand)}")
         commodity.save()
 
     for stock in social_stocks:
@@ -64,7 +64,7 @@ def calculate_supply(simulation):
         stock.supply = stock.size
         stock.save()
         commodity.supply += stock.supply
-        Trace.enter(simulation,2,f" Supply of {Trace.sim_object(commodity.name)} from the industry {Trace.sim_object(stock.stock_owner_name)} is {Trace.sim_quantity(stock.size)}. Total supply is now {Trace.sim_quantity(commodity.supply)}")
+        Trace.enter(simulation,2,f" Supply of {Trace.sim_object(commodity.name)} from the industry {Trace.sim_object(stock.stock_owner.name)} is {Trace.sim_quantity(stock.size)}. Total supply is now {Trace.sim_quantity(commodity.supply)}")
         commodity.save()
 
 def allocate_supply(simulation):
@@ -180,7 +180,7 @@ def set_total_value_and_price(simulation):
         size=stock.size
         stock.value=size*unit_value
         stock.price=size*unit_price
-        owner_name=stock.stock_owner_name
+        owner_name=stock.stock_owner.name
         stock.save()
         Trace.enter(simulation,4,f"Size of the stock of {Trace.sim_object(stock.commodity.name)} owned by {Trace.sim_object(owner_name)} is {Trace.sim_quantity(stock.size)}. Its value is {Trace.sim_quantity(stock.value)} and its price is {Trace.sim_quantity(stock.price)}")
     
@@ -220,7 +220,7 @@ def set_total_value_and_price(simulation):
     for stock in Stock.objects.filter(time_stamp=simulation.current_time_stamp):
         unit_price=stock.commodity.unit_price
         unit_value=stock.commodity.unit_value
-        Trace.enter(simulation,4,f"Size of {Trace.sim_object(stock.commodity.name)} owned by {Trace.sim_object(stock.stock_owner_name)} is {Trace.sim_quantity(stock.size)}, with value {Trace.sim_quantity(stock.value)} and price {Trace.sim_quantity(stock.price)}")
+        Trace.enter(simulation,4,f"Size of {Trace.sim_object(stock.commodity.name)} owned by {Trace.sim_object(stock.stock_owner.name)} is {Trace.sim_quantity(stock.size)}, with value {Trace.sim_quantity(stock.value)} and price {Trace.sim_quantity(stock.price)}")
         new_value=stock.size*unit_value
         new_price=stock.size*unit_price
         Trace.enter(simulation,4,f"Unit value is now {Trace.sim_quantity(unit_value)} so total value be reset to {Trace.sim_quantity(new_value)}; Unit price {Trace.sim_quantity(unit_price)} so total price will be reset to {Trace.sim_quantity(new_price)}")

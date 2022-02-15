@@ -77,7 +77,7 @@ class Commodity(models.Model):
         return Commodity.objects.filter(time_stamp=self.user.current_simulation.current_time_stamp)
 
     def __str__(self):
-        return f"[Time Stamp {self.time_stamp.time_stamp}] {self.name}"
+        return f"[Time Stamp {self.time_stamp}] {self.name}"
 
 
 

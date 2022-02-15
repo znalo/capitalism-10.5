@@ -40,7 +40,6 @@ class User(AbstractUser):
         return self.username
 
 #! Note there is no user field for the projects. They are simply a fixture
-#! TODO The admin user, and only the admin user, has the option to re-import projects
 class Project(models.Model):
     number = models.IntegerField(null=False, default=1)
     description = models.CharField(max_length=50, default=DEMAND)
@@ -99,12 +98,10 @@ class Simulation(models.Model):
         logger.info(f"User {self.user} of simulation {self} is moving time stamp {self.current_time_stamp} forward one step")
         old_time_stamp_id = self.current_time_stamp.id
         new_time_stamp = self.current_time_stamp
-        #! create a new timestamp object by saving with pk=None. Forces Django to create a new database object
-        new_time_stamp.pk = None
-        new_time_stamp.time_stamp += 1
-        #! because the new time stamp gets saved to the database, we need to retrieve the old one
-        #!TODO there's probably a better way
-        old_time_stamp = TimeStamp.objects.get(id=old_time_stamp_id)
+
+        new_time_stamp.pk = None  #! Create a new timestamp object by saving with pk=None, to force Django to create a new database object
+        #! because the new time stamp gets saved to the database, old_time_stamp must be explicitly retrieved from its id
+        old_time_stamp = TimeStamp.objects.get(id=old_time_stamp_id) #! TODO is there a better way
         new_time_stamp.save()
         logger.info(f"Stepping from Time Stamp with id {new_time_stamp.id} and step {new_time_stamp.step} to new time stamp {new_time_stamp.id} whose step is {new_time_stamp.step}")
 
@@ -126,7 +123,6 @@ class Simulation(models.Model):
 
 class TimeStamp(models.Model):
     simulation=models.ForeignKey(Simulation, on_delete=models.CASCADE) 
-    time_stamp = models.IntegerField(default=1) # ! TODO rename this field to avoid confusion
     step = models.CharField(max_length=50, default=UNDEFINED)
     stage = models.CharField(max_length=50, default=UNDEFINED)
     period = models.IntegerField(default=1)
@@ -159,7 +155,7 @@ class TimeStamp(models.Model):
             industry.pk = None
             industry.id = None
             industry.save()
-            logger.info(f"Created a new Industry record {(industry.name)} with time stamp {industry.time_stamp.time_stamp} which will contain the results of action {industry.time_stamp.step}")
+            logger.info(f"Created a new Industry record {(industry.name)} with time stamp {industry.time_stamp} which will contain the results of action {industry.time_stamp.step}")
 
         commodities = Commodity.objects.filter(time_stamp=source_time_stamp)
         for commodity in commodities:
@@ -167,7 +163,7 @@ class TimeStamp(models.Model):
             commodity.id = None
             commodity.time_stamp = self
             commodity.save()
-            logger.info(f"Created a new Commodity record {(commodity.name)} with time stamp {commodity.time_stamp.time_stamp} which will contain the results of action {commodity.time_stamp.step}")
+            logger.info(f"Created a new Commodity record {(commodity.name)} with time stamp {commodity.time_stamp} which will contain the results of action {commodity.time_stamp.step}")
 
         social_classes = SocialClass.objects.filter(
             time_stamp=source_time_stamp)
@@ -176,7 +172,7 @@ class TimeStamp(models.Model):
             social_class.id = None
             social_class.time_stamp = self
             social_class.save()
-            logger.info(f"Created a new Social Class record {(social_class.name)} with time stamp {social_class.time_stamp.time_stamp} which will contain the results of action {social_class.time_stamp.step}")
+            logger.info(f"Created a new Social Class record {(social_class.name)} with time stamp {social_class.time_stamp} which will contain the results of action {social_class.time_stamp.step}")
 
         social_stocks = SocialStock.objects.filter(
             time_stamp=source_time_stamp)
@@ -185,7 +181,7 @@ class TimeStamp(models.Model):
             social_stock.id = None
             social_stock.time_stamp = self
             social_stock.save()
-            logger.info(f"Created a new Social Stock record of usage type {(social_stock.usage_type)} for owner {(social_stock.stock_owner_name)} with time stamp {social_stock.time_stamp.time_stamp} which will contain the results of action {social_stock.time_stamp.step}")
+            logger.info(f"Created a new Social Stock record of usage type {(social_stock.usage_type)} for owner {(social_stock.stock_owner.name)} with time stamp {social_stock.time_stamp} which will contain the results of action {social_stock.time_stamp.step}")
 
         industry_stocks = IndustryStock.objects.filter(
             time_stamp=source_time_stamp)
@@ -194,7 +190,7 @@ class TimeStamp(models.Model):
             industry_stock.id = None
             industry_stock.time_stamp = self
             industry_stock.save()
-            logger.info(f"Created a new Industry Stock record of usage type {(industry_stock.usage_type)} for owner {(industry_stock.stock_owner_name)} with time stamp {industry_stock.time_stamp.time_stamp} which will contain the results of action {industry_stock.time_stamp.step}")
+            logger.info(f"Created a new Industry Stock record of usage type {(industry_stock.usage_type)} for owner {(industry_stock.stock_owner.name)} with time stamp {industry_stock.time_stamp} which will contain the results of action {industry_stock.time_stamp.step}")
 
         #! send in the clones
         #! we now connect each new object to the duplicates of its relevant parent objects
@@ -251,9 +247,6 @@ class TimeStamp(models.Model):
             social_stock.stock_owner = new_social_class
             social_stock.save()
             new_social_class.save()
-
-    class Meta:
-        ordering = ['time_stamp', ]
 
     def __str__(self):
         return f"{self.period}.{self.stage}.{self.step}[{self.id}]"
