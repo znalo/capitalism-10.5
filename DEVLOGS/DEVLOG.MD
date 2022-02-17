@@ -122,6 +122,7 @@ Tested perfunctorily
 
 ## Commit Economy-wide data recorded and displayed
 
+## Commit Improvements to calculation of capital price, and value; price mechanism yet to be completed but logic in place
 
 
 

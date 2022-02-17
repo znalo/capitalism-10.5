@@ -1,8 +1,14 @@
 from ..global_constants import *
-from economy.actions.exchange import set_initial_capital, calculate_demand, calculate_supply, allocate_supply, calculate_trade, set_total_value_and_price
-from economy.actions.produce import calculate_production, calculate_reproduction
+from economy.actions.exchange import (
+    calculate_demand, 
+    calculate_supply, 
+    allocate_supply, 
+    calculate_trade, 
+)
+from economy.actions.produce import calculate_production, calculate_reproduction, calculate_price_changes_in_distribution
 from economy.actions.distribution import calculate_revenue, calculate_investment
 from economy.models.report import Trace
+from economy.actions.helpers import set_initial_capital, set_current_capital, evaluate_commodities, evaluate_stocks
 
 #! Each function in this module executes one step of a simulation.
 #! They are grouped here for clarity
@@ -30,11 +36,14 @@ def production(simulation):
     Trace.enter(simulation,1,"PRODUCE")  
     logger.info(f"Produce in simulation {simulation} for user {simulation.user}")
     calculate_production(simulation=simulation)
+    evaluate_commodities(simulation=simulation) #! The immediate results of production
+    evaluate_stocks(simulation=simulation) #! We have to revalue the stocks, because unit values and prices have changed
 
 def values_and_prices(simulation):
     Trace.enter(simulation,1,"PRICES AND VALUES ARISING FROM PRODUCTION")  
-    logger.info(f"Calculate values and prices in simulation {simulation} for user {simulation.user}")
-    set_total_value_and_price(simulation=simulation)
+    logger.info(f"Calculate prices and values arising from production in simulation {simulation} for user {simulation.user}")
+    calculate_price_changes_in_distribution(simulation)
+    
 
 def reproduce(simulation):
     Trace.enter(simulation,1,"SOCIAL REPRODUCTION")  

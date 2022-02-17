@@ -21,17 +21,17 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
     @property
     def comparator_stock(self):
         comparator_time_stamp=self.simulation.comparator_time_stamp
-        comparator_stock=Stock.objects.filter(
+
+        comparator_stocks=Stock.objects.filter(
             time_stamp=comparator_time_stamp,
             commodity__name=self.commodity.name,
-            usage_type=self.usage_type
+            usage_type=self.usage_type,
+            stock_owner__name=self.stock_owner.name,
             )
-        if comparator_stock.count()!=1:
+        if comparator_stocks.count()!=1:
             return self
-        elif comparator_stock.count()<1:
-            return None
         else:
-            return comparator_stock.first()
+            return comparator_stocks.get()
 
     @property
     def commodity_name(self):
@@ -76,7 +76,7 @@ class IndustryStock(Stock):
         verbose_name_plural = 'Industry Stocks'
 
     def __str__(self):
-        return f"[Project {self.time_stamp.simulation.project_number}] [Industry {self.industry.name}] [Commodity: {self.commodity.name}] [Usage Type: {self.usage_type}]"
+        return f"[Project {self.time_stamp.simulation.project_number}] (usage {self.usage_type}){self.industry.name}:{self.commodity.name}:{self.usage_type}[{self.id}]"
 
 
 class SocialStock(Stock):
@@ -89,5 +89,5 @@ class SocialStock(Stock):
         ordering = ['commodity__display_order']        
 
     def __str__(self):
-        return f"[Project {self.time_stamp.simulation.project_number}] [Class {self.social_class.name}] [Commodity: {self.commodity.name}] [Usage Type: {self.usage_type}]"
+        return f"[Project {self.time_stamp.simulation.project_number}](usage {self.usage_type}){self.social_class.name}:{self.commodity.name}:{self.usage_type}[{self.id}]"
 

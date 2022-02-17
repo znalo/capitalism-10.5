@@ -3,7 +3,7 @@ from economy.models.report import Trace
 from economy.models.commodity import Commodity
 from economy.models.owners import Industry, SocialClass, StockOwner
 from economy.models.stocks import IndustryStock, SocialStock, Stock
-from economy.actions.exchange import set_initial_capital, set_total_value_and_price
+from economy.actions.helpers import evaluate_stocks, set_initial_capital
 from django.contrib.staticfiles.storage import staticfiles_storage
 import pandas as pd
 from economy.global_constants import *
@@ -219,9 +219,9 @@ def initialize(request):
         else:
             logger.error(f"Unknown user type {row.owner_type}")
 
-    #! Create initial values, prices and capitals for all simulations iof this user
+    #! Create initial values, prices and capitals for all simulations of this user
     for simulation in Simulation.objects.filter(user=logged_in_user):
-        set_total_value_and_price(simulation=simulation)
+        evaluate_stocks(simulation=simulation)
         set_initial_capital(simulation=simulation)
 
 #! set the user up to point to project 1

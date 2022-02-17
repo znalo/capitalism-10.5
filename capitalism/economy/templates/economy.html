@@ -8,18 +8,10 @@
 <table id="simulation" class="display compact cell-border" style="width:80%">
     <thead>
         <tr>
-            <th>
-                Initial Capital
-            </th>
-            <th>
-                Current Capital
-            </th>
-            <th>
-                Profit
-            </th>
-            <th>
-                Profit Rate
-            </th>
+            <th>Initial Capital</th>
+            <th>Current Capital</th>
+            <th>Profit</th>
+            <th>Profit Rate</th>
         </tr>
     </thead>
     <tbody>
@@ -31,15 +23,13 @@
         </tr>
     </tbody>
 </table>
-<hr>
+<div class="hr-sect" style="width:80%;">Industry Productive Structure</div>
 <table id="industry" class="display compact cell-border" style="width:80%">
     <thead>
         <tr class="w3-text-black">
             <th colspan="2">Industry</th>
             {% for stock in industry_headers %}
-            <th colspan=2>
-                {{ stock.commodity.name}}
-            </th>
+            <th colspan=2>{{ stock.commodity.name}}</th>
             {% endfor %}
             <th colspan=2>Other Assets</th>
             <th colspan=2>Output</th>
@@ -48,12 +38,8 @@
             <th class="p-0">Name</th>
             <th class="p-0">Product</th>
             {% for stock in industry_headers %}
-            <th>
-                Stock
-            </th>
-            <th>
-                Required
-            </th>
+            <th>Stock</th>
+            <th>Required</th>
             {% endfor %}
             <th>Sales Inventory</th>
             <th>Money</th>
@@ -82,7 +68,8 @@
         {% endfor %}
     </tbody>
 </table>
-<hr>
+
+<div class="hr-sect" style="width:80%;">Industry Asset Structure</div>
 <table id="assets" class="display compact cell-border" style="width:80%">
     <thead>
         <tr class="w3-text-black">
@@ -114,7 +101,7 @@
         {% endfor %}
     </tbody>
 </table>
-<hr>
+<div class="hr-sect" style="width:80%;">Social Classes</div>
 <table id="social-class" class="display compact cell-border" style="width:80%">
     <thead>
         <tr class="w3-text-black">
@@ -135,12 +122,8 @@
             <th>Social Class</th>
             <th>Population</th>
             {% for stock in consumption_headers %}
-            <th>
-                Stock
-            </th>
-            <th>
-                Required
-            </th>
+            <th>Stock</th>
+            <th>Required</th>
             {% endfor %}
             <th>Labour Power</th>
             <th>Money</th>
@@ -172,7 +155,7 @@
         {% endfor %}
     </tbody>
 </table>
-<hr>
+<div class="hr-sect" style="width:80%;">Commodities</div>
 <table id="commodities" class="display compact cell-border" style="width:80%">
     <thead>
         <tr class="w3-text-black">

@@ -26,7 +26,7 @@ C_P = "C-P-C' (produce)"
 C_M = "C'-M' (distribute)"
 INITIAL="Initial"
 VALUES='Values',
-EQUALISED='Equal Profit Rate',
+EQUALIZED='Equal Profit Rate',
 DYNAMIC='Dynamic'
 
 
@@ -60,7 +60,7 @@ STOCK_OWNER_TYPES = [
 
 PRICE_RESPONSE_TYPES =[
     (VALUES,'Values'),
-    (EQUALISED, 'Equal Profit Rate'),
+    (EQUALIZED, 'Equal Profit Rate'),
     (DYNAMIC, 'Dynamic')
 ]
 

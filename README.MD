@@ -84,7 +84,9 @@ Too much money is allocated to industries in the distribution stage
 ## 15 February
   * refactored to simplify comparator logic
   * we now display the economy-wide data (initial capital, current capital, profit, profit rate)
-  
+## 17 February
+  * fixes to comparator logicl, fixes to capital calculations
+    
 
   
 
