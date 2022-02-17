@@ -124,6 +124,11 @@ Tested perfunctorily
 
 ## Commit Improvements to calculation of capital price, and value; price mechanism yet to be completed but logic in place
 
+Fiddled with the trace list to create a crude facility to limit the display of detail.
+TODO this should be done with a dropdown list, or perhaps checkboxes, within the trace list form. But it will do for now.
+
+## Commit Trace List can now select level of detail to display
+
 
 
 

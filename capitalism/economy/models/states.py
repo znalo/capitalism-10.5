@@ -51,10 +51,11 @@ class Simulation(models.Model):
     name=models.CharField(max_length=50,null=False,default = UNDEFINED)
     current_time_stamp= models.OneToOneField("TimeStamp", related_name="current_time_stamp",on_delete=models.SET_NULL, blank=True, null=True, default=None)
     comparator_time_stamp=models.OneToOneField("TimeStamp", related_name="comparator_time_stamp",on_delete=models.SET_NULL, blank=True, null=True, default=None)
-    project_number = models.IntegerField(default=1) #! We don't have a foreign key to the project because the admin might need to rebuild the project table
-    periods_per_year=models.IntegerField(default=1)
-    population_growth_rate = models.IntegerField(default=1)
-    investment_ratio = models.IntegerField(default=1)
+    project_number = models.SmallIntegerField(default=1) #! We don't have a foreign key to the project because the admin might need to rebuild the project table
+    trace_display_level=models.IntegerField(default=5)
+    periods_per_year=models.SmallIntegerField(default=1)
+    population_growth_rate = models.FloatField(default=1)
+    investment_ratio = models.FloatField(default=1)
     labour_supply_response = models.CharField(max_length=50, default=UNDEFINED)
     price_response_type = models.CharField(max_length=50, default=UNDEFINED)
     melt_response_type = models.CharField(max_length=50, null=True, blank=True,default=None)

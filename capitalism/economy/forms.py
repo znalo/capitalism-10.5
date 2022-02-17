@@ -1,12 +1,11 @@
+from trace import Trace
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, UsernameField
+from django.contrib.auth.forms import UserCreationForm
 from economy.models.states import Simulation, Project
 from economy.models.states import User
 from django.forms import ModelChoiceField
 from .global_constants import *
-
-# from django.contrib.auth import get_user_model
-# User=get_user_model()
+from economy.models.report import Trace
 
 class UserModelForm(forms.ModelForm):
     class Meta:
@@ -78,3 +77,8 @@ class SimulationDeleteForm(forms.ModelForm):
    class Meta:
       model=Simulation
       fields=['name', 'project_number']
+
+class TraceLevelSetForm(forms.ModelForm):
+   class Meta:
+      model=Simulation
+      fields=['trace_display_level']

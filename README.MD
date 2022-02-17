@@ -85,8 +85,10 @@ Too much money is allocated to industries in the distribution stage
   * refactored to simplify comparator logic
   * we now display the economy-wide data (initial capital, current capital, profit, profit rate)
 ## 17 February
-  * fixes to comparator logicl, fixes to capital calculations
-    
+  * fixes to comparator logic, fixes to capital calculations
+## 17 February
+  * Trace List can now select level of detail to display. Rudimentary implementation, should be done with dropdown list or spinner, but is helpful
+
 
   
 

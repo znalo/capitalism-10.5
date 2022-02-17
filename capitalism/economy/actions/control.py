@@ -7,7 +7,8 @@ from django.contrib import messages
 from .steps import ACTION_LIST
 
 def step_execute(request,act):
-    #! The various states of the simulation are comprised of stages and steps. The user decides either to execute a single step, or all steps in a stage
+    #! The various states of the simulation are comprised of stages and steps. 
+    #! The user decides either to execute a single step, or all steps in a stage
     #! We may thus arrive at this point by one of three routes:
         # * because we're only processing stages (user not interested in the detail), and this is one step in a complete stage
         # *  or:
@@ -19,25 +20,24 @@ def step_execute(request,act):
     user=request.user
     simulation=user.current_simulation
     current_time_stamp=simulation.current_time_stamp
-
     try:
         action=ACTION_LIST[act]
+        step=STEPS[act]
+        next_step=step.next_step
+        action_description=step.description
     except Exception as error:
-        raise Exception("The simulation asked for an action that we don't know about. It was called {act}")
-    Trace.enter(simulation, 0,f"Executing action {act}")
-    logger.info(f"Preparing to execute step {act} in simulation {simulation} with time stamp {current_time_stamp} (id={current_time_stamp.id})")
+        raise Exception("The simulation asked for action {act} that we don't know how to do")
+    Trace.enter(simulation, 0,action_description)
+    logger.info(f"Preparing to execute step {act} ({action_description}) in simulation {simulation} with time stamp {current_time_stamp} (id={current_time_stamp.id})")
     simulation.one_step()#! creates new timestamp, ready for the action
     action(simulation=simulation) #! perform the action
-    next_step=STEPS[act].next_step
     current_time_stamp.step=next_step
-    logger.info(f"The next planned action will be {current_time_stamp.step}")
-
     #! If we just implemented "demand" then we are at the start of a new period.
     if act==DEMAND:
         current_time_stamp.period+=1        
         logger.info(f"Moving forward one period to {current_time_stamp.period}")
     current_time_stamp.save()
-    logger.info(f"Saved the time stamp {current_time_stamp}")
+    logger.info(f"The step succeeded. The next planned action will be {current_time_stamp.step}")
 
 def stage_execute(request,act):
     #! Executes an entire stage or, if the user is partway through a stage, executes the remaining steps of that stage

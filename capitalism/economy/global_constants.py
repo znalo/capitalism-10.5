@@ -65,23 +65,24 @@ PRICE_RESPONSE_TYPES =[
 ]
 
 class Step:
-    def __init__(self, name, stage_name, next_step):
+    def __init__(self, name, stage_name, next_step, description):
         self.name = name
         self.stage_name=stage_name
         self.next_step=next_step
+        self.description=description
 
 
 STEPS={
-  "demand":Step(name=DEMAND,stage_name="M_C", next_step=ALLOCATE),
-  "allocate":Step(name=ALLOCATE,stage_name="M_C", next_step=TRADE),
-  "trade":Step(name=TRADE,stage_name="M_C",next_step=PRODUCE),
-  "produce":Step(name=PRODUCE,stage_name="C_P", next_step=PRICES),
-  "prices":Step(name=PRICES,stage_name="C_P", next_step=REPRODUCE),
-  "reproduce":Step(name=REPRODUCE,stage_name="C_P", next_step=REVENUE),
-  "revenue":Step(name=REVENUE,stage_name="C_M",next_step=INVEST),
-  "invest":Step(name=INVEST,stage_name="C_M", next_step=DEMAND),
-  "UNDEFINED":Step(name=UNDEFINED,stage_name="C_M", next_step=UNDEFINED),
-  "Initial":Step(name=INITIAL,stage_name="C_M", next_step=INITIAL),
+  "demand":Step(name=DEMAND,stage_name="M_C", next_step=ALLOCATE, description="EVALUATE DEMAND AND SUPPLY"),
+  "allocate":Step(name=ALLOCATE,stage_name="M_C", next_step=TRADE, description="ALLOCATE SUPPLY"),
+  "trade":Step(name=TRADE,stage_name="M_C",next_step=PRODUCE, description="TRADE"),
+  "produce":Step(name=PRODUCE,stage_name="C_P", next_step=PRICES, description="PRODUCE"),
+  "prices":Step(name=PRICES,stage_name="C_P", next_step=REPRODUCE, description="PRICES AND VALUES ARISING FROM PRODUCTION"),
+  "reproduce":Step(name=REPRODUCE,stage_name="C_P", next_step=REVENUE, description="SOCIAL REPRODUCTION"),
+  "revenue":Step(name=REVENUE,stage_name="C_M",next_step=INVEST, description="REVENUES"),
+  "invest":Step(name=INVEST,stage_name="C_M", next_step=DEMAND, description="INVESTMENT"),
+  "UNDEFINED":Step(name=UNDEFINED,stage_name="C_M", next_step=UNDEFINED, description=UNDEFINED),
+  "Initial":Step(name=INITIAL,stage_name="C_M", next_step=INITIAL, description=UNDEFINED),
 }
 
 STAGES={

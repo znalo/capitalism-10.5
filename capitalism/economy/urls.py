@@ -40,6 +40,7 @@ urlpatterns = [
     path('select-simulation/<int:pk>/', views.simulationSelectView, name='select-simulation'),
     path('delete-simulation/<int:pk>/', views.SimulationDeleteView.as_view(),name='delete-simulation'),
     path('restart-simulation/<int:pk>/', views.simulationRestartView ,name='restart-simulation'),
+    path('tracelevel/<int:pk>/', views.TraceLevelSetView.as_view(),name='tracelevel'),
     path('signup/', views.signup, name='signup'),
 ]
 

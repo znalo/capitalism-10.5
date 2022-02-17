@@ -1,24 +1,22 @@
-from .forms import SimulationCreateForm, SimulationSelectForm, SimulationDeleteForm
-from .actions.control import step_execute
+from economy.actions.control import step_execute
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django import forms
 from django.shortcuts import render
-from economy.actions.initialize import initialize_projects
-from economy.actions.initialize import initialize
-from .models.states import Project, TimeStamp, User, Simulation
-from economy.models.report import Trace
-from .models.commodity import Commodity
-from .models.owners import Industry, SocialClass, StockOwner
-from .models.stocks import IndustryStock, SocialStock, Stock
 from django.http import HttpResponse
 from django.template import loader
 from django.views.generic import ListView,UpdateView, DeleteView, CreateView
-from .global_constants import *
-from .forms import SignUpForm
 from django.contrib.auth import authenticate,login
 from django.http.response import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
+
+from .global_constants import *
+from economy.forms import SignUpForm,TraceLevelSetForm, SimulationCreateForm
+from economy.actions.initialize import initialize_projects, initialize
+from economy.models.states import Project, TimeStamp, User, Simulation
+from economy.models.report import Trace
+from economy.models.commodity import Commodity
+from economy.models.owners import Industry, SocialClass, StockOwner
+from economy.models.stocks import IndustryStock, SocialStock, Stock
 
 def get_economy_view_context(request):#TODO change name - this function now not only creates the context but also displays it, so the naming is wrong
     current_simulation=request.user.current_simulation
@@ -47,7 +45,6 @@ def get_economy_view_context(request):#TODO change name - this function now not 
     context["commodities"]= commodities
     template = loader.get_template('economy.html')
     return HttpResponse(template.render(context, request))
-
 
 def sandbox(request):
     table_query = Commodity.objects.all()
@@ -121,7 +118,6 @@ class AllOwnersView(ListView):
         context['stock_list']= stock_list
         return context
 
-
 class SocialStockView(ListView):
     model=SocialStock
     template_name='socialstock_list.html'
@@ -151,8 +147,10 @@ class TraceView(ListView):
     template_name='trace_list.html'    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        qs=Trace.objects.filter(simulation=self.request.user.current_simulation).order_by('real_time')
+        simulation=self.request.user.current_simulation
+        qs=Trace.objects.filter(simulation=simulation, level__lte=simulation.trace_display_level).order_by('real_time')
         context['trace_list']=qs
+        context['simulation']=simulation
         return context    
 
 class SimulationView(ListView):
@@ -166,8 +164,8 @@ class SimulationView(ListView):
 
         return context    
 
-#! Executes a single step and then renders the economy
 def step_execute_and_display(request,act):
+#! Executes a single step and then renders the economy    
     try:
         step_execute(request=request,act=act)
     except Exception as error:
@@ -190,17 +188,16 @@ def about_capitalism(request):
     logger.info(f"User {user} requested the about page")
     return render(request, 'about-capitalism.html')
 
-#! to display messages to people that just logged in
 def newlyLanded(request):
+#! to display messages to people that just logged in    
     user=request.user
     logger.info(f"User {user} has landed on the new landing page")
     messages.info(request,"Hi, welcome to capitalism")
     messages.info(request, "To view the current state of the project, visit the Status Update Page")
     return render(request, 'landing.html')
 
-
-#! See the [CSEStack](https://www.csestack.org/django-sign-up-registration-form/) solution
 def signup(request):
+#! See the [CSEStack](https://www.csestack.org/django-sign-up-registration-form/) solution    
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
@@ -317,3 +314,10 @@ def simulationRestartView(request,pk):
         logger.info(f"Failed to restart a simulation because {error}")
         messages.info(request, f"Failed to restart a simulation because {error}")
     return HttpResponseRedirect(reverse("user-dashboard"))      
+
+class TraceLevelSetView(LoginRequiredMixin, UpdateView):
+    model=Simulation
+    form_class=TraceLevelSetForm
+    template_name='trace_level_update.html'
+    success_url=reverse_lazy('trace')
+
