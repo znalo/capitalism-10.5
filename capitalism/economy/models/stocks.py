@@ -1,8 +1,8 @@
 from django.db import models
-from .states import TimeStamp, Simulation
-from .commodity import Commodity
-from ..global_constants import *
-
+from economy.models.states import TimeStamp, Simulation
+from economy.models.commodity import Commodity
+from economy.global_constants import *
+from economy.models.report import Trace
 
 class Stock(models.Model): # Base class for IndustryStock and SocialStock
     time_stamp = models.ForeignKey(TimeStamp, related_name="%(app_label)s_%(class)s_related", on_delete=models.CASCADE)
@@ -65,7 +65,7 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
 
     @property
     def current_query_set(self):
-        return Stock.objects.filter(self.user.current_simulation.current_time_stamp)
+        return Stock.objects.filter(self.simulation.current_time_stamp)
 
     #! TODO had to do this because {self} doesn't return __str__ for reasons I don't follow
     @property
@@ -84,7 +84,8 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
         new_price=self.price+quantity*self.commodity.unit_price
         new_value=self.value+quantity*self.commodity.unit_value
         if new_size<0 or new_value<0 or new_price<0:
-            raise Exception (f"The stock {self} will become negative with size {new_size}, value {new_value} and price {new_price}")
+            Trace.enter(self.simulation,0,"WARNING: the stock {self.commodity.name} of type {self.usage_type} owned by {self.stock_owner.name} will become negative with size {new_size}, value {new_value} and price {new_price}")
+            # raise Exception (f"The stock {self} will become negative with size {new_size}, value {new_value} and price {new_price}")
         self.size=new_size
         self.price=new_price
         self.value=new_value

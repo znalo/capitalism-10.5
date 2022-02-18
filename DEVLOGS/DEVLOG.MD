@@ -130,8 +130,8 @@ TODO this should be done with a dropdown list, or perhaps checkboxes, within the
 ## Commit Trace List can now select level of detail to display
  * TODO debug 'restart simulation' - at present, this deletes all simulations :-(
 
-## Commit intermediate save of a non-working version prior to refactoring Trace.sim_object and Trace.sim_quantity
-
+## Commit intermediate save of a non-working version prior to refactoring Trace.o and Trace.q
+## Commit Trade and Trace now working: debugging produce
 
 
 

@@ -58,7 +58,8 @@ class Commodity(models.Model):
         new_price=self.total_price+quantity*self.unit_price
         new_value=self.total_value+quantity*self.unit_value
         if new_size<0 or new_value<0 or new_price<0:
-            raise Exception (f"The commodity {self} will become negative with size {new_size}, value {new_value} and price {new_price}")
+            Trace.enter(self.simulation,0,"WARNING: The commodity {self.name} will become negative with size {new_size}, value {new_value} and price {new_price}")
+            # raise Exception (f"The commodity {self} will become negative with size {new_size}, value {new_value} and price {new_price}")
         self.size=new_size
         self.total_price=new_price
         self.total_value=new_value
@@ -66,7 +67,7 @@ class Commodity(models.Model):
         return        
 
     def current_query_set(self):
-        return Commodity.objects.filter(time_stamp=self.user.current_simulation.current_time_stamp)
+        return Commodity.objects.filter(time_stamp=self.simulation.current_time_stamp)
 
     def __str__(self):
         return f"[Time Stamp {self.time_stamp}] {self.name}"

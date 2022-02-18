@@ -34,8 +34,8 @@ def produce(industry, simulation):
     unit_price_of_output=output_commodity.unit_price
     sales_stocks=IndustryStock.objects.filter(industry=industry,usage_type=SALES)
     if sales_stocks.count()!=1:
-        logger.error(f"industry {Trace.sim_object(industry)} has the wrong number of sales stocks. It has {sales_stocks.count()}")
-        raise Exception (f"Industry {Trace.sim_object(industry)} has the wrong number of sales stocks. It has {sales_stocks.count()}")
+        logger.error(f"industry {Trace.o(industry)} has the wrong number of sales stocks. It has {sales_stocks.count()}")
+        raise Exception (f"Industry {Trace.o(industry)} has the wrong number of sales stocks. It has {sales_stocks.count()}")
     sales_stock=sales_stocks.get()
     added_value=0
     for ps in IndustryStock.objects.all().filter(industry=industry,usage_type=PRODUCTION):
@@ -48,22 +48,22 @@ def produce(industry, simulation):
             added_value+=used_up_quantity
         else:
             raise Exception (f"+++Commodity {productive_commodity.name} has unknown origin+++")
-        Trace.enter(simulation,2,f"{Trace.sim_object(industry.name)}'s stock of {Trace.sim_object(productive_commodity.name)} has been reduced by {Trace.sim_quantity(used_up_quantity)} to {Trace.sim_quantity(ps.size)}")
-        Trace.enter(simulation,2,f"Society's stock of {Trace.sim_object(productive_commodity.name)} has been reduced by {Trace.sim_quantity(used_up_quantity)} to {Trace.sim_quantity(productive_commodity.size)}")
+        Trace.enter(simulation,2,f"{Trace.o(industry.name)}'s stock of {Trace.o(productive_commodity.name)} has been reduced by {Trace.q(used_up_quantity)} to {Trace.q(ps.size)}")
+        Trace.enter(simulation,2,f"Society's stock of {Trace.o(productive_commodity.name)} has been reduced by {Trace.q(used_up_quantity)} to {Trace.q(productive_commodity.size)}")
     #! NOTE that we don't use 'change_quantity' to recalculate the value of sales, because this moves independently
     sales_stock.size+=industry.output_scale/periods_per_year
     sales_stock.value+=added_value
     sales_stock.price=sales_stock.size*unit_price_of_output
     sales_stock.save()
-    Trace.enter(simulation,1,f"{Trace.sim_object(industry.name)}'s sales stock of {Trace.sim_object(output_commodity.name)} has grown by {Trace.sim_quantity(industry.output_scale)} to {Trace.sim_quantity(sales_stock.size)}." )
-    Trace.enter(simulation,1,f"Its unit price is {Trace.sim_quantity(unit_price_of_output)} so its price is now {Trace.sim_quantity(sales_stock.price)}. Its value is now {Trace.sim_quantity(sales_stock.value)}")
+    Trace.enter(simulation,1,f"{Trace.o(industry.name)}'s sales stock of {Trace.o(output_commodity.name)} has grown by {Trace.q(industry.output_scale)} to {Trace.q(sales_stock.size)}." )
+    Trace.enter(simulation,1,f"Its unit price is {Trace.q(unit_price_of_output)} so its price is now {Trace.q(sales_stock.price)}. Its value is now {Trace.q(sales_stock.value)}")
   
 def calculate_production(simulation):
     current_time_stamp=simulation.current_time_stamp
     #! establish the scale at which production is possible, given the stocks available
     for industry in Industry.objects.filter(time_stamp=current_time_stamp):
         ratio=industry.scale_output()
-        Trace.enter(simulation,1,f"{industry}'s output will be scaled by {Trace.sim_quantity(ratio)} and so will produce {Trace.sim_quantity(industry.output_scale)} units of {Trace.sim_object(industry.commodity.name)}")
+        Trace.enter(simulation,1,f"{industry}'s output will be scaled by {Trace.q(ratio)} and so will produce {Trace.q(industry.output_scale)} units of {Trace.o(industry.commodity.name)}")
     #! For each industry, carry out production
     for industry in Industry.objects.filter(time_stamp=current_time_stamp):
         produce(industry, simulation)

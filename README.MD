@@ -89,7 +89,7 @@ Too much money is allocated to industries in the distribution stage
 ## 17 February
   * Trace List can now select level of detail to display. Rudimentary implementation, should be done with dropdown list or spinner, but is helpful
 ## 18 February
-  * Debugging a fault in trade in which industries end up with less money than they should
+  * Debugged a fault in trade in which industries end up with less money than they should
   * A good opportunity to sharpen up the Trace reporting
 
 
