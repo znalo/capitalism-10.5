@@ -3,15 +3,33 @@
 
 <header class="w3-container w3-sand" style="width:80%;margin:auto">
     <h5 style="text-align:center">Overview of {{simulation}}</h5>
+
 </header>
+<table id="simulation" class="display compact cell-border" style="width:80%">
+    <thead>
+        <tr>
+            <th>Initial Capital</th>
+            <th>Current Capital</th>
+            <th>Profit</th>
+            <th>Profit Rate</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{ simulation.current_time_stamp.initial_capital|has_changed:simulation.comparator_time_stamp.initial_capital }}</td>
+            <td>{{ simulation.current_time_stamp.current_capital|has_changed:simulation.comparator_time_stamp.current_capital }}</td>
+            <td>{{ simulation.current_time_stamp.profit|has_changed:simulation.current_time_stamp.profit }}</td>
+            <td>{{ simulation.current_time_stamp.profit_rate|has_changed:simulation.current_time_stamp.profit_rate }}</td>
+        </tr>
+    </tbody>
+</table>
+<div class="hr-sect" style="width:80%;">Industry Productive Structure</div>
 <table id="industry" class="display compact cell-border" style="width:80%">
     <thead>
         <tr class="w3-text-black">
             <th colspan="2">Industry</th>
             {% for stock in industry_headers %}
-            <th colspan=2>
-                {{ stock.commodity_FK.name}}
-            </th>
+            <th colspan=2>{{ stock.commodity.name}}</th>
             {% endfor %}
             <th colspan=2>Other Assets</th>
             <th colspan=2>Output</th>
@@ -20,12 +38,8 @@
             <th class="p-0">Name</th>
             <th class="p-0">Product</th>
             {% for stock in industry_headers %}
-            <th>
-                Stock
-            </th>
-            <th>
-                Required
-            </th>
+            <th>Stock</th>
+            <th>Required</th>
             {% endfor %}
             <th>Sales Inventory</th>
             <th>Money</th>
@@ -37,8 +51,8 @@
         {% for industry in industries %}
         <tr>
             <td>{{ industry.name }}</td>
-            <td>{{ industry.commodity_FK.name }}</td>
-            {% for stock in productive_stocks %} {% if stock.industry_FK.name == industry.name %}
+            <td>{{ industry.commodity.name }}</td>
+            {% for stock in productive_stocks %} {% if stock.industry.name == industry.name %}
             <td class='dt-body-right'>
                 {{ stock.size|has_changed:stock.old_size}}
             </td>
@@ -55,6 +69,7 @@
     </tbody>
 </table>
 
+<div class="hr-sect" style="width:80%;">Industry Asset Structure</div>
 <table id="assets" class="display compact cell-border" style="width:80%">
     <thead>
         <tr class="w3-text-black">
@@ -86,14 +101,31 @@
         {% endfor %}
     </tbody>
 </table>
-
+<div class="hr-sect" style="width:80%;">Social Classes</div>
 <table id="social-class" class="display compact cell-border" style="width:80%">
     <thead>
         <tr class="w3-text-black">
+            <th colspan="2">Social Class</th>
+            {% for stock in consumption_headers %}
+            <th colspan=2>
+                {{ stock.commodity_name}}
+            </th>
+            {% endfor %}
+            <th colspan=2>Other Assets</th>
+            <th colspan=3>
+                More
+            </th>
+        </tr>
+
+
+        <tr class="w3-text-black">
             <th>Social Class</th>
             <th>Population</th>
+            {% for stock in consumption_headers %}
+            <th>Stock</th>
+            <th>Required</th>
+            {% endfor %}
             <th>Labour Power</th>
-            <th>Consumption Goods</th>
             <th>Money</th>
             <th>Consumption Ratio</th>
             <th>Revenue</th>
@@ -105,9 +137,16 @@
         <tr>
             <td>{{social_class.name}}</td>
             <td>{{social_class.population}}</td>
-            <td class='dt-body-right'> {{ social_class.class_stock.all|sales_filter }}</td>
-            <td class='dt-body-right'> {{ social_class.class_stock.all|consumption_filter }}</td>
-            <td class='dt-body-right'> {{ social_class.class_stock.all|money_filter }}</td>
+            {% for stock in consumption_stocks %} {% if stock.social_class.name == social_class.name %}
+            <td class='dt-body-right'>
+                {{ stock.size|has_changed:stock.old_size}}
+            </td>
+            <td class='dt-body-right'>
+                {{ stock.consumption_requirement}}
+            </td>
+            {% endif %} {% endfor %}
+            <td class='dt-body-right'> {{ social_class.class_stock|sales_filter }}</td>
+            <td class='dt-body-right'> {{ social_class.class_stock|money_filter }}</td>
             <td class='dt-body-right'> {{social_class.consumption_ratio}}</td>
             <td class='dt-body-right'>{{social_class.revenue}}</td>
             <td class='dt-body-right'>{{social_class.assets}}</td>
@@ -116,7 +155,7 @@
         {% endfor %}
     </tbody>
 </table>
-
+<div class="hr-sect" style="width:80%;">Commodities</div>
 <table id="commodities" class="display compact cell-border" style="width:80%">
     <thead>
         <tr class="w3-text-black">
@@ -164,6 +203,16 @@
 
 <script>
     $(document).ready(function() {
+        $('#simulation').DataTable({
+            "paging": false,
+            "searching": false,
+            "info": false
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
         $('#industry').DataTable({
             "paging": false,
             "searching": false,
@@ -204,4 +253,6 @@
         });
     });
 </script>
+
+
 {% endblock %}

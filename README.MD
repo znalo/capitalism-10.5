@@ -72,6 +72,24 @@ Too much money is allocated to industries in the distribution stage
     * Complete the refactoring by making 'simulation' the parameter for all actions
 ## 10 February
   * Added rudimentary 'about' page
+## 11 February
+  * Cleaner Dashboard with delete simulation facility
+## 12 February
+  * Gradually moving all the activities associated with a user, to the current_simulation of a user
+  * This is not quite complete, but got us to the point where we can run project 4 though we haven't fully checked the result
+## 13 February
+  * Check it out: [Capitalism 10.5](www.dascapital.org)
+## 14 February
+  * price response variable incorporated, along with economy-wide profit rate. However this is not yet displayed. It is Traced, however.
+## 15 February
+  * refactored to simplify comparator logic
+  * we now display the economy-wide data (initial capital, current capital, profit, profit rate)
+## 17 February
+  * fixes to comparator logic, fixes to capital calculations
+## 17 February
+  * Trace List can now select level of detail to display. Rudimentary implementation, should be done with dropdown list or spinner, but is helpful
+
+
   
 
 

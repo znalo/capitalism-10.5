@@ -10,32 +10,26 @@
             <th>Stage</th>
             <th>Step</th>
             <th>Comparator Time Stamp</th>
-            <th>MELT</th>
-            <th>Population Growth Rate</th>
-            <th>Investment Ratio</th>
-            <th>Labour Supply Response</th>
-            <th>Price Response</th>
-            <th>MELT Response</th>
-            <th>Symbols</th>
+            <th>Initial Capital</th>
+            <th>Current Capital</th>
+            <th>Profit</th>
+            <th>Profit Rate</th>
         </tr>
     </thead>
     <tbody>
         {% for ts in timestamp_list %}
         <tr>
-            <td>{{ ts.simulation_FK.project_number }} </td>
-            <td>{{ ts.time_stamp}} ( {{ ts.stage }}.{{ ts.step }}) </td>
+            <td>{{ ts.simulation.project_number }} </td>
+            <td>{{ ts }} </td>
             <td>{{ ts.period}} </td>
             <td>{{ ts.id }}</td>
             <td>{{ ts.stage}} </td>
             <td>{{ ts.step}} </td>
-            <td>{{ ts.comparator_time_stamp_FK.id }}({{ ts.comparator_time_stamp_FK.stage}}. {{ ts.comparator_time_stamp_FK.step}}) </td>
-            <td>{{ ts.MELT}} </td>
-            <td>{{ ts.simulation_FK.population_growth_rate}} </td>
-            <td>{{ ts.simulation_FK.investment_ratio}} </td>
-            <td>{{ ts.simulation_FK.labour_supply_response}} </td>
-            <td>{{ ts.simulation_FK.price_response_type}} </td>
-            <td>{{ ts.simulation_FK.melt_response_type}} </td>
-            <td>{{ ts.simulation_FK.quantity_symbol}} {{ ts.currency_symbol}} </td>
+            <td>{{ ts.simulation.comparator_time_stamp.id }}({{ ts.simulation.comparator_time_stamp.stage}}. {{ ts.simulation.comparator_time_stamp.step}}) </td>
+            <td>{{ ts.initial_capital}} </td>
+            <td>{{ ts.current_capital}} </td>
+            <td>{{ ts.profit}} </td>
+            <td>{{ ts.profit_rate}} </td>
         </tr>
         {% endfor %}
     </tbody>

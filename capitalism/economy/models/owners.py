@@ -1,23 +1,23 @@
 from django.db import models
-from .states import TimeStamp, User
+from .states import TimeStamp, Simulation
 from .report import Trace
 from .commodity import Commodity
 from .stocks import IndustryStock, Stock,SocialStock
 from ..global_constants import *
 
 class StockOwner(models.Model): # Base class for Industry and Social Class
-    time_stamp_FK = models.ForeignKey(TimeStamp, related_name="%(app_label)s_%(class)s_related", on_delete=models.CASCADE)
+    time_stamp = models.ForeignKey(TimeStamp, related_name="%(app_label)s_%(class)s_related", on_delete=models.CASCADE)
     name = models.CharField(max_length=50, default=UNDEFINED)
-    commodity_FK = models.ForeignKey(Commodity, related_name='%(app_label)s_%(class)s_related', on_delete=models.CASCADE)
+    commodity = models.ForeignKey(Commodity, related_name='%(app_label)s_%(class)s_related', on_delete=models.CASCADE)
     stock_owner_type=models.CharField(max_length=20,choices=STOCK_OWNER_TYPES,default=UNDEFINED)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    simulation = models.ForeignKey(Simulation, on_delete=models.CASCADE)
 
     class meta:     #! helps view the objects in time stamp order in admin
-        ordering = ['time_stamp_FK.time_stamp']
+        ordering = ['time_stamp.time_stamp']
     
     @property
     def money_stock(self):
-        stocks = Stock.objects.filter(time_stamp_FK=self.time_stamp_FK, usage_type=MONEY, stock_owner_FK=self)
+        stocks = Stock.objects.filter(time_stamp=self.time_stamp, usage_type=MONEY, stock_owner=self)
         if stocks.count()>1:
             logger.error(f"+++{self.name} has duplicate money stock") 
             return None
@@ -28,7 +28,7 @@ class StockOwner(models.Model): # Base class for Industry and Social Class
 
     @property
     def sales_stock(self):
-        stocks = Stock.objects.filter(time_stamp_FK=self.time_stamp_FK, usage_type=SALES, stock_owner_FK=self)
+        stocks = Stock.objects.filter(time_stamp=self.time_stamp, usage_type=SALES, stock_owner=self)
         if stocks.count()>1:
             logger.error(f"+++{self.name} has duplicate sales stock") 
             return None
@@ -42,7 +42,7 @@ class StockOwner(models.Model): # Base class for Industry and Social Class
     
     def capitalists(self):
         try:
-            capitalists_qs=SocialClass.objects.filter(time_stamp_FK=self.time_stamp_FK, name="Capitalists")
+            capitalists_qs=SocialClass.objects.filter(time_stamp=self.time_stamp, name="Capitalists")
             capitalists=capitalists_qs.get()
         except Exception as error:
             logger.error(f"Too many capitalists for user {self.user} because of exception {error}. Giving Up")
@@ -65,34 +65,35 @@ class Industry(StockOwner):
 
     @property
     def current_queryset(self):
-        return Industry.objects.filter(time_stamp_FK=self.user.current_time_stamp)
+        return Industry.objects.filter(time_stamp=self.user.current_simulation.current_time_stamp)
 
     # @property
     # def productive_stocks(self):
-    #     return IndustryStock.objects.industrystock_set.filter(time_stamp_FK=self.time_stamp_FK,usage_type=PRODUCTION,industry_FK=self)
+    #     return IndustryStock.objects.industrystock_set.filter(time_stamp=self.time_stamp,usage_type=PRODUCTION,industry=self)
 
     #! calculate how much it will cost to purchase sufficient stocks for this industry to produce at its current scale
     @property
     def replenishment_cost(self):
+        simulation=self.simulation
+        current_time_stamp=simulation.current_time_stamp
         #! Requires that demand is correctly set - this must be provided for by the caller 
         logger.info(f"Calculating replenishment cost for industry {self}")
-        Trace.enter(self.user,3,f"Processing industry {Trace.sim_object(self.name)}")
+        Trace.enter(simulation,3,f"Processing industry {Trace.sim_object(self.name)}")
         cost=0
-        productive_stocks=IndustryStock.objects.filter(usage_type=PRODUCTION,time_stamp_FK=self.user.current_time_stamp,stock_owner_FK=self)
+        productive_stocks=IndustryStock.objects.filter(usage_type=PRODUCTION,time_stamp=current_time_stamp,stock_owner=self)
         for stock in productive_stocks:
-            logger.info (f"Stock {stock} has generated an additional cost of {stock.monetary_demand}")
             cost+=stock.monetary_demand
-            logger.info (f"The cumulative total cost to the industry is now {cost}")
-            Trace.enter(self.user,4,f"Industry {Trace.sim_object(self.name)} needs ${Trace.sim_quantity(stock.monetary_demand)} to replenish its stock of {Trace.sim_object(stock.commodity_name)}")
-        Trace.enter(self.user,3,f"The total money required by industry {Trace.sim_object(self.name)} is {cost}")
+            logger.info (f"Stock {stock} has found an additional cost of {stock.monetary_demand} and the cumulative total cost to {self.name} is now {cost}")
+            Trace.enter(simulation,4,f"Industry {Trace.sim_object(self.name)} has found an additional cost of {Trace.sim_quantity(stock.monetary_demand)} and now needs a total of ${Trace.sim_quantity(cost)} to replenish its stock of {Trace.sim_object(stock.commodity_name)}")
+        Trace.enter(simulation,3,f"The total money required by industry {Trace.sim_object(self.name)} is {cost}")
         return cost
 
     @property
     def comparator(self):
-        comparator_time_stamp=self.time_stamp_FK.comparator_time_stamp_FK
+        comparator_time_stamp=self.simulation.comparator_time_stamp
        
         comparator=Industry.objects.filter(
-            time_stamp_FK=comparator_time_stamp,
+            time_stamp=comparator_time_stamp,
             name=self.name
             )
         if comparator.count()>1: #! primitive error-checking (there should be only and exactly one comparator) TODO more sophisticated error trapping
@@ -142,12 +143,12 @@ class SocialClass(StockOwner):
 
     @property
     def current_queryset(self):
-        return SocialClass.objects.filter(time_stamp_FK=self.user.current_time_stamp)
+        return SocialClass.objects.filter(time_stamp=self.user.current_simulation.current_time_stamp)
 
     def consumption_stocks(self):
-        qs=SocialStock.objects.socialstock_set.filter(time_stamp_FK=self.time_stamp_FK,usage_type=CONSUMPTION,industry_FK=self)
+        qs=SocialStock.objects.socialstock_set.filter(time_stamp=self.time_stamp,usage_type=CONSUMPTION,industry=self)
         return qs
 
     def __str__(self):
-        return f"[Project {self.time_stamp_FK.simulation_FK.project_number}] {self.name}"
+        return f"[Project {self.time_stamp.simulation.project_number}] {self.name}"
 

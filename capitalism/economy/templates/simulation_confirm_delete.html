@@ -1,0 +1,13 @@
+{% extends "base.html" %} {% block content %} {% load crispy_forms_tags %}
+<div class="w3-container" style="width:30%">
+
+    <h3>Delete a Simulation</h3>
+    <div class="w3-medium w3-red">Are you sure you want to delete {{ simulation }} ?</div>
+    <form method="POST">
+        {% csrf_token %}
+        <input class="btn btn-primary my-4" type="submit" value="Confirm"></input>
+        <button href="{% url 'user-dashboard' %} " class="btn btn-primary my-4 " type="Cancel ">Cancel</button>
+    </form>
+</div>
+
+{% endblock %}

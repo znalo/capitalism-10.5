@@ -15,10 +15,10 @@
         {% for record in stockowner_list %}
         <tr>
             <td class="w3-center"> {{ record.id }}</td>
-            <td class="w3-center"> {{ record.time_stamp_FK.time_stamp }}</td>
-            <td class="w3-center"> {{ record.time_stamp_FK.simulation_FK.project_number }}</td>
+            <td class="w3-center"> {{ record.time_stamp.time_stamp }}</td>
+            <td class="w3-center"> {{ record.time_stamp.simulation.project_number }}</td>
             <td> {{ record.name }}</td>
-            <td> {{ record.commodity_FK.name }}</td>
+            <td> {{ record.commodity.name }}</td>
             <td> {{ record.stock_owner_type }}</td>
         </tr>
         {% endfor %}

@@ -17,13 +17,14 @@
             <th>Demand</th>
             <th>Supply</th>
             <th>Allocation Ratio</th>
+            <th>Display Order</th>
         </tr>
     </thead>
     <tbody>
         {% for commodity in commodity_list %}
         <tr>
-            <td class="w3-center"> {{ commodity.time_stamp_FK.time_stamp}} </td>
-            <td class="w3-center"> {{ commodity.time_stamp_FK.simulation_FK.project_number}} </td>
+            <td class="w3-center"> {{ commodity.time_stamp.time_stamp}} </td>
+            <td class="w3-center"> {{ commodity.time_stamp.simulation.project_number}} </td>
             <td> {{ commodity.name }}</td>
             <td> {{ commodity.origin }} </td>
             <td> {{ commodity.usage}} </td>
@@ -36,6 +37,8 @@
             <td> {{ commodity.demand }} </td>
             <td> {{ commodity.supply }} </td>
             <td> {{ commodity.allocation_ratio }} </td>
+            <td> {{ commodity.display_order }} </td>
+
         </tr>
         {% endfor %}
     </tbody>

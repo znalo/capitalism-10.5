@@ -8,6 +8,8 @@
             <th>Industry</th>
             <th>Sales Stocks</th>
             <th>Money Stocks</th>
+            <th>Initial Capital</th>
+            <th>Current Capital</th>
             <th>Scale</th>
             <th>Growth Rate</th>
         </tr>
@@ -15,11 +17,13 @@
     <tbody>
         {% for record in industry_list %}
         <tr>
-            <td class="w3-center"> {{ record.time_stamp_FK.time_stamp }}</td>
-            <td class="w3-center"> {{ record.time_stamp_FK.simulation_FK.project_number}} </td>
+            <td class="w3-center"> {{ record.time_stamp.time_stamp }}</td>
+            <td class="w3-center"> {{ record.time_stamp.simulation.project_number}} </td>
             <td> {{ record.name }}</td>
             <td> {{ record.industrystock_set.all|sales_filter }} </td>
             <td> {{ record.industrystock_set.all|money_filter }} </td>
+            <td> {{ record.initial_capital }}</td>
+            <td> {{ record.current_capital }}</td>
             <td> {{ record.output_scale }}</td>
             <td> {{ record.output_growth_rate }}</td>
         </tr>

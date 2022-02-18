@@ -19,10 +19,10 @@
     <tbody>
         {% for record in social_class_list %}
         <tr>
-            <td> {{ record.time_stamp_FK.time_stamp }}</td>
+            <td> {{ record.time_stamp.time_stamp }}</td>
             <td> {{ record.name }}</td>
             <td> {{ record.population }}</td>
-            <td> {{ record.commodity_FK.name }}</td>
+            <td> {{ record.commodity.name }}</td>
             <td> {{ record.class_stock.all|sales_filter }}</td>
             <td> {{ record.class_stock.all|consumption_filter }}</td>
             <td> {{ record.class_stock.all|money_filter }}</td>

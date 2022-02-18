@@ -1,52 +1,72 @@
 {% extends "base.html" %} {% block content %}
 
-<p>
-    <div class="w3-container" style="width:50%">
+<div class="w3-container" style="width:80%">
+    <div class="w3-medium">
+        <h4>Project Management (Under Development)</h4>
+        <h6>Grey options not available</h6>
+        <h6>Note that you can't delete your current simulation</h6>
+
         <p>
-            <div class="w3-medium ">
-                <h4>Project Management (Under Development)</h4>
-                <h4>red=proceed with caution</h4>
-                <h4>green=OK; orange = experimental; blue = not done yet)</h4>
-
-                <p>
-                    <div class="w3-btn w3-block w3-round w3-red ">
-                        <a href="{% url 'initialize' %}">Reinitialize all Simulations</a>
-                    </div>
-                </p>
-                <p>
-                    <div class="w3-btn w3-block w3-round w3-green ">
-                        <a href="{% url 'create-simulation' %} ">New Simulation</a>
-                    </div>
-                </p>
-                <p>
-                    <div class="w3-btn w3-block w3-round w3-green">
-                        <a href="{% url 'select-simulation' %}">Switch Simulation</a>
-                    </div>
-                </p>
-                <p>
-                    <div class="w3-btn w3-block w3-round w3-blue ">
-                        <a href="# ">Restart this Simulation</a>
-                    </div>
-                </p>
-                <p>
-                    <div class="w3-btn w3-block w3-round w3-blue ">
-                        <a href="# ">Delete this Simulation</a>
-                    </div>
-                </p>
-                <p>
-                    <div class="w3-btn w3-block w3-round w3-blue ">
-                        <a href="# ">Download this simulation's details</a>
-                    </div>
-                </p>
-                <p>
-                    <div class="w3-btn w3-block w3-round w3-blue ">
-                        <a href="# ">Upload new simulation details</a>
-                    </div>
-                </p>
-
+            <div class="w3-btn w3-block w3-round w3-red ">
+                <a href="{% url 'initialize' %}">Reinitialize all Simulations</a>
             </div>
         </p>
+        <p>
+            <div class="w3-btn w3-block w3-round w3-green ">
+                <a href="{% url 'create-simulation' %} ">New Simulation</a>
+            </div>
+        </p>
+        <table id="simulation" class="display compact w3-small" style="width:80%">
+            <thead>
+                <tr>
+                    <th>Project</th>
+                    <th>Name</th>
+                    <th>Periods</th>
+                    <th>Switch</th>
+                    <th>Delete</th>
+                    <th>Restart</th>
+                    <th>Download</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for simulation in simulation_list %}
+                <tr>
+                    <td> {{ simulation.project_number }} ({{ simulation.project_description }})</td>
+                    <td> {{ simulation.name }}</td>
+                    <td> {{ simulation.periods_per_year }}</td>
+                    <td>
+
+                        {% if simulation == simulation.user.current_simulation %}
+                        <button class="w3-button w3-round-large w3-grey">Switch</button> {% else %}
+                        <a href="/select-simulation/{{ simulation.pk }}" class="w3-button w3-round-large w3-blue ">Switch</a> {% endif %}
+
+                    </td>
+
+                    <td>
+                        {% if simulation == simulation.user.current_simulation %}
+                        <button class="w3-button w3-round-large w3-grey ">Delete</button> {% else %}
+                        <a href="/delete-simulation/{{ simulation.pk }} " class="w3-button w3-round-large w3-red ">Delete</a> {% endif %}
+                    </td>
+
+                    <td> <a href="/restart-simulation/{{ simulation.pk}}" class="w3-button w3-round-large w3-blue ">Restart</a></td>
+                    <td> <button class="w3-button w3-grey w3-round-large ">Download</button></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+    </p>
+</div>
 </p>
 
+{% endblock %} {% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#simulation').DataTable({
+            "paging ": false,
+            "searching ": false,
+            "info ": false
+        });
+    });
+</script>
 {% endblock %}
