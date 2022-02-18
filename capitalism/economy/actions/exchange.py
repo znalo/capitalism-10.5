@@ -1,3 +1,4 @@
+from django.contrib import messages
 from economy.actions.helpers import evaluate_commodities, set_initial_capital,set_current_capital
 from economy.models.report import Trace
 from economy.models.commodity import Commodity
@@ -5,10 +6,10 @@ from economy.models.owners import StockOwner
 from economy.models.stocks import Stock, IndustryStock, SocialStock
 from ..global_constants import *
 
-#! Calculate the unconstrained demand for all stocks
-#! Use this to calculate the total demand for each commodity
-#! Later (in 'allocate') we impose constraints arising from supply and (TODO) money shortages
 def calculate_demand(simulation):
+    #! Calculate the unconstrained demand for all stocks
+    #! Use this to calculate the total demand for each commodity
+    #! In 'allocate' we impose constraints arising from supply and (TODO) money shortages
     current_time_stamp=simulation.current_time_stamp
     periods_per_year=simulation.periods_per_year
     user=simulation.user
@@ -63,7 +64,7 @@ def calculate_supply(simulation):
         stock.supply = stock.size
         stock.save()
         commodity.supply += stock.supply
-        Trace.enter(simulation,2,f" Supply of {Trace.sim_object(commodity.name)} from the industry {Trace.sim_object(stock.stock_owner.name)} is {Trace.sim_quantity(stock.size)}. Total supply is now {Trace.sim_quantity(commodity.supply)}")
+        Trace.enter(simulation,2,f" Supply of {Trace.sim_object(commodity.name)} from owner {Trace.sim_object(stock.stock_owner.name)} is {Trace.sim_quantity(stock.size)}. Total supply is now {Trace.sim_quantity(commodity.supply)}")
         commodity.save()
 
 def allocate_supply(simulation):
@@ -96,11 +97,13 @@ def calculate_trade(simulation):
     #! iterate over all stocks that want to buy a commodity
     buyer_stocks=Stock.objects.filter(time_stamp=current_time_stamp).exclude(usage_type=MONEY).exclude(usage_type=SALES)
     for buyer_stock in buyer_stocks:
+        #! mostly, we use these local variables for debugging, but it also helps clarity
         buyer=buyer_stock.stock_owner
+        buyer_name=buyer.name
         buyer_commodity=buyer_stock.commodity
-        Trace.enter(simulation,3,f"{Trace.sim_object(buyer.name)} seeks to purchase {Trace.sim_quantity(buyer_stock.demand)} of {Trace.sim_object(buyer_commodity.name)} for stock of usage type {Trace.sim_object(buyer_commodity.usage)} whose origin is {Trace.sim_object(buyer_commodity.origin)}")
         buyer_money_stock=buyer.money_stock
-        Trace.enter(simulation,3,f"The buyer has {Trace.sim_quantity(buyer_money_stock.size)} in money and the unit price is {Trace.sim_quantity(buyer_commodity.unit_price)}. Looking for sellers")
+        buyer_verbs=buyer.verbs()
+        Trace.enter(simulation,2,f"{Trace.sim_object(buyer_name)} will spend up to ${Trace.sim_quantity(buyer_money_stock.size)} to get {Trace.sim_quantity(buyer_stock.demand)} of {Trace.sim_object(buyer_commodity.name)} for an {Trace.sim_object(buyer_commodity.usage)} stock with origin {Trace.sim_object(buyer_commodity.origin)}. The unit price is ${Trace.sim_quantity(buyer_commodity.unit_price)}")
         
         #! iterate over all potential sellers of this commodity
         potential_sellers=StockOwner.objects.filter(time_stamp=current_time_stamp)
@@ -109,9 +112,16 @@ def calculate_trade(simulation):
             seller_name=seller.name
             seller_stock=seller.sales_stock
             seller_commodity=seller_stock.commodity
-            Trace.enter(simulation,3,f"{Trace.sim_object(seller_name)} can offer {Trace.sim_quantity(seller_stock.supply)} of {Trace.sim_object(seller_commodity.name)} for sale to {Trace.sim_object(buyer.name)} who wants {Trace.sim_object(buyer_commodity.name)}")
+            seller_money_stock=seller.money_stock
+            seller_verbs=seller.verbs()
             if seller_commodity==buyer_commodity:
-                sale(seller_stock,buyer_stock,seller,buyer)
+                Trace.enter(simulation,2,f"SALE:{Trace.sim_object(seller_name)} can sell up to {Trace.sim_quantity(seller_stock.supply)} of {Trace.sim_object(seller_commodity.name)} to {Trace.sim_object(buyer.name)}")
+                sale(seller_stock,buyer_stock,seller,buyer, seller_money_stock,buyer_money_stock)
+                Trace.enter(simulation,3,f"Buyer status after sale: {Trace.sim_object(buyer.name)} now {buyer_verbs[1]} {Trace.sim_quantity(buyer_stock.size)} of {Trace.sim_object(seller_commodity.name)} and ${Trace.sim_quantity(buyer_money_stock.size)}")
+                Trace.enter(simulation,3,f"Seller status after sale: {Trace.sim_object(seller.name)} now {seller_verbs[1]} {Trace.sim_quantity(seller_stock.size)} of {Trace.sim_object(seller_commodity.name)} and ${Trace.sim_quantity(seller_money_stock.size)}")
+            else:
+                Trace.enter(simulation,4,f"NO SALE: {Trace.sim_object(seller_name)} cannot help")
+        Trace.enter(simulation,2,f"BUYER FINAL STATUS: {Trace.sim_object(buyer.name)} now {buyer_verbs[1]} {Trace.sim_quantity(buyer_stock.size)} with value ${Trace.sim_quantity(buyer_stock.value)} and price ${Trace.sim_quantity(buyer_stock.price)}")    
     
     #!Every industry now has the goods with which they will start production.
     #!At the end of this process, we (and the owners) want to know how much profit the industries have made
@@ -121,25 +131,29 @@ def calculate_trade(simulation):
     set_initial_capital(simulation=simulation)
     set_current_capital(simulation=simulation)
 
-def sale(seller_stock, buyer_stock, seller, buyer):
-    simulation=seller.simulation
-    transferred_stock=min(buyer_stock.demand,seller_stock.supply)
-    commodity=buyer_stock.commodity
-    cost=transferred_stock*commodity.unit_price
-    seller_stock.size-=transferred_stock
-    buyer_stock.size+=transferred_stock
-    seller_money_stock=seller.money_stock
-    buyer_money_stock=buyer.money_stock
-    Trace.enter(simulation,1,f"Sale: {Trace.sim_object(buyer.name)} is buying {Trace.sim_quantity(transferred_stock)} of {Trace.sim_object(seller_stock.commodity.name)} from {Trace.sim_object(seller.name)} at a cost of {Trace.sim_quantity(cost)}")
-    Trace.enter(simulation,1,f"The seller has ${Trace.sim_quantity(seller_money_stock.size)} and the buyer has ${Trace.sim_quantity(buyer_money_stock.size)}")
-    seller_stock.demand+=transferred_stock
-    buyer_stock.supply-=transferred_stock
-    seller_stock.save()
-    buyer_stock.save()
-    if buyer.id!=seller.id: #!Bizarrely, the code below does not work if the seller and buyer are the same
-        buyer_money_stock.size-=cost
+def sale(seller_stock, buyer_stock, seller, buyer, seller_money_stock,buyer_money_stock):
+    try:
+        simulation=seller.simulation
+        transferred_stock=min(buyer_stock.demand,seller_stock.supply)
+        logger.info(f"Transferring {transferred_stock} from {seller.name} to {buyer.name}")
+        commodity=buyer_stock.commodity
+        cost=transferred_stock*commodity.unit_price
+
+        buyer_stock.change_size(transferred_stock)
+        seller_stock.change_size(-transferred_stock)
+        seller_stock.supply+=transferred_stock
+        buyer_stock.demand-=transferred_stock
+        Trace.enter(simulation,1,f"Buyer transaction state: {Trace.sim_object(buyer.name)} {buyer.verbs[1]} buying {Trace.sim_quantity(transferred_stock)} of {Trace.sim_object(seller_stock.commodity.name)} from {Trace.sim_object(seller.name)} for ${Trace.sim_quantity(cost)}")
+        Trace.enter(simulation,3,f"Seller transaction state: {seller.verbs[2]} ${Trace.sim_quantity(seller_money_stock.size)} and {buyer.verbs[2]} ${Trace.sim_quantity(buyer_money_stock.size)}")
+        seller_stock.save()
+        buyer_stock.save()
+        #!TODO Bizarrely, the code below does not always work if the seller and buyer are the same
+        buyer_money_stock.change_size(-cost)
         buyer_money_stock.save()    
-        seller_money_stock.size+=cost
+        seller_money_stock.change_size(cost)
         seller_money_stock.save()
-    Trace.enter(simulation,1,f"After trade, the seller now has ${Trace.sim_quantity(seller_money_stock.size)} and the buyer ${Trace.sim_quantity(buyer_money_stock.size)}")
+    except Exception as error:
+        logger.error(f"Attempted sale failed because of {error}: details {type(error).__name__} {__file__} {error.__traceback__.tb_lineno} ")
+        return
+   
 

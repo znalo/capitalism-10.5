@@ -41,6 +41,8 @@ def trade(simulation):
 
 def production(simulation):
     calculate_production(simulation=simulation)    # ! The immediate results of production
+
+def capital(simulation):
     evaluate_commodities(simulation=simulation)    # ! We have to revalue the stocks, because unit values and prices have changed
     evaluate_stocks(simulation=simulation)         # ! Now we can calculate capital and profits arising from the 'immediate process of production'
     set_current_capital(simulation=simulation)
@@ -62,7 +64,8 @@ ACTION_LIST = {
     'allocate': allocate,
     'trade': trade,
     'produce': production,
-    'prices': values_and_prices,
+    'capital': capital,
+    'revalue': values_and_prices,
     'reproduce': reproduce,
     'revenue': revenue,
     'invest': invest,

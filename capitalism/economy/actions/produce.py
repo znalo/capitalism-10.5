@@ -7,9 +7,9 @@ from economy.models.stocks import Stock, IndustryStock, SocialStock
 
 #! Actions for the 'production' phase
 
+def scale_output(industry):
 #! scale output down if constrained by stock size. Normally should not happen, but we have to catch this to ensure stocks don't go negative
 #TODO should this be a method of the Industry object?
-def scale_output(industry):
     simulation=industry.user.current_simulation
     desired_scale=1
     scale_ratio=desired_scale
@@ -25,52 +25,51 @@ def scale_output(industry):
     industry.output_scale*=scale_ratio
     return scale_ratio #! probably superfluous
 
-#! Produce for one industry. Invoked by 'calculate_production'
-#! TODO should be a method of Industry class?
 def produce(industry, simulation):
+#! Produce for one industry. Invoked by 'calculate_production'
+#! TODO should be a method of Industry class?    
     periods_per_year=simulation.periods_per_year
-    logger.info(f"Start production for Industry {industry} in simulation {simulation} with {periods_per_year} periods per year")
+    output_commodity=industry.commodity
+    logger.info(f"Industry {industry} is producing {output_commodity} in simulation {simulation} with {periods_per_year} periods per year")
+    unit_price_of_output=output_commodity.unit_price
     sales_stocks=IndustryStock.objects.filter(industry=industry,usage_type=SALES)
     if sales_stocks.count()!=1:
-        logger.error(f"industry {industry} has the wrong number of sales stocks. It has {sales_stocks.count()}")
-        raise Exception (f"Industry {industry} has the wrong number of sales stocks. It has {sales_stocks.count()}")
+        logger.error(f"industry {Trace.sim_object(industry)} has the wrong number of sales stocks. It has {sales_stocks.count()}")
+        raise Exception (f"Industry {Trace.sim_object(industry)} has the wrong number of sales stocks. It has {sales_stocks.count()}")
     sales_stock=sales_stocks.get()
-    unit_price_of_output=industry.commodity.unit_price
     added_value=0
     for ps in IndustryStock.objects.all().filter(industry=industry,usage_type=PRODUCTION):
-        commodity=ps.commodity
+        productive_commodity=ps.commodity
         used_up_quantity=ps.production_requirement/periods_per_year
-        ps.size-=used_up_quantity
-        commodity.size-=used_up_quantity
-        if commodity.origin=="INDUSTRIAL":
-            added_value+=used_up_quantity*commodity.unit_price
-        elif commodity.origin=="SOCIAL": #! assume it's labour power - alternative models may want to add other sources of value
+        ps.change_size(-used_up_quantity)
+        if productive_commodity.origin=="INDUSTRIAL":
+            added_value+=used_up_quantity*productive_commodity.unit_price
+        elif productive_commodity.origin=="SOCIAL": #! assume it's labour power - alternative models may want to add other sources of value
             added_value+=used_up_quantity
         else:
-            raise Exception (f"+++Commodity {commodity.name} has unknown origin+++")
-        ps.save()
-        Trace.enter(simulation,2,f"{industry.name}'s stock of {ps.commodity.name} has been reduced by {used_up_quantity} to {ps.size}")
-        Trace.enter(simulation,2,f"Total social stock of {commodity.name}  has been reduced by {used_up_quantity} to {commodity.size}")
+            raise Exception (f"+++Commodity {productive_commodity.name} has unknown origin+++")
+        Trace.enter(simulation,2,f"{Trace.sim_object(industry.name)}'s stock of {Trace.sim_object(productive_commodity.name)} has been reduced by {Trace.sim_quantity(used_up_quantity)} to {Trace.sim_quantity(ps.size)}")
+        Trace.enter(simulation,2,f"Society's stock of {Trace.sim_object(productive_commodity.name)} has been reduced by {Trace.sim_quantity(used_up_quantity)} to {Trace.sim_quantity(productive_commodity.size)}")
+    #! NOTE that we don't use 'change_quantity' to recalculate the value of sales, because this moves independently
     sales_stock.size+=industry.output_scale/periods_per_year
     sales_stock.value+=added_value
     sales_stock.price=sales_stock.size*unit_price_of_output
     sales_stock.save()
-    Trace.enter(simulation,1,f"{industry.name}'s sales stock has increased by {industry.output_scale} to {sales_stock.size} and its value has risen to {sales_stock.value}" )
-
+    Trace.enter(simulation,1,f"{Trace.sim_object(industry.name)}'s sales stock of {Trace.sim_object(output_commodity.name)} has grown by {Trace.sim_quantity(industry.output_scale)} to {Trace.sim_quantity(sales_stock.size)}." )
+    Trace.enter(simulation,1,f"Its unit price is {Trace.sim_quantity(unit_price_of_output)} so its price is now {Trace.sim_quantity(sales_stock.price)}. Its value is now {Trace.sim_quantity(sales_stock.value)}")
+  
 def calculate_production(simulation):
     current_time_stamp=simulation.current_time_stamp
-    Trace.enter(simulation,0,"Start Producing")
     #! establish the scale at which production is possible, given the stocks available
     for industry in Industry.objects.filter(time_stamp=current_time_stamp):
         ratio=industry.scale_output()
-        Trace.enter(simulation,1,f"{industry}'s output will be scaled by {ratio} and so will produce {industry.output_scale} units of {industry.commodity.name}")
+        Trace.enter(simulation,1,f"{industry}'s output will be scaled by {Trace.sim_quantity(ratio)} and so will produce {Trace.sim_quantity(industry.output_scale)} units of {Trace.sim_object(industry.commodity.name)}")
     #! For each industry, carry out production
     for industry in Industry.objects.filter(time_stamp=current_time_stamp):
         produce(industry, simulation)
         industry.save()
-    Commodity.set_commodity_sizes(user=simulation.user)
-    set_current_capital(simulation=simulation)    
 
+def calculate_price_changes_in_distribution(simulation):
 #! calculate the prices at which producers will sell products, and at which consumers will purchase them, when the production stage is complete.
 #! it implements an algorithm determined by two parameters of the simulation that are specified either initially, or by the user:
 #  * price_response
@@ -84,10 +83,7 @@ def calculate_production(simulation):
 # * price_response_type==DYNAMIC
 #   ** prices are set in proportions that respond to differences between supply and demand
 #   ** as with EQUALIZED, the actual price level is determined by the melt_response parameter
-#!Initially, in development, we suppose a melt-response of 1, that is, total money price=total price in labour time
-
-def calculate_price_changes_in_distribution(simulation):
-    Trace.enter(simulation,2,"RECALCULATING PRICES")
+#!Initially, in development, we suppose a melt-response of 1, that is, total money price=total price in labour time    Trace.enter(simulation,2,"RECALCULATING PRICES")
     current_time_stamp=simulation.current_time_stamp
     industries=Industry.objects.filter(simulation=simulation, time_stamp=current_time_stamp)
     Trace.enter(simulation,1,"EFFECTS OF DISTRIBUTION")
@@ -105,19 +101,16 @@ def calculate_price_changes_in_distribution(simulation):
             Trace.enter(simulation,2,f"The unit prices is {commodity.unit_price} and will be set to {desired_unit_price} ")
             commodity.unit_price=desired_unit_price
             commodity.save()
-    return
 #! more to come...
+    return
 
-
-
-
+def calculate_reproduction(simulation):
 #! Social Consumption
 #! Production determines output values and prices
 #! Once we have a sophisticated pricing model, prices will change as a result of reproduction (in response to demand, etc)
 #! In any case, we suppose for simplicity a quantity-response model of social demand
 #! So in the next stage (reproduction) classes set levels of consumption dependent on what they can afford
 #! Then, in the sophisticated model, prices will respond to the changes in stocks. If stocks have fallen, prices will fall and vice versa.
-def calculate_reproduction(simulation):
     current_time_stamp=simulation.current_time_stamp
     periods_per_year=simulation.periods_per_year
     Trace.enter(simulation,0,f"Social Consumption")

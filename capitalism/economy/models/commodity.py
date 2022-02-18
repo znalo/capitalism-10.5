@@ -41,21 +41,6 @@ class Commodity(models.Model):
         else:
             return comparator_qs.first()
 
-    def set_commodity_size(self):
-        simulation=self.simulation
-        current_time_stamp=simulation.current_time_stamp
-        from .stocks import Stock #! have to do this here to avoid circular import. TODO not very happy with this
-        Trace.enter(simulation,1,f"Recaculating the size of commodity {self.name}; currently this is {self.size} ")
-        stocks=Stock.objects.filter(commodity=self,time_stamp=current_time_stamp) 
-        #! TODO What a mess
-        #! TODO can we resolve this mess by converting all related querysets into methods of the relevant objects
-        size=0
-        for stock in stocks:
-            size+=stock.size
-        self.size=size
-        self.save()
-        Trace.enter(simulation,2,f"Commodity {Trace.sim_object(self.name)} size is {Trace.sim_quantity(size)} ")
-
     @property
     def comparator_demand(self):
         return self.comparator_commodity().demand
@@ -64,14 +49,21 @@ class Commodity(models.Model):
     def comparator_supply(self):
         return self.comparator_commodity().supply
 
-    @staticmethod
-    def set_commodity_sizes(user):
-        simulation=user.simulation
-        Trace.enter(simulation,1,f"Recalculating all commodity sizes for user {user}")
-        logger.info(f"Recalculating all commodity sizes for user {user}")
-        commodities=Commodity.objects.filter(time_stamp=user.current_simulation.current_time_stamp)
-        for commodity in commodities:
-            commodity.set_commodity_size()
+    def change_size(self,quantity):
+        #! NOTE caller does not have to save TODO is this the best way?
+        logger.info(f"Commodity {self.name} is changing its size by {quantity}")
+        self.refresh_from_db()
+        logger.info(f"Current size:{self.size} value:{self.total_value} price:{self.total_price}")
+        new_size=self.size+quantity
+        new_price=self.total_price+quantity*self.unit_price
+        new_value=self.total_value+quantity*self.unit_value
+        if new_size<0 or new_value<0 or new_price<0:
+            raise Exception (f"The commodity {self} will become negative with size {new_size}, value {new_value} and price {new_price}")
+        self.size=new_size
+        self.total_price=new_price
+        self.total_value=new_value
+        self.save()
+        return        
 
     def current_query_set(self):
         return Commodity.objects.filter(time_stamp=self.user.current_simulation.current_time_stamp)

@@ -8,6 +8,7 @@ from django.contrib.auth import authenticate,login
 from django.http.response import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
+import traceback
 
 from .global_constants import *
 from economy.forms import SignUpForm,TraceLevelSetForm, SimulationCreateForm
@@ -299,20 +300,24 @@ def simulationRestartView(request,pk):
     user=request.user
     simulation=user.current_simulation
     #! Find the first time stamp in the simulation. Its period will be 0
-    first_time_stamp=TimeStamp.objects.get(user=user,simulation=simulation,period=0)
-    logger.info(f"User {request.user} is restarting simulation {request.user.current_simulation}")
-    logger.info(f"The time stamp is {first_time_stamp}")
+    first_time_stamp=TimeStamp.objects.get(simulation=simulation,period=0)
+    logger.info(f"User {user} is restarting simulation {simulation}")
+    logger.info(f"The first time stamp is {first_time_stamp}")
     try:
-        Commodity.objects.filter(simulation=simulation).exclude(time_stamp=first_time_stamp).delete()
-        StockOwner.objects.filter(simulation=simulation).exclude(time_stamp=first_time_stamp).delete()
-        Stock.objects.filter(simulation=simulation).exclude(time_stamp=first_time_stamp).delete()
-        Trace.objects.filter(simulation=simulation).exclude(time_stamp_id=first_time_stamp.time_stamp).delete()
-        TimeStamp.objects.filter(simulation=simulation).exclude(time_stamp=first_time_stamp.time_stamp).delete()
-        simulation.current_time_stamp=first_time_stamp
-        simulation.save()
+
+        Commodity.objects.filter(simulation=simulation).exclude(simulation__current_time_stamp=first_time_stamp).delete()
+        StockOwner.objects.filter(simulation=simulation).exclude(simulation__current_time_stamp=first_time_stamp).delete()
+        Stock.objects.filter(simulation=simulation).exclude(simulation__current_time_stamp=first_time_stamp).delete()
+        Trace.objects.filter(simulation=simulation).exclude(simulation__current_time_stamp=first_time_stamp).delete()
+        TimeStamp.objects.filter(simulation=simulation).exclude(simulation__current_time_stamp=first_time_stamp).delete()
+        Simulation.objects.filter(user__current_simulation=simulation).exclude(current_time_stamp=first_time_stamp).delete()
+        #TODO debug this
+
+        remaining_simulations=Simulation.objects.filter(user__current_simulation=simulation)
     except Exception as error:
-        logger.info(f"Failed to restart a simulation because {error}")
-        messages.info(request, f"Failed to restart a simulation because {error}")
+        logger.error(f"Failed to restart a simulation because {error}: details {type(error).__name__} {__file__} {error.__traceback__.tb_lineno} ")
+        messages.error(request, f"Failed to restart a simulation because {error}")
+    
     return HttpResponseRedirect(reverse("user-dashboard"))      
 
 class TraceLevelSetView(LoginRequiredMixin, UpdateView):

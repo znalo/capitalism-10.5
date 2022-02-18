@@ -12,9 +12,17 @@ class StockOwner(models.Model): # Base class for Industry and Social Class
     stock_owner_type=models.CharField(max_length=20,choices=STOCK_OWNER_TYPES,default=UNDEFINED)
     simulation = models.ForeignKey(Simulation, on_delete=models.CASCADE)
 
+    def verbs(self):
+        singulars=["is", "has", "wants", "sells"]
+        plurals=["are", "have", "want", "sell"]
+        if self.stock_owner_type==INDUSTRY:
+            return singulars
+        else:
+            return plurals
+
     class meta:     #! helps view the objects in time stamp order in admin
         ordering = ['time_stamp.time_stamp']
-    
+
     @property
     def money_stock(self):
         stocks = Stock.objects.filter(time_stamp=self.time_stamp, usage_type=MONEY, stock_owner=self)
@@ -57,7 +65,7 @@ class Industry(StockOwner):
     work_in_progress=models.FloatField(default=0)
     current_capital=models.FloatField(default=0)
     profit=models.FloatField(default=0)
-    profit_rate =models.FloatField(default=0)
+    profit_rate=models.FloatField(default=0)
 
     class Meta:
         verbose_name = 'Industry'

@@ -128,8 +128,9 @@ Fiddled with the trace list to create a crude facility to limit the display of d
 TODO this should be done with a dropdown list, or perhaps checkboxes, within the trace list form. But it will do for now.
 
 ## Commit Trace List can now select level of detail to display
+ * TODO debug 'restart simulation' - at present, this deletes all simulations :-(
 
-
+## Commit intermediate save of a non-working version prior to refactoring Trace.sim_object and Trace.sim_quantity
 
 
 

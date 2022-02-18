@@ -67,27 +67,56 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
     def current_query_set(self):
         return Stock.objects.filter(self.user.current_simulation.current_time_stamp)
 
+    #! TODO had to do this because {self} doesn't return __str__ for reasons I don't follow
+    @property
+    def description(self):
+        return f"stock with owner:{self.stock_owner.name} commodity:{self.commodity.name} usage:{self.usage_type} id:{self.id}"
+
+
+    def change_size(self,quantity):
+    #! change the size of this stock by 'quantity'
+    #! change its price using the commodity's unit price
+    #! change its value using the commodity's unit value
+    #! save self (NOTE caller does not have to do this) TODO is this the best way?
+    #! tell the commodity about these changes
+        logger.info(f"Stock {self.description} is changing its size by {quantity}")
+        new_size=self.size+quantity
+        new_price=self.price+quantity*self.commodity.unit_price
+        new_value=self.value+quantity*self.commodity.unit_value
+        if new_size<0 or new_value<0 or new_price<0:
+            raise Exception (f"The stock {self} will become negative with size {new_size}, value {new_value} and price {new_price}")
+        self.size=new_size
+        self.price=new_price
+        self.value=new_value
+        self.commodity.change_size(quantity)
+        self.save()
+        return
+
 class IndustryStock(Stock):
     industry = models.ForeignKey("Industry", on_delete=models.CASCADE, null=True) #TODO redundant? the base class has stock_owner
     production_requirement = models.FloatField( default=0)
+
 
     class Meta:
         verbose_name = 'Industry Stock'
         verbose_name_plural = 'Industry Stocks'
 
+
     def __str__(self):
-        return f"[Project {self.time_stamp.simulation.project_number}] (usage {self.usage_type}){self.industry.name}:{self.commodity.name}:{self.usage_type}[{self.id}]"
+        return f"[Project {self.time_stamp.simulation.project_number}]{self.name}:{self.commodity.name}:{self.usage_type}[{self.id}]"
 
 
 class SocialStock(Stock):
     social_class = models.ForeignKey("SocialClass",  related_name='class_stock', on_delete=models.CASCADE, null=True)
     consumption_requirement = models.FloatField(default=0)
-    
+
+    #! TODO had to do this because {self} doesn't return __str__ for reasons I don't follow
+
     class Meta:
         verbose_name = 'Social Stock'
         verbose_name_plural = 'Social Stocks'
         ordering = ['commodity__display_order']        
 
     def __str__(self):
-        return f"[Project {self.time_stamp.simulation.project_number}](usage {self.usage_type}){self.social_class.name}:{self.commodity.name}:{self.usage_type}[{self.id}]"
+        return f"[Project {self.time_stamp.simulation.project_number}]{self.social_class.name}:{self.commodity.name}:{self.usage_type}[{self.id}]"
 

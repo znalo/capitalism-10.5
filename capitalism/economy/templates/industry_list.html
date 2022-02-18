@@ -6,6 +6,8 @@
             <th>Time Stamp</th>
             <th>Project</th>
             <th>Industry</th>
+            <th>Product</th>
+            <th>Work in Progress</th>
             <th>Sales Stocks</th>
             <th>Money Stocks</th>
             <th>Initial Capital</th>
@@ -17,9 +19,11 @@
     <tbody>
         {% for record in industry_list %}
         <tr>
-            <td class="w3-center"> {{ record.time_stamp.time_stamp }}</td>
-            <td class="w3-center"> {{ record.time_stamp.simulation.project_number}} </td>
+            <td class="w3-center"> {{ record.time_stamp}}</td>
+            <td class="w3-center"> {{ record.simulation.project_number}} </td>
             <td> {{ record.name }}</td>
+            <td> {{ record.commodity.name }} </td>
+            <td> ${{ record.work_in_progress}} </td>
             <td> {{ record.industrystock_set.all|sales_filter }} </td>
             <td> {{ record.industrystock_set.all|money_filter }} </td>
             <td> {{ record.initial_capital }}</td>
