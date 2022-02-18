@@ -91,7 +91,10 @@ Too much money is allocated to industries in the distribution stage
 ## 18 February
   * Debugged a fault in trade in which industries end up with less money than they should
   * A good opportunity to sharpen up the Trace reporting
-
+## 18 February
+  * This one seems to run right through without obvious error so I will migrate it to the site
+  * Doesn't do profit rate equalization yet (or at least if it does, I didn't verify it)
+  * But the Trace is much more helpful especially for bug tracking, and the logic seems to work OK
 
   
 

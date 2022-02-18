@@ -5,8 +5,7 @@ from economy.models.stocks import Stock
 from ..global_constants import *
 
 def evaluate_stocks(simulation):
-#! Set the price and value of every stock from its size and the unit price and value of its commodity
-#! (Verify commodity total values and prices against unit values, prices and quantities of each commodity)
+#! Set the price and value of every stock from its size
     Trace.enter(simulation,1,f"Evaluate stock values and prices from commodity unit prices and values")
     logger.info(f"Calculate values and prices for simulation {simulation} and time stamp  {simulation.current_time_stamp}")
     for stock in Stock.objects.filter(time_stamp=simulation.current_time_stamp):
@@ -17,12 +16,10 @@ def evaluate_stocks(simulation):
         Trace.enter(simulation,4,f"Unit price {Trace.q(stock.commodity.unit_price)} so total price has been reset to {Trace.q(stock.price)}")
         stock.save()
 
-def evaluate_commodities(simulation):
-    #! Set the unit price and value of each commodity to the average price and value of all stocks of it
+def calculate_commodity_totals(simulation):
     current_time_stamp=simulation.current_time_stamp
-    Trace.enter(simulation,1,f"Re-evaluate commodity prices and values")
-    logger.info(f"Re-evaluate commodity prices and values for simulation {simulation} at time stamp {current_time_stamp}")
-    
+    Trace.enter(simulation,1,f"Calculate totals of commodity sizes, prices and values")
+    logger.info(f"Calculate totals of commodity sizes, prices and values for simulation {simulation} at time stamp {current_time_stamp}")
     stocks=Stock.objects.filter(time_stamp=current_time_stamp)
     for commodity in Commodity.objects.filter(time_stamp=current_time_stamp):
         commodity.total_value=0
@@ -37,6 +34,13 @@ def evaluate_commodities(simulation):
             Trace.enter(simulation,3,f"{Trace.o(owner_name)}'s stock of {Trace.o(stock.usage_type)} has added {Trace.q(stock.size)} with value {Trace.q(stock.value)} and price {Trace.q(stock.price)} to commodity {Trace.o(commodity.name)}")
         commodity.save()
         Trace.enter(simulation,2,f"Total size of commodity {Trace.o(stock.commodity.name)} is {Trace.q(commodity.size)}. Its value is {Trace.q(commodity.total_value)} and its price is {Trace.q(commodity.total_price)}")
+
+def evaluate_unit_prices_and_values(simulation):
+    #! Set the size, unit price and value of each commodity to the average price and value of all stocks of it
+    current_time_stamp=simulation.current_time_stamp
+    Trace.enter(simulation,1,f"Evaluate commodity prices and values")
+    logger.info(f"Re-evaluate commodity prices and values for simulation {simulation} at time stamp {current_time_stamp}")
+
     Trace.enter(simulation,1,"Unit prices and values have changed. Recalculate them by dividing total price and value by the size, for each commodity")
     for commodity in Commodity.objects.filter(time_stamp=current_time_stamp):
         Trace.enter(simulation,2, f"There are now {Trace.q(commodity. size)} units of Commodity {Trace.o(commodity.name)} with total value {Trace.q(commodity.total_value)} and total price {Trace.q(commodity.total_price)}")

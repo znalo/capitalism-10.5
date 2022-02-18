@@ -42,12 +42,25 @@ class Commodity(models.Model):
             return comparator_qs.first()
 
     @property
+    def comparator_size(self):
+        return self.comparator_commodity().size
+
+
+    @property
     def comparator_demand(self):
         return self.comparator_commodity().demand
 
     @property
     def comparator_supply(self):
         return self.comparator_commodity().supply
+
+    @property
+    def comparator_total_price(self):
+        return self.comparator_commodity().total_price
+
+    @property
+    def comparator_total_value(self):
+        return self.comparator_commodity().total_value
 
     def change_size(self,quantity):
         #! NOTE caller does not have to save TODO is this the best way?

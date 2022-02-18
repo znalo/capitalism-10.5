@@ -13,8 +13,8 @@ class StockOwner(models.Model): # Base class for Industry and Social Class
     simulation = models.ForeignKey(Simulation, on_delete=models.CASCADE)
 
     def verbs(self):
-        singulars=["is", "has", "wants", "sells"]
-        plurals=["are", "have", "want", "sell"]
+        singulars=["is", "has", "wants", "sells", "doesn't"]
+        plurals=["are", "have", "want", "sell", "don't"]
         if self.stock_owner_type==INDUSTRY:
             return singulars
         else:

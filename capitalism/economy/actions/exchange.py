@@ -1,8 +1,7 @@
-from django.contrib import messages
-from economy.actions.helpers import evaluate_commodities, set_initial_capital,set_current_capital
+from economy.actions.helpers import calculate_commodity_totals, set_initial_capital,set_current_capital
 from economy.models.report import Trace
 from economy.models.commodity import Commodity
-from economy.models.owners import StockOwner, Industry, SocialClass
+from economy.models.owners import StockOwner
 from economy.models.stocks import Stock, IndustryStock, SocialStock
 from ..global_constants import *
 
@@ -96,10 +95,7 @@ def calculate_trade(simulation):
     current_time_stamp=simulation.current_time_stamp
     #! iterate over all stocks that want to buy a commodity
     buyer_stocks=Stock.objects.filter(time_stamp=current_time_stamp).exclude(usage_type=MONEY).exclude(usage_type=SALES)
-    d1=Industry.objects.get(time_stamp=current_time_stamp,name="Department I")
-    d1_money=d1.money_stock
-    Trace.enter(simulation,0,f"KICKOFF: {Trace.o(d1.name)} HAS ${Trace.q(d1_money.size)} ")
-            
+           
     for buyer_stock in buyer_stocks:
         #! mostly, we use these local variables for debugging, but it also helps clarity
         buyer=buyer_stock.stock_owner
@@ -119,20 +115,23 @@ def calculate_trade(simulation):
             seller_money_stock=seller.money_stock
             seller_verbs=seller.verbs()
             if seller_commodity==buyer_commodity:
-                Trace.enter(simulation,2,f"SALE: {Trace.o(seller_name)} with ${Trace.q(buyer_money_stock.size)} can sell up to {Trace.q(seller_stock.supply)} of {Trace.o(seller_commodity.name)} to {Trace.o(buyer.name)}")
-                sale(seller_stock,buyer_stock,seller,buyer, seller_money_stock,buyer_money_stock)
-                Trace.enter(simulation,3,f"Buyer status after sale: {Trace.o(buyer.name)} now {buyer_verbs[1]} {Trace.q(buyer_stock.size)} of {Trace.o(seller_commodity.name)} and ${Trace.q(buyer_money_stock.size)}")
-                Trace.enter(simulation,3,f"Seller status after sale: {Trace.o(seller.name)} now {seller_verbs[1]} {Trace.q(seller_stock.size)} of {Trace.o(seller_commodity.name)} and ${Trace.q(seller_money_stock.size)}")
+                transferred_stock=min(buyer_stock.demand,seller_stock.supply)
+                if transferred_stock!=0:
+                    Trace.enter(simulation,2,f"SALE: {Trace.o(seller_name)} with ${Trace.q(buyer_money_stock.size)} can sell up to {Trace.q(seller_stock.supply)} of {Trace.o(seller_commodity.name)} to {Trace.o(buyer.name)}, who will buy {Trace.q(transferred_stock)} of it")
+                    sale(seller_stock,buyer_stock,seller,buyer, seller_money_stock,buyer_money_stock)
+                    Trace.enter(simulation,3,f"Buyer status after sale: {Trace.o(buyer.name)} now {buyer_verbs[1]} {Trace.q(buyer_stock.size)} of {Trace.o(seller_commodity.name)} and ${Trace.q(buyer_money_stock.size)}")
+                    Trace.enter(simulation,3,f"Seller status after sale: {Trace.o(seller.name)} now {seller_verbs[1]} {Trace.q(seller_stock.size)} of {Trace.o(seller_commodity.name)} and ${Trace.q(seller_money_stock.size)}")
+                else:
+                    Trace.enter(simulation,4,f"NO SALE: {Trace.o(seller_name)} {seller_verbs[4]} have any stocks to sell")
             else:
-                Trace.enter(simulation,4,f"NO SALE: {Trace.o(seller_name)} cannot help")
+                Trace.enter(simulation,4,f"NO SALE: {Trace.o(seller_name)} {seller_verbs[4]} sell this")
         Trace.enter(simulation,2,f"BUYER FINAL STATUS: {Trace.o(buyer.name)} now {buyer_verbs[1]} ${Trace.q(buyer_money_stock.size)} and a stock of {Trace.q(buyer_stock.size)} with value ${Trace.q(buyer_stock.value)} and price ${Trace.q(buyer_stock.price)}")    
-        Trace.enter(simulation,0,f"CAPITAL: {Trace.o(d1.name)} NOW HAS ${Trace.q(d1_money.size)} ")
     
     #!Every industry now has the goods with which they will start production.
     #!At the end of this process, we (and the owners) want to know how much profit the industries have made
     #!Therefore, we now establish the total value and price of each commodity and stock
     #!Then, the initial and current capital of each industry
-    evaluate_commodities(simulation=simulation)
+    calculate_commodity_totals(simulation=simulation)
     set_initial_capital(simulation=simulation)
     set_current_capital(simulation=simulation)
 
@@ -151,14 +150,16 @@ def sale(seller_stock, buyer_stock, seller, buyer, seller_money_stock, buyer_mon
         Trace.enter(simulation,4,f"Seller transaction state before payment: {Trace.o(seller.name)} {seller.verbs()[1]} {Trace.q(seller_stock.size)} and ${Trace.q(seller_money_stock.size)} in money")
         seller_stock.save()
         buyer_stock.save()
-        #!TODO Bizarrely, the code below does not always work if the seller and buyer are the same
-        Trace.enter(simulation,4,f"Payment details: cost is {Trace.q(cost)}")        
-        buyer_money_stock.change_size(-cost)
-        buyer_money_stock.save()    
-        seller_money_stock.change_size(cost)
-        seller_money_stock.save()
-        Trace.enter(simulation,4,f"Buyer transaction state after payment: {Trace.o(buyer.name)} {buyer.verbs()[0]} buying {Trace.q(transferred_stock)} of {Trace.o(seller_stock.commodity.name)} from {Trace.o(seller.name)} for ${Trace.q(cost)}")
-        Trace.enter(simulation,4,f"Seller transaction state after payment: {seller.verbs()[2]} ${Trace.q(seller_money_stock.size)} and {buyer.verbs()[2]} ${Trace.q(buyer_money_stock.size)}")
+        Trace.enter(simulation,4,f"Payment details: cost is {Trace.q(cost)}")   
+        if buyer.id!=seller.id:
+            #! The code below does not work if the seller and buyer are the same (we would need to do a refresh_from_db I think)
+            #! but in that case, there's no need to transfer any money so what the hey
+            buyer_money_stock.change_size(-cost)
+            buyer_money_stock.save()    
+            seller_money_stock.change_size(cost)
+            seller_money_stock.save()
+        Trace.enter(simulation,4,f"Buyer transaction state after payment: {Trace.o(buyer.name)} {buyer.verbs()[1]} bought {Trace.q(transferred_stock)} of {Trace.o(seller_stock.commodity.name)} from {Trace.o(seller.name)} for ${Trace.q(cost)}")
+        Trace.enter(simulation,4,f"Seller transaction state after payment: {Trace.o(seller.name)} {seller.verbs()[1]} ${Trace.q(seller_money_stock.size)} ")
     except Exception as error:
         logger.error(f"Attempted sale failed because of {error}: details {type(error).__name__} {__file__} {error.__traceback__.tb_lineno} ")
         return
