@@ -136,5 +136,4 @@ TODO this should be done with a dropdown list, or perhaps checkboxes, within the
 ## Commit rip it up - migration-free restart ready to install on the server
 ## Commit [The original] (https://www.youtube.com/watch?v=aZ308aOOX04) No changes, just felt the tribute was needed
 ## [understand origins](https://www.youtube.com/watch?v=VH40n5lchQo) Understand origins
-## Commit working version in which project 1 runs right through and returns to its original state, which is what should happen.
-
+## Commit This version installed on remote server and tested for project 1
