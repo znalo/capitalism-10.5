@@ -3,7 +3,10 @@
 <div class="w3-container" style="width:80%">
     <div class="w3-medium">
         <h4>Project Management (Under Development)</h4>
+        <h6>Green options work, to the best of our knowledge</h6>
+        <h6>Red options work but have effects you should be aware of (such as deleting all your work)</h6>
         <h6>Grey options not available</h6>
+        <h6>Orange objects don't always work and are being debugged</h6>
         <h6>Note that you can't delete your current simulation</h6>
 
         <p>
@@ -38,7 +41,7 @@
 
                         {% if simulation == simulation.user.current_simulation %}
                         <button class="w3-button w3-round-large w3-grey">Switch</button> {% else %}
-                        <a href="/select-simulation/{{ simulation.pk }}" class="w3-button w3-round-large w3-blue ">Switch</a> {% endif %}
+                        <a href="/select-simulation/{{ simulation.pk }}" class="w3-button w3-round-large w3-green ">Switch</a> {% endif %}
 
                     </td>
 
@@ -48,7 +51,8 @@
                         <a href="/delete-simulation/{{ simulation.pk }} " class="w3-button w3-round-large w3-red ">Delete</a> {% endif %}
                     </td>
 
-                    <td> <a href="/restart-simulation/{{ simulation.pk}}" class="w3-button w3-round-large w3-blue ">Restart</a></td>
+                    <td>
+                        <a href="/restart-simulation/{{ simulation.pk}}" class="w3-button w3-round-large w3-orange ">Restart</a></td>
                     <td> <button class="w3-button w3-grey w3-round-large ">Download</button></td>
                 </tr>
                 {% endfor %}

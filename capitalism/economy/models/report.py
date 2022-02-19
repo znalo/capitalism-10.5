@@ -26,9 +26,9 @@ class Trace(models.Model):
             logger.error(f"Could not make a trace entry because {error}, for message {message}")
 
     @staticmethod
-    def sim_object(value):
+    def o(value):
         return f"<span class = 'simulation-object'>{value}</span>"
 
     @staticmethod
-    def sim_quantity(value):
+    def q(value):
         return f"<span class = 'quantity-object'>{value}</span>"

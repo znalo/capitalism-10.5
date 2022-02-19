@@ -22,10 +22,10 @@ def calculate_revenue(simulation):
     current_time_stamp=simulation.current_time_stamp
     Trace.enter(simulation,0,"Calculate capitalist revenue and other property-based entitlements")
     for industry in Industry.objects.filter(time_stamp=current_time_stamp):
-        Trace.enter(simulation,2,f"Industry {Trace.sim_object(industry.name)} has made a profit of {Trace.sim_quantity(industry.profit)} which will be transferred to the capitalists")
+        Trace.enter(simulation,2,f"Industry {Trace.o(industry.name)} has made a profit of {Trace.q(industry.profit)} which will be transferred to the capitalists")
         donor_money_stock=industry.money_stock
         recipient=SocialClass.objects.get(time_stamp=current_time_stamp, name="Capitalists")
-        Trace.enter(simulation,2,f"This will go to {Trace.sim_object(recipient.name)}")
+        Trace.enter(simulation,2,f"This will go to {Trace.o(recipient.name)}")
         recipient_money_stock=recipient.money_stock
         donor_money_stock.size-=industry.profit
         recipient_money_stock.size+=industry.profit
@@ -92,12 +92,12 @@ def calculate_investment(simulation):
     Trace.enter(simulation,1, f"Calculate input costs to continue producing at current scales")
     for industry in industries:
         cost=industry.replenishment_cost
-        Trace.enter(simulation,1, f"{Trace.sim_object(industry.name)} needs {Trace.sim_quantity(cost)} to produce at its current scale of {Trace.sim_quantity(industry.output_scale)}")
+        Trace.enter(simulation,1, f"{Trace.o(industry.name)} needs {Trace.q(cost)} to produce at its current scale of {Trace.q(industry.output_scale)}")
         #! just give them the money
         capitalists_money=capitalists.money_stock
         industry_money=industry.money_stock
         transferred_amount=cost-industry_money.size
-        Trace.enter(simulation,1, f"{Trace.sim_object(industry.name)} already has {Trace.sim_quantity(industry_money.size)} and will receive {Trace.sim_quantity(transferred_amount)}")
+        Trace.enter(simulation,1, f"{Trace.o(industry.name)} already has {Trace.q(industry_money.size)} and will receive {Trace.q(transferred_amount)}")
         capitalists_money.size-=transferred_amount
         industry_money.size+=transferred_amount
         industry_money.save()
@@ -114,10 +114,10 @@ def effective_demand(simulation):
         if commodity.origin=="INDUSTRIAL": #! filter didn't work, TODO we found out why, change the code
             total_monetarily_effective_demand+=commodity.monetarily_effective_demand
             commodity.save()
-    Trace.enter(simulation,1,f"Total money demand is {Trace.sim_object(total_monetarily_effective_demand)}")
+    Trace.enter(simulation,1,f"Total money demand is {Trace.o(total_monetarily_effective_demand)}")
     for commodity in Commodity.current_queryset():
         if commodity.origin=="INDUSTRIAL": #! filter didn't work, TODO we found out why, change the code
             commodity.investment_proportion=commodity.monetarily_effective_demand/total_monetarily_effective_demand
-            Trace.enter(simulation,2,f"Investment proportion for {Trace.sim_object(commodity.name)} is {Trace.sim_quantity(commodity.investment_proportion)}")
+            Trace.enter(simulation,2,f"Investment proportion for {Trace.o(commodity.name)} is {Trace.q(commodity.investment_proportion)}")
             commodity.save()
 

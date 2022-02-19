@@ -128,9 +128,12 @@ Fiddled with the trace list to create a crude facility to limit the display of d
 TODO this should be done with a dropdown list, or perhaps checkboxes, within the trace list form. But it will do for now.
 
 ## Commit Trace List can now select level of detail to display
+ * TODO debug 'restart simulation' - at present, this deletes all simulations :-(
 
+## Commit intermediate save of a non-working version prior to refactoring Trace.o and Trace.q
+## Commit Trade and Trace now working: debugging produce
+## Commit Apparently working verion of refactored step management structure with rudimentary profit equalization logic in place but not checked. Much improved Trace reporting
+## Commit rip it up - migration-free restart ready to install on the server
 
-
-
-
-
+## Commit [The original] (https://www.youtube.com/watch?v=aZ308aOOX04) No changes, just felt the tribute was needed
+## [understand origins](https://www.youtube.com/watch?v=VH40n5lchQo) Understand origins

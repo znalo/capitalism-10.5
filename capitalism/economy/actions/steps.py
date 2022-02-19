@@ -3,7 +3,8 @@ from economy.models.report import Trace
 from economy.actions.helpers import (
     set_initial_capital,
     set_current_capital,
-    evaluate_commodities,
+    evaluate_unit_prices_and_values,
+    calculate_commodity_totals,
     evaluate_stocks,
     )
 from economy.actions.exchange import (
@@ -38,10 +39,14 @@ def allocate(simulation):
 
 def trade(simulation):
     calculate_trade(simulation)
+    calculate_commodity_totals(simulation)    
 
 def production(simulation):
     calculate_production(simulation=simulation)    # ! The immediate results of production
-    evaluate_commodities(simulation=simulation)    # ! We have to revalue the stocks, because unit values and prices have changed
+    calculate_commodity_totals(simulation=simulation)    
+
+def capital(simulation):
+    evaluate_unit_prices_and_values(simulation=simulation)    # ! We have to revalue the stocks, because unit values and prices have changed
     evaluate_stocks(simulation=simulation)         # ! Now we can calculate capital and profits arising from the 'immediate process of production'
     set_current_capital(simulation=simulation)
 
@@ -62,7 +67,8 @@ ACTION_LIST = {
     'allocate': allocate,
     'trade': trade,
     'produce': production,
-    'prices': values_and_prices,
+    'capital': capital,
+    'revalue': values_and_prices,
     'reproduce': reproduce,
     'revenue': revenue,
     'invest': invest,

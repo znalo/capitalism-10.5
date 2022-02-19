@@ -12,9 +12,17 @@ class StockOwner(models.Model): # Base class for Industry and Social Class
     stock_owner_type=models.CharField(max_length=20,choices=STOCK_OWNER_TYPES,default=UNDEFINED)
     simulation = models.ForeignKey(Simulation, on_delete=models.CASCADE)
 
+    def verbs(self):
+        singulars=["is", "has", "wants", "sells", "doesn't"]
+        plurals=["are", "have", "want", "sell", "don't"]
+        if self.stock_owner_type==INDUSTRY:
+            return singulars
+        else:
+            return plurals
+
     class meta:     #! helps view the objects in time stamp order in admin
         ordering = ['time_stamp.time_stamp']
-    
+
     @property
     def money_stock(self):
         stocks = Stock.objects.filter(time_stamp=self.time_stamp, usage_type=MONEY, stock_owner=self)
@@ -57,7 +65,7 @@ class Industry(StockOwner):
     work_in_progress=models.FloatField(default=0)
     current_capital=models.FloatField(default=0)
     profit=models.FloatField(default=0)
-    profit_rate =models.FloatField(default=0)
+    profit_rate=models.FloatField(default=0)
 
     class Meta:
         verbose_name = 'Industry'
@@ -78,14 +86,14 @@ class Industry(StockOwner):
         current_time_stamp=simulation.current_time_stamp
         #! Requires that demand is correctly set - this must be provided for by the caller 
         logger.info(f"Calculating replenishment cost for industry {self}")
-        Trace.enter(simulation,3,f"Processing industry {Trace.sim_object(self.name)}")
+        Trace.enter(simulation,3,f"Processing industry {Trace.o(self.name)}")
         cost=0
         productive_stocks=IndustryStock.objects.filter(usage_type=PRODUCTION,time_stamp=current_time_stamp,stock_owner=self)
         for stock in productive_stocks:
             cost+=stock.monetary_demand
             logger.info (f"Stock {stock} has found an additional cost of {stock.monetary_demand} and the cumulative total cost to {self.name} is now {cost}")
-            Trace.enter(simulation,4,f"Industry {Trace.sim_object(self.name)} has found an additional cost of {Trace.sim_quantity(stock.monetary_demand)} and now needs a total of ${Trace.sim_quantity(cost)} to replenish its stock of {Trace.sim_object(stock.commodity_name)}")
-        Trace.enter(simulation,3,f"The total money required by industry {Trace.sim_object(self.name)} is {cost}")
+            Trace.enter(simulation,4,f"Industry {Trace.o(self.name)} has found an additional cost of {Trace.q(stock.monetary_demand)} and now needs a total of ${Trace.q(cost)} to replenish its stock of {Trace.o(stock.commodity_name)}")
+        Trace.enter(simulation,3,f"The total money required by industry {Trace.o(self.name)} is {cost}")
         return cost
 
     @property

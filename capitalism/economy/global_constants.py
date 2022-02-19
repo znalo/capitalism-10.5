@@ -21,6 +21,8 @@ PRICES = "prices"
 REPRODUCE = "reproduce"
 REVENUE="revenue"
 INVEST="invest"
+CAPITAL="capital"
+REVALUE="revalue"
 M_C = "M-C (exchange)"
 C_P = "C-P-C' (produce)"
 C_M = "C'-M' (distribute)"
@@ -76,8 +78,9 @@ STEPS={
   "demand":Step(name=DEMAND,stage_name="M_C", next_step=ALLOCATE, description="EVALUATE DEMAND AND SUPPLY"),
   "allocate":Step(name=ALLOCATE,stage_name="M_C", next_step=TRADE, description="ALLOCATE SUPPLY"),
   "trade":Step(name=TRADE,stage_name="M_C",next_step=PRODUCE, description="TRADE"),
-  "produce":Step(name=PRODUCE,stage_name="C_P", next_step=PRICES, description="PRODUCE"),
-  "prices":Step(name=PRICES,stage_name="C_P", next_step=REPRODUCE, description="PRICES AND VALUES ARISING FROM PRODUCTION"),
+  "produce":Step(name=PRODUCE,stage_name="C_P", next_step=CAPITAL, description="PRODUCE"),
+  "capital":Step(name=CAPITAL,stage_name="C_P", next_step=REVALUE, description="CALCULATE CAPITAL AS THE IMMEDIATE RESULT OF PRODUCTION"),
+  "revalue":Step(name=REVALUE,stage_name="C_P", next_step=REPRODUCE, description="PRICE AND VALUE CHANGES ARISING FROM DISTRIBUTION"),
   "reproduce":Step(name=REPRODUCE,stage_name="C_P", next_step=REVENUE, description="SOCIAL REPRODUCTION"),
   "revenue":Step(name=REVENUE,stage_name="C_M",next_step=INVEST, description="REVENUES"),
   "invest":Step(name=INVEST,stage_name="C_M", next_step=DEMAND, description="INVESTMENT"),
