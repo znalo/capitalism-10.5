@@ -135,3 +135,4 @@ TODO this should be done with a dropdown list, or perhaps checkboxes, within the
 ## Commit Apparently working verion of refactored step management structure with rudimentary profit equalization logic in place but not checked. Much improved Trace reporting
 ## Commit rip it up - migration-free restart ready to install on the server
 
+## Commit [The original] (https://www.youtube.com/watch?v=aZ308aOOX04) No changes, just felt the tribute was needed
