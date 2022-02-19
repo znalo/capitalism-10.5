@@ -99,7 +99,8 @@ Too much money is allocated to industries in the distribution stage
   * gonna [rip it up](https://www.youtube.com/watch?v=pc_F3PaYgl0)
   * wiped out migrations and database, encouraged by conversation with Ambrose Andrews, and push it over to the server
   * [understand origins](https://www.youtube.com/watch?v=VH40n5lchQo)
-   
+## 19 February
+  * removed another couple of bugs in the investment algorithm. Project 1 now runs from start to finish of a cycle, and ends up in the same state - which is what should in fact happen
   
 
   

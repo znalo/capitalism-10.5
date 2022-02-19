@@ -86,7 +86,7 @@ def calculate_price_changes_in_distribution(simulation):
 #!Initially, in development, we suppose a melt-response of 1, that is, total money price=total price in labour time    Trace.enter(simulation,2,"RECALCULATING PRICES")
     current_time_stamp=simulation.current_time_stamp
     industries=Industry.objects.filter(simulation=simulation, time_stamp=current_time_stamp)
-    Trace.enter(simulation,1,"EFFECTS OF DISTRIBUTION")
+    Trace.enter(simulation,0,"EFFECTS OF DISTRIBUTION")
     if simulation.price_response_type==EQUALIZED:
         Trace.enter(simulation,1,"EQUAL PROFIT RATE CALCULATION")
         r=simulation.profit_rate
@@ -132,15 +132,15 @@ def calculate_reproduction(simulation):
             sales_stock=sales_stocks.get()
             sales_amount=social_class.population*social_class.participation_ratio/periods_per_year
         if consumption_stocks.count()<1:
-            raise Exception(f"consumption stock of {social_class} does not exist")
+            raise Exception(f"consumption stock of {Trace.o(social_class.name)} does not exist")
         for cs in consumption_stocks: #! initial scaffold for multiplicity of consumption goods - needed for 3-sector model, etc, but will develop later
             quantity_consumed=cs.consumption_requirement
             if cs.size<quantity_consumed:
-                Trace.enter(simulation,2,f"consumption by {social_class} constrained to {cs.size} because it does not have enough")
+                Trace.enter(simulation,2,f"consumption by {Trace.o(social_class.name)} constrained to {Trace.q(cs.size)} because it does not have enough")
                 quantity_consumed=cs.size/periods_per_year
             cs.size-=quantity_consumed
             sales_stock.size+=sales_amount
             sales_stock.save()
             cs.save()
-            Trace.enter(simulation,1,f"Social Class {social_class} has consumed {quantity_consumed} and created {sales_amount} of sales stocks")
-            Trace.enter(simulation,1,f"{social_class} now owns {cs.size} in consumption goods and has {sales_stock.size} to sell")
+            Trace.enter(simulation,1,f"Social Class {Trace.o(social_class.name)} have consumed {Trace.q(quantity_consumed)} and created {Trace.q(sales_amount)} of sales stocks")
+            Trace.enter(simulation,1,f"{Trace.o(social_class.name)} now own {Trace.q(cs.size)} in consumption goods and have {Trace.q(sales_stock.size)} to sell")

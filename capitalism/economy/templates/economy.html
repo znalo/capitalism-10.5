@@ -29,7 +29,7 @@
         <tr class="w3-text-black">
             <th colspan="2">Industry</th>
             {% for stock in industry_headers %}
-            <th colspan=2>{{ stock.commodity.name}}</th>
+            <th colspan=2>Stock of {{ stock.commodity.name}}</th>
             {% endfor %}
             <th colspan=2>Other Assets</th>
             <th colspan=2>Output</th>
@@ -38,7 +38,7 @@
             <th class="p-0">Name</th>
             <th class="p-0">Product</th>
             {% for stock in industry_headers %}
-            <th>Stock</th>
+            <th>Actual</th>
             <th>Required</th>
             {% endfor %}
             <th>Sales Inventory</th>
@@ -96,7 +96,7 @@
             <td class='dt-body-right'>${{ industry.current_capital|has_changed:industry.comparator_current_capital }}
             </td>
             <td class='dt-body-right'>${{ industry.profit|has_changed:industry.comparator_profit }}</td>
-            <td class='dt-body-right'>%{{ industry.profit_rate|has_changed:industry.comparator_profit_rate }}</td>
+            <td class='dt-body-right'>%{{ industry.profit_rate|has_changed:industry.comparator_profit_rate|floatformat }}</td>
         </tr>
         {% endfor %}
     </tbody>
