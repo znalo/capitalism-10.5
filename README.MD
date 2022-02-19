@@ -95,6 +95,10 @@ Too much money is allocated to industries in the distribution stage
   * This one seems to run right through without obvious error so I will migrate it to the site
   * Doesn't do profit rate equalization yet (or at least if it does, I didn't verify it)
   * But the Trace is much more helpful especially for bug tracking, and the logic seems to work OK
+## 18 February
+  * gonna [rip it up](https://www.youtube.com/watch?v=pc_F3PaYgl0)
+  * wiped out migrations and database, encouraged by conversation with Ambrose Andrews, and push it over to the server
+  
 
   
 

@@ -38,6 +38,10 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
         return self.commodity.name
 
     @property
+    def owner_name(self):
+        return self.stock_owner.name
+
+    @property
     def display_order(self):
         return self.commodity.display_order
 
@@ -104,7 +108,7 @@ class IndustryStock(Stock):
 
 
     def __str__(self):
-        return f"[Project {self.time_stamp.simulation.project_number}]{self.name}:{self.commodity.name}:{self.usage_type}[{self.id}]"
+        return f"[Project {self.time_stamp.simulation.project_number}]{self.owner_name}:{self.commodity.name}:{self.usage_type}[{self.id}]"
 
 
 class SocialStock(Stock):

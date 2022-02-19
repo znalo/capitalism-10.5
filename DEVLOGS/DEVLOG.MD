@@ -133,5 +133,5 @@ TODO this should be done with a dropdown list, or perhaps checkboxes, within the
 ## Commit intermediate save of a non-working version prior to refactoring Trace.o and Trace.q
 ## Commit Trade and Trace now working: debugging produce
 ## Commit Apparently working verion of refactored step management structure with rudimentary profit equalization logic in place but not checked. Much improved Trace reporting
-
+## Commit rip it up - migration-free restart ready to install on the server
 
