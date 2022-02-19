@@ -98,6 +98,8 @@ Too much money is allocated to industries in the distribution stage
 ## 18 February
   * gonna [rip it up](https://www.youtube.com/watch?v=pc_F3PaYgl0)
   * wiped out migrations and database, encouraged by conversation with Ambrose Andrews, and push it over to the server
+  * [understand origins](https://www.youtube.com/watch?v=VH40n5lchQo)
+   
   
 
   
