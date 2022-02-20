@@ -24,10 +24,11 @@ def calculate_revenue(simulation):
         recipient=SocialClass.objects.get(time_stamp=current_time_stamp, name="Capitalists")
         Trace.enter(simulation,2,f"Industry {Trace.o(industry.name)} has made a profit of {Trace.q(industry.profit)} which will be transferred to {Trace.o(recipient.name)}")
         recipient_money_stock=recipient.money_stock
-        donor_money_stock.size-=industry.profit
-        recipient_money_stock.size+=industry.profit
+        donor_money_stock.change_size(-industry.profit)
+        recipient_money_stock.change_size(industry.profit)
         donor_money_stock.save()
         recipient_money_stock.save()
+
 """
 In the 'invest' step, the capitalists decide what to do with their money.
 
@@ -50,7 +51,6 @@ Note that our current crude allocation mechanism does provide some sort of provi
 
 A more sophisticated approach would be monetary, basically to cut wages, which corresponds more closely to what actually happens. But reluctant to introduce monetary constraints as the primary mechanism, essentially because credit intervenes. We therefore start from simple 'replenishment', get that working for the principal use cases Then explore the effect of supply shortages using the simulation itself.
 """
-
 def calculate_investment(simulation):
     current_time_stamp=simulation.current_time_stamp
     calculate_demand(simulation=simulation) #! this is required if we are to estimate correctly the replenishment cost
@@ -69,7 +69,7 @@ def calculate_investment(simulation):
         industry_money.change_size(transferred_amount)
         industry_money.save()
         capitalists_money.save()
-    set_initial_capital(simulation=simulation) #! as soon as we are ready for the next circuit, we should reset the initial capital
+    return
 
 def effective_demand(simulation):
 #! Not in current use, preserved here because we may want it.

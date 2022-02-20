@@ -221,11 +221,12 @@ def initialize(request):
 
     #! Create initial values, prices and capitals for all simulations of this user
     for simulation in Simulation.objects.filter(user=logged_in_user):
+        Trace.enter(simulation,1,f"COMPLETED INITIALIZATION OF SIMULATION {simulation.name}.")
         evaluate_stocks(simulation=simulation)
         calculate_commodity_totals(simulation=simulation)
-        evaluate_unit_prices_and_values(simulation=simulation)
-        set_initial_capital(simulation=simulation)
-        set_current_capital(simulation=simulation)
+        # evaluate_unit_prices_and_values(simulation=simulation)
+        # set_initial_capital(simulation=simulation)
+        # set_current_capital(simulation=simulation)
 
 #! set the user up to point to project 1
     simulation=Simulation.objects.get(user=logged_in_user, project_number=1)

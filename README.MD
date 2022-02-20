@@ -105,7 +105,7 @@ Too much money is allocated to industries in the distribution stage
   * This version installed on server and tested
 ## 20 February
   * Improvements to comparator display to make changes more easily visible
-  
+  * Debug price and value calculations
 
   
 

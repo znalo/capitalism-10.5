@@ -251,7 +251,6 @@ class TimeStamp(models.Model):
     #! connect social stocks to their commodities and owners
         social_stocks = SocialStock.objects.filter(
             time_stamp=self)
-        print(social_stocks)
         for social_stock in social_stocks:
             commodity_name = social_stock.commodity.name
             logger.info(f"Connecting Social Stock with id {social_stock.id} of usage type {(social_stock.usage_type)} to commodity {(commodity_name)}")

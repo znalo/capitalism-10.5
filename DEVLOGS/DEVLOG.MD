@@ -138,3 +138,4 @@ TODO this should be done with a dropdown list, or perhaps checkboxes, within the
 ## [understand origins](https://www.youtube.com/watch?v=VH40n5lchQo) Understand origins
 ## Commit This version installed on remote server and tested for project 1
 ## Commit Improvements to comparator display and numeric displays
+## Commit Debug Price and Value calculations
