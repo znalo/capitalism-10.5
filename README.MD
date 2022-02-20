@@ -103,6 +103,9 @@ Too much money is allocated to industries in the distribution stage
   * removed another couple of bugs in the investment algorithm. 
   * Project 1 now runs from start to finish of a cycle, and ends up in the same state - which is what should in fact happen
   * This version installed on server and tested
+## 20 February
+  * Improvements to comparator display to make changes more easily visible
+  
 
   
 
