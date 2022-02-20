@@ -20,14 +20,12 @@ from economy.actions.produce import(
     )
 from economy.actions.distribution import (
     calculate_revenue,
-    calculate_investment,
-    )
+    calculate_investment,    )
 
-#! Each function in this module executes one step of a simulation.
-#! They are grouped here for clarity. Sometimes, they only invoke one function. However,
-#! This organisation of the code makes it easier to vary the steps
-#! - so for example 'revalue' and 'production' carry out three distinct actions, which are coded separately
-#! TODO a bit of DRY abstraction for the code lines that are repeated in every case below
+"""
+Each function in this module executes one step of a simulation.
+They are grouped here for clarity. Sometimes, they only invoke one function. However, this organisation of the code makes it easier to vary the steps - so for example 'revalue' and 'production' carry out three distinct actions, which are coded separately
+"""
 
 def revalue(simulation):
     set_initial_capital(simulation=simulation)
@@ -47,11 +45,13 @@ def production(simulation):
 
 def capital(simulation):
     evaluate_unit_prices_and_values(simulation=simulation)    # ! We have to revalue the stocks, because unit values and prices have changed
-    evaluate_stocks(simulation=simulation)         # ! Now we can calculate capital and profits arising from the 'immediate process of production'
+    evaluate_stocks(simulation=simulation)                    # ! Now we can calculate capital and profits arising from the 'immediate process of production'
     set_current_capital(simulation=simulation)
 
 def values_and_prices(simulation):
     calculate_price_changes_in_distribution(simulation)
+    evaluate_stocks(simulation=simulation)
+    set_current_capital(simulation=simulation)
 
 def reproduce(simulation):
     calculate_reproduction(simulation)

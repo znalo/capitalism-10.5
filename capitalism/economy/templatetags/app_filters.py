@@ -15,10 +15,7 @@ def stock_compare(usage_type, value):
         comparator_stock=current_stock.comparator_stock
         new=current_stock.size
         old=comparator_stock.size
-        if old==new:
-            return new
-        else:
-            return mark_safe(f"<span style=\'color:red\'>{new:.0f}</span> (<span style=\'color:green\'>{old:.0f}</span>)")
+        return has_changed(new,old)
 
 
 @register.filter(name='money_filter')
@@ -33,17 +30,37 @@ def sales_filter(value):
 def consumption_filter(value):
     return stock_compare(CONSUMPTION, value)
 
-@register.filter #! TOD redundant I think - this was just a test to see how filters work
+@register.filter # TODO redundant I think - this was just a test to see how filters work
 def multiply(value, arg):
     return value * arg
 
 @register.filter
-def has_changed(new,old):
+def percent_has_changed(new,old):
+    #! I got defeated trying to construct a filter with multiple arguments, so I created two filters
+    #! one of which does 2 decimal places and the other does 0. This one does 2
+    new_string=f"{new:.2f}"
+    old_string=f"{old:.2f}"
     if old==new:
-        return new
+        return mark_safe(new_string)
     else:
-        return mark_safe(f"<span style=\'color:red\'>{new:.0f}</span> (<span style=\'color:green\'>{old:.0f}</span>)")
+        return mark_safe(f"<span style=\'color:red\'>{new_string}</span> (<span style=\'color:green\'>{old_string}</span>)")
+
+
+@register.filter
+def has_changed(new,old):
+    #! I got defeated trying to construct a filter with multiple arguments, so I created two filters
+    #! one of which does 2 decimal places and the other does 0. This one does 2
+    new_string=f"{new:,.0f}"
+    old_string=f"{old:,.0f}"
+    if old==new:
+        return mark_safe(f"<span style=\'color:blue\'>{new_string}</span>")
+    else:
+        return mark_safe(f"<span style=\'color:red\'>{new_string}</span> (<span style=\'color:green\'>{old_string}</span>)")
 
 @register.filter(is_safe=True)
 def mark_as_safe(value):
     return mark_safe(value)
+
+@register.filter
+def percentage(value):
+    return format(float(value), ".2%")

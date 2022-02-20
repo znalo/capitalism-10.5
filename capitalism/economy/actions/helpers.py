@@ -9,7 +9,7 @@ def evaluate_stocks(simulation):
     Trace.enter(simulation,1,f"Evaluate stock values and prices from commodity unit prices and values")
     logger.info(f"Calculate values and prices for simulation {simulation} and time stamp  {simulation.current_time_stamp}")
     for stock in Stock.objects.filter(time_stamp=simulation.current_time_stamp):
-        Trace.enter(simulation,4,f"{Trace.o(stock.stock_owner.name)} owns a stock of {Trace.o(stock.commodity.name)} whose size is presently {Trace.q(stock.size)}, with value {Trace.q(stock.value)} and price {Trace.q(stock.price)}")
+        Trace.enter(simulation,3,f"{Trace.o(stock.stock_owner.name)} owns a stock of {Trace.o(stock.commodity.name)} whose size is presently {Trace.q(stock.size)}, with value {Trace.q(stock.value)} and price {Trace.q(stock.price)}")
         stock.value=stock.size*stock.commodity.unit_value
         stock.price=stock.size*stock.commodity.unit_price
         Trace.enter(simulation,4,f"Unit value is {Trace.q(stock.commodity.unit_value)} so total value has been reset to {Trace.q(stock.value)}")
@@ -118,7 +118,7 @@ def set_current_capital(simulation):
         Trace.enter(simulation, 2, f"Economy wide capital has grown to {Trace.o(current_time_stamp.current_capital)} and profit to {Trace.o(current_time_stamp.profit)}")
         industry.work_in_progress=work_in_progress
         industry.save()
-    current_time_stamp.profit_rate=current_time_stamp.profit/current_time_stamp.initial_capital
+    current_time_stamp.profit_rate=current_time_stamp.profit/current_time_stamp.initial_capital*100
     current_time_stamp.save()
     Trace.enter(simulation, 1, f"Economy wide capital is {Trace.o(current_time_stamp.current_capital)}, profit is {Trace.o(current_time_stamp.profit)} and the profit rate is {Trace.o(current_time_stamp.profit_rate)}")
 

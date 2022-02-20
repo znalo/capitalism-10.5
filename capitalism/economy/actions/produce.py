@@ -69,40 +69,41 @@ def calculate_production(simulation):
         produce(industry, simulation)
         industry.save()
 
+"""
+calculate the prices at which producers will sell products, and at which consumers will purchase them, when the production stage is complete.
+it implements an algorithm determined by two parameters of the simulation that are specified either initially, or by the user:
+ * price_response
+ * melt_response
+The first step is simply to register the values and prices that emerge from production.
+Once this is done, there are three options (currently):
+ * price_response_type==VALUES
+   ** prices are simply set equal to values. Note that prices actually do have to be reset, because in general, the simulation may start with any arbitrary set of prices and values
+ * price_response_type==EQUALIZED
+   ** prices are set to proportions that equalise the profit rate. Note that this does not fully determine prices since the MELT may make them higher or lower in total than values
+ * price_response_type==DYNAMIC
+   ** prices are set in proportions that respond to differences between supply and demand
+   ** as with EQUALIZED, the actual price level is determined by the melt_response parameter
+Initially, in development, we suppose a melt-response of 1, that is, total money price=total price in labour time    Trace.enter(simulation,2,"RECALCULATING PRICES")
+"""
+
 def calculate_price_changes_in_distribution(simulation):
-#! calculate the prices at which producers will sell products, and at which consumers will purchase them, when the production stage is complete.
-#! it implements an algorithm determined by two parameters of the simulation that are specified either initially, or by the user:
-#  * price_response
-#  * melt_response
-#! The first step is simply to register the values and prices that emerge from production.
-#! Once this is done, there are three options (currently):
-# * price_response_type==VALUES
-#   ** prices are simply set equal to values. Note that prices actually do have to be reset, because in general, the simulation may start with any arbitrary set of prices and values
-# * price_response_type==EQUALIZED
-#   ** prices are set to proportions that equalise the profit rate. Note that this does not fully determine prices since the MELT may make them higher or lower in total than values
-# * price_response_type==DYNAMIC
-#   ** prices are set in proportions that respond to differences between supply and demand
-#   ** as with EQUALIZED, the actual price level is determined by the melt_response parameter
-#!Initially, in development, we suppose a melt-response of 1, that is, total money price=total price in labour time    Trace.enter(simulation,2,"RECALCULATING PRICES")
     current_time_stamp=simulation.current_time_stamp
     industries=Industry.objects.filter(simulation=simulation, time_stamp=current_time_stamp)
-    Trace.enter(simulation,0,"EFFECTS OF DISTRIBUTION")
-    if simulation.price_response_type==EQUALIZED:
+    if simulation.price_response_type=="EQUALIZED":
         Trace.enter(simulation,1,"EQUAL PROFIT RATE CALCULATION")
-        r=simulation.profit_rate
+        r=simulation.current_time_stamp.profit_rate
         Trace.enter(simulation,2,f"General rate of profit is {r}")
         for industry in industries:
             commodity=industry.commodity
             x=commodity.size
             K=industry.initial_capital
             Trace.enter(simulation,2,f"Industry {industry} has sales stock {x} and initial capital {K}")
-            desired_profit=(1+r)*K
+            desired_profit=(1+r/100)*K
             desired_unit_price=desired_profit/x
-            Trace.enter(simulation,2,f"The unit prices is {commodity.unit_price} and will be set to {desired_unit_price} ")
+            Trace.enter(simulation,2,f"The unit price is {commodity.unit_price} and will be set to {desired_unit_price} ")
             commodity.unit_price=desired_unit_price
             commodity.save()
-#! more to come...
-    return
+    return #! The caller must ensure that stocks are revalued
 
 def calculate_reproduction(simulation):
 #! Social Consumption

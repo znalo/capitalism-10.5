@@ -27,20 +27,6 @@ project,time_stamp,name,owner_type,commodity,stock_type,quantity,production_quan
 2,1,Workers,CLASS,Money,Money,1500,0,0
 2,1,Workers,CLASS,Labour Power,Sales,3000,0,0
 2,1,Capitalists,CLASS,Labour Power,Sales,0,0,0
-3,1,Capitalists,CLASS,Consumption,Consumption,0,0,1500
-3,1,Capitalists,CLASS,Money,Money,750,0,0
-3,1,Consumption,INDUSTRY,Money,Money,3000,0,0
-3,1,Means of Production,INDUSTRY,Money,Money,6000,0,0
-3,1,Consumption,INDUSTRY,Means of Production,Production,1000,1000,0
-3,1,Means of Production,INDUSTRY,Means of Production,Production,2000,2000,0
-3,1,Means of Production,INDUSTRY,Labour Power,Production,1000,1000,0
-3,1,Consumption,INDUSTRY,Labour Power,Production,500,500,0
-3,1,Means of Production,INDUSTRY,Means of Production,Sales,3000,0,0
-3,1,Consumption,INDUSTRY,Consumption,Sales,1500,0,0
-3,1,Workers,CLASS,Consumption,Consumption,0,0,3000
-3,1,Workers,CLASS,Money,Money,750,0,0
-3,1,Workers,CLASS,Labour Power,Sales,1500,0,0
-3,1,Capitalists,CLASS,Labour Power,Sales,0,0,0
 4,1,Capitalists,CLASS,Luxuries,Consumption,0,0,1500
 4,1,Capitalists,CLASS,Money,Money,3000,0,0
 4,1,Capitalists,CLASS,Necessities,Consumption,0,0,0

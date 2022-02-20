@@ -70,7 +70,7 @@ def initialize(request):
     df = pd.read_csv(file_name)
     for row in df.itertuples(index=False, name='Pandas'):
         #! Create a new simulation
-        s=Simulation(user=logged_in_user, 
+        simulation=Simulation(user=logged_in_user, 
             name=f"{INITIAL}.{row.project_FK}",
             project_number=row.project_FK,
             population_growth_rate=row.population_growth_rate,
@@ -81,10 +81,10 @@ def initialize(request):
             currency_symbol=row.currency_symbol,
             quantity_symbol=row.quantity_symbol,
         )
-        s.save()       
+        simulation.save()       
         #! Create a new time stamp
         t = TimeStamp(
-            simulation=s,
+            simulation=simulation,
             period=row.period,
             step=row.description,
             stage="M_C", #! projects must start with this stage TODO remove this field from the CSV file
@@ -94,12 +94,12 @@ def initialize(request):
             profit_rate=0,
         )
         t.save()
-        s.current_time_stamp=t
-        s.comparator_time_stamp=t #! comparator for the first stamp is itself
-        s.save()
+        simulation.current_time_stamp=t
+        simulation.comparator_time_stamp=t #! comparator for the first stamp is itself
+        simulation.save()
         #! Create an initial Trace object to mark the start of the simulation
         #! We cannot use 'Trace.enter' because the user's current_simulation has not yet been defined
-        Trace.enter(s,0,"INITIALISING")
+        Trace.enter(simulation,0,"INITIALISING")
 
 #! Commodities
     file_name = staticfiles_storage.path('data/commodities.csv')    
@@ -232,5 +232,6 @@ def initialize(request):
     time_stamp=TimeStamp.objects.get(simulation=simulation)
     logged_in_user.current_simulation=simulation
     simulation.current_time_stamp=time_stamp
+    simulation.comparator_time_stamp=time_stamp
     simulation.save()
     logged_in_user.save()

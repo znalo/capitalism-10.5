@@ -45,7 +45,6 @@ class Commodity(models.Model):
     def comparator_size(self):
         return self.comparator_commodity().size
 
-
     @property
     def comparator_demand(self):
         return self.comparator_commodity().demand
@@ -57,6 +56,14 @@ class Commodity(models.Model):
     @property
     def comparator_total_price(self):
         return self.comparator_commodity().total_price
+
+    @property
+    def comparator_unit_price(self):
+        return self.comparator_commodity().unit_price
+
+    @property
+    def comparator_unit_value(self):
+        return self.comparator_commodity().unit_value
 
     @property
     def comparator_total_value(self):

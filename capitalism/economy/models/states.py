@@ -28,9 +28,6 @@ class User(AbstractUser):
     def current_stage(self):
         return STEPS[self.current_step].stage_name
 
-    def one_step(self): #! Probably redundant. TODO get rid of it
-        self.simulation.one_step()        
-
     def set_current_comparator(self,comparator):
         logger.info(f"User {self} is changing its comparator which is {self.current_time_stamp} from {self.simulation.current_comparator_time_stamp} to {comparator}")
         self.simulation.comparator_time_stamp = comparator
@@ -39,8 +36,8 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
-#! Note there is no user field for the projects. They are simply a fixture
 class Project(models.Model):
+#! Note there is no user field for the projects. They are simply a fixture
     number = models.IntegerField(null=False, default=1)
     description = models.CharField(max_length=50, default=DEMAND)
 
@@ -65,48 +62,44 @@ class Simulation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
     @property
-    def comparator(self):
-        comparator_time_stamp=self.comparator_time_stamp
-       
-        comparator=Simulation.objects.filter(
-            current_time_stamp=comparator_time_stamp,
-            name=self.name,
-            user=self.user
-            )
-        if comparator.count()>1: #! primitive error-checking (there should be only and exactly one comparator) TODO more sophisticated error trapping
-            return self
-        elif comparator.count()<1:
-            return None
-        else:
-            return comparator.first()    
+    def initial_capital(self):
+        return self.current_time_stamp.initial_capital
+
+    @property
+    def current_capital(self):
+        return self.current_time_stamp.current_capital
+
+    @property
+    def profit(self):
+        return self.current_time_stamp.profit
+
+    @property
+    def profit_rate(self):
+        return self.current_time_stamp.profit_rate
 
     @property
     def comparator_initial_capital(self):
-        if self.comparator==None:
-            return 0
-        return self.comparator.initial_capital
+        return self.comparator_time_stamp.initial_capital
 
     @property
     def comparator_current_capital(self):
-        if self.comparator==None:
-            return 0
-        return self.comparator.current_capital
+        return self.comparator_time_stamp.current_capital
 
     @property
     def comparator_profit(self):
-        if self.comparator==None:
-            return 0
-        return self.comparator.profit
+        return self.comparator_time_stamp.profit
 
     @property
     def comparator_profit_rate(self):
-        if self.comparator==None:
-            return 0
-        return self.comparator.profit_rate
+        return self.comparator_time_stamp.profit_rate
 
+    @property
+    def project_description(self):
+        return Project.objects.get(number=self.project_number).description
+
+    def startup(self):
     #! Create a new simulation from the embryo of this simulation object, which was created by SimulationCreateView.
     #! We now have to create all the objects of this simulation, based on its name.
-    def startup(self):
         try:
             logger.info(f"User {self.user} is populating the simulation {self.name} which has project number {self.project_number}")
             #! First create my current_time_stamp (as a prelude to cloning it)
@@ -130,30 +123,20 @@ class Simulation(models.Model):
             logger.error(f"Could not create the requested simulation because {error}")
             return error
 
-    #! Move forward one time stamp and clone all the associated objects
     def one_step(self):
-        logger.info(f"User {self.user} of simulation {self} is moving time stamp {self.current_time_stamp} forward one step")
-        old_time_stamp_id = self.current_time_stamp.id
+    #! Move forward one time stamp and clone all the associated objects
+        logger.info(f"User {self.user} of simulation {self} intends to move time stamp {self.current_time_stamp} forward one step")
+        old_id = self.current_time_stamp.id
         new_time_stamp = self.current_time_stamp
-
-        new_time_stamp.pk = None  #! Create a new timestamp object by saving with pk=None, to force Django to create a new database object
-        #! because the new time stamp gets saved to the database, old_time_stamp must be explicitly retrieved from its id
-        old_time_stamp = TimeStamp.objects.get(id=old_time_stamp_id) #! TODO is there a better way
+        new_time_stamp.pk = None
         new_time_stamp.save()
-        logger.info(f"Stepping from Time Stamp with id {new_time_stamp.id} and step {new_time_stamp.step} to new time stamp {new_time_stamp.id} whose step is {new_time_stamp.step}")
-
-        #! Now clone all the objects that were associated with the old time stamp, and create identical copies associated with the new stamp
-        #! Once that's done, the control logic will invoke the action specified by the new stamp, but that's outside this particular procedure
-
-        #! tell the user she has a new current time stamp, namely the one we just created
-        new_time_stamp.clone(old_time_stamp) #! We assume cloning saves the new current stamp and all objects that reference it
+        old_time_stamp = TimeStamp.objects.get(id=old_id) #! TODO is there a better way?
+    #! Now clone all the objects that were associated with the old time stamp, and create identical copies associated with the new stamp
+        new_time_stamp.clone(old_time_stamp)
+        logger.info(f"Stepping from Time Stamp with id {old_time_stamp.id}({old_time_stamp.step}) to new time stamp {new_time_stamp.id} ({new_time_stamp.step})")
         self.current_time_stamp=new_time_stamp
         self.comparator_time_stamp=old_time_stamp
         self.save()
-
-    @property
-    def project_description(self):
-        return Project.objects.get(number=self.project_number).description
 
     def __str__(self):
         return f"{self.name}.{self.user}[{self.id}]"
@@ -171,18 +154,17 @@ class TimeStamp(models.Model):
     @property
     def project_number(self):
         return self.simulation.project_number 
-    
-    #! create a complete clone of each object from source_time_stamp and assign it to self (which is assumed to be already saved to the database as a new time stamp)
+ 
+    def clone(self, source_time_stamp):
+    #! create a complete clone of each object from source_time_stamp and assign it to self 
+    #! (which is assumed to be already saved to the database as a new time stamp)
     #! when this is done, pass through the newly-created children linking them to their new parents
     #! (so, for example, connect each stock to its new owner)
 
-    #! First create the clones
-    #! cloning method is to set pk=0 and save. See https://django.fun/docs/django-orm-cookbook/en/2.0/copy/
+    #! Cloning method is to set pk=0 and save. See https://django.fun/docs/django-orm-cookbook/en/2.0/copy/
     #! but we must set both .pk and .id to None before it works (see https://www.youtube.com/watch?v=E0oM9r3LhQU)
     #! seems a bit quirky but haven't found another way
-
-    def clone(self, source_time_stamp):
-       #! import these here to avoid circular imports
+    #! import these here to avoid circular imports
         from .commodity import Commodity
         from .stocks import IndustryStock, SocialStock
         from .owners import Industry, SocialClass
@@ -269,9 +251,10 @@ class TimeStamp(models.Model):
     #! connect social stocks to their commodities and owners
         social_stocks = SocialStock.objects.filter(
             time_stamp=self)
+        print(social_stocks)
         for social_stock in social_stocks:
             commodity_name = social_stock.commodity.name
-            logger.info(f"Connecting Social Stock of usage type {(social_stock.usage_type)} to commodity {(commodity_name)}")
+            logger.info(f"Connecting Social Stock with id {social_stock.id} of usage type {(social_stock.usage_type)} to commodity {(commodity_name)}")
     #! find the commodity that has the same name but the new time stamp
             new_commodity = Commodity.objects.get(
                 name=commodity_name, time_stamp=self)
@@ -280,11 +263,13 @@ class TimeStamp(models.Model):
             social_class_name = social_stock.social_class.name
             new_social_class = SocialClass.objects.get(
                 name=social_class_name, time_stamp=self)
-            logger.info(f"Connecting Social Stock of usage_type {(social_stock.usage_type)} to its social class {(social_class_name)}")
+            logger.info(f"Connecting Social Stock with id {social_stock.id} of usage_type {(social_stock.usage_type)} to social class {(social_class_name)}")
             social_stock.social_class = new_social_class
             social_stock.stock_owner = new_social_class
             social_stock.save()
             new_social_class.save()
+
+        return
 
     def __str__(self):
         return f"{self.period}.{self.stage}.{self.step}[{self.id}]"
