@@ -97,6 +97,10 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
         self.save()
         return
 
+    def __str__(self):
+        return f"[Project {self.time_stamp.simulation.project_number}]{self.owner_name}:{self.commodity.name}:{self.usage_type}[{self.id}]"
+
+
 class IndustryStock(Stock):
     industry = models.ForeignKey("Industry", on_delete=models.CASCADE, null=True) #TODO redundant? the base class has stock_owner
     production_requirement = models.FloatField( default=0)
@@ -105,11 +109,6 @@ class IndustryStock(Stock):
     class Meta:
         verbose_name = 'Industry Stock'
         verbose_name_plural = 'Industry Stocks'
-
-
-    def __str__(self):
-        return f"[Project {self.time_stamp.simulation.project_number}]{self.owner_name}:{self.commodity.name}:{self.usage_type}[{self.id}]"
-
 
 class SocialStock(Stock):
     social_class = models.ForeignKey("SocialClass",  related_name='class_stock', on_delete=models.CASCADE, null=True)
@@ -121,7 +120,3 @@ class SocialStock(Stock):
         verbose_name = 'Social Stock'
         verbose_name_plural = 'Social Stocks'
         ordering = ['commodity__display_order']        
-
-    def __str__(self):
-        return f"[Project {self.time_stamp.simulation.project_number}]{self.social_class.name}:{self.commodity.name}:{self.usage_type}[{self.id}]"
-

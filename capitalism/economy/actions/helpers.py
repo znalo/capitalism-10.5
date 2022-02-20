@@ -1,7 +1,7 @@
 from economy.models.report import Trace
 from economy.models.commodity import Commodity
 from economy.models.owners import Industry
-from economy.models.stocks import Stock
+from economy.models.stocks import Stock, IndustryStock
 from ..global_constants import *
 
 def evaluate_stocks(simulation):
@@ -63,14 +63,15 @@ def set_initial_capital(simulation):
     user=simulation.user
     current_time_stamp=simulation.current_time_stamp
     current_time_stamp.initial_capital=0
-    Trace.enter(simulation,1,f"Calculate initial capitals for user {user} studying {simulation} with time stamp {current_time_stamp}")
+    Trace.enter(simulation,1,f"Calculate initial capitals")
     logger.info(f"Calculate initial capitals for user {user} who is currently studying {simulation} with time stamp {current_time_stamp}")
-
     for industry in Industry.objects.filter(time_stamp=current_time_stamp):
         Trace.enter(simulation,2,f"calculating the initial capital of industry {industry.name}")
         capital=0
         work_in_progress=0
-        for stock in industry.stock_set.filter(time_stamp=current_time_stamp):
+        stock_set=industry.stock_set.filter(time_stamp=current_time_stamp)
+        for stock in stock_set:
+            stock.refresh_from_db()
             Trace.enter(simulation,3,f"Adding the price ${Trace.q(stock.price)} of the stock of {Trace.o(stock.commodity.name)}, type {Trace.o(stock.usage_type)}")
             capital+=stock.price
             if stock.usage_type==PRODUCTION:

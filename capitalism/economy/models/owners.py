@@ -13,8 +13,8 @@ class StockOwner(models.Model): # Base class for Industry and Social Class
     simulation = models.ForeignKey(Simulation, on_delete=models.CASCADE)
 
     def verbs(self):
-        singulars=["is", "has", "wants", "sells", "doesn't"]
-        plurals=["are", "have", "want", "sell", "don't"]
+        singulars=["is", "has", "wants", "sells", "doesn't", "owns"]
+        plurals=["are", "have", "want", "sell", "don't", "own"]
         if self.stock_owner_type==INDUSTRY:
             return singulars
         else:
@@ -75,9 +75,9 @@ class Industry(StockOwner):
     def current_queryset(self):
         return Industry.objects.filter(time_stamp=self.user.current_simulation.current_time_stamp)
 
-    # @property
-    # def productive_stocks(self):
-    #     return IndustryStock.objects.industrystock_set.filter(time_stamp=self.time_stamp,usage_type=PRODUCTION,industry=self)
+    @property
+    def productive_stocks(self):
+        return IndustryStock.objects.industrystock_set.filter(time_stamp=self.time_stamp,usage_type=PRODUCTION,industry=self)
 
     #! calculate how much it will cost to purchase sufficient stocks for this industry to produce at its current scale
     @property

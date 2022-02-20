@@ -22,67 +22,54 @@ def calculate_revenue(simulation):
     current_time_stamp=simulation.current_time_stamp
     Trace.enter(simulation,0,"Calculate capitalist revenue and other property-based entitlements")
     for industry in Industry.objects.filter(time_stamp=current_time_stamp):
-        Trace.enter(simulation,2,f"Industry {Trace.o(industry.name)} has made a profit of {Trace.q(industry.profit)} which will be transferred to the capitalists")
         donor_money_stock=industry.money_stock
         recipient=SocialClass.objects.get(time_stamp=current_time_stamp, name="Capitalists")
-        Trace.enter(simulation,2,f"This will go to {Trace.o(recipient.name)}")
+        Trace.enter(simulation,2,f"Industry {Trace.o(industry.name)} has made a profit of {Trace.q(industry.profit)} which will be transferred to {Trace.o(recipient.name)}")
         recipient_money_stock=recipient.money_stock
         donor_money_stock.size-=industry.profit
         recipient_money_stock.size+=industry.profit
         donor_money_stock.save()
         recipient_money_stock.save()
+"""
+In the 'invest' step, the capitalists decide what to do with their money
+There are two fundamentally different simulation scenarios which go to the heart of the divisions in economics that have been around since Say and Proudhon. Proudhon, Say, and all equilibrium theory simply assumes that the economy reproduces itself.
 
-#! In the 'invest' step, the capitalists decide what to do with their money
-#! There are two fundamentally different simulation scenarios which go to the heart of the divisions in economics
-#! that have been around since Say and Proudhon
+In this scenario, we simply take the given scales of production and consumption and perpetuate them.
+It's not clear what happens if this is not possible, and this is (not unsurprisingly) the problem that bedevils all attempts to explore this scenario
 
-#! Proudhon, Say, and all equilibrium theory simply assumes that the economy reproduces itself.
+In the other scenario explored by Marx, Kalecki, etc, there is no assumption of self-reproduction.
+Then there must be some mechanism or other that adjusts supply to demand, but over time
+This too may break down, but assuming the simulation is good, the breakdown (if it occurs) will reflect what happens in the real world.
 
-#! In this scenario, we simply take the given scales of production and consumption and perpetuate them.
-# It's not clear what happens if this is not possible, and this is (not unsurprisingly) the problem
-# that dogs all attempts to explore this scenario
+This second scenario, however, has two sub-categories. Generally, price-adjustment is supposed.
 
-#! In the other scenario explored by Marx, Kalecki, etc, there is no assumption of self-reproduction
-#! Then there must be some mechanism or other that adjusts supply to demand, but over time
-#! This too may break down, but assuming the simulation is good, the breakdown (if it occurs) will reflect what happens in the real world.
+The question is then whether there is some other possible adjustment process.If so, this is what should be pursued 
+by rational government insofar as this is confined to the satisfaction of need.
 
-#! This second scenario, however, has two sub-categories.
-#! Generally, price-adjustment is supposed.
+In this simulation, we should allow for all three variants.
 
-#! The question is then whether there is some other possible adjustment process
-#! If so, this is what should be pursued by rational government insofar as this is confined to the satisfaction of need.
+We will leave price-adjustment until last. This is entirely for algorithmic reasons. It has no necessary logical foundation.
+In fact, we do it  only in order to illustrate the various self-reproducing systems that have been proposed, or logically exist.
+This has a purely educational function, and is not actually especially interesting.
 
-#! In this simulation, we should allow for all three variants.
+We therefore start by supposing that money is allocated to maintain the existing levels of production.
 
-#! We will leave price-adjustment until last. This is entirely for algorithmic reasons. It has no necessary logical foundation.
-#! In fact, we do it  only in order to illustrate the various self-reproducing systems that have been proposed, or logically exist.
-#! This has a purely educational function, and is not actually especially interesting.
+We should not be overly concerned with a shortage of money, because we know that credit steps in and because monetary shortage is a relatively complex issue, to be addressed when we have a government and a banking sector. 
+Therefore, the 'disparity' question is this: when production is maintained at existing levels, does this result in a disparity between supply and demand?
 
-#! We therefore start by supposing that money is allocated to maintain the existing levels of production.
+The original simulation supposed that this will manifest itself in a disparity between *stocks* and *requirements*.
+(is this algorithmically the same as a disparity between supply and demand?)
+We'll treat it that way and see what happens (it's an interesting exercise)
 
-#! We should not be overly concerned with a shortage of money, because we know that credit steps in and because monetary
-#! shortage is a relatively complex issue, to be addressed when we have a government and a banking sector.
+Note that our current crude allocation mechanism does provide some sort of provision for dealing with demand/supply mismatches, in that final demand will be reduced as a result, leaving space for production to increase. But we don't know how the simulation will actually proceed without, basically, doing it.
 
-#! Therefore, the 'disparity' question is this: when production is maintained at existing levels, does
-#! this result in a disparity between supply and demand?
+So let's try that to start with.
+A more sophisticated approach would be monetary, basically to cut wages, which corresponds more closely to what actually happens.
 
-#! The original simulation supposed that this will manifest itself in a disparity between *stocks* and *requirements*.
-#! ?is this algorithmically the same as a disparity between supply and demand?
-#! We'll treat it that way and see what happens (it's an interesting exercise)
+But reluctant to introduce monetary constraints as the primary mechanism, essentially because credit intervenes.
 
-#! Note that our current crude allocation mechanism does provide some sort of provision for dealing with
-#! demand/supply mismatches, in that final demand will be reduced as a result, leaving space
-#! for production to increase. But we don't know how the simulation will actually proceed without, basically, doing it.
-
-#! So let's try that to start with.
-#! A more sophisticated approach would be monetary, basically to cut wages, which corresponds more closely
-#! to what actually happens.
-
-#! But reluctant to introduce monetary constraints as the primary mechanism, essentially because credit intervenes.
-
-#! We therefore start from simple 'replenishment', get that working for the principal use cases
-#! Then explore the effect of supply shortages using the simulation itself.
-
+We therefore start from simple 'replenishment', get that working for the principal use cases Then explore the effect of supply shortages using the simulation itself.
+"""
 
 def calculate_investment(simulation):
     current_time_stamp=simulation.current_time_stamp
@@ -98,8 +85,8 @@ def calculate_investment(simulation):
         industry_money=industry.money_stock
         transferred_amount=cost-industry_money.size
         Trace.enter(simulation,1, f"{Trace.o(industry.name)} already has {Trace.q(industry_money.size)} and will receive {Trace.q(transferred_amount)}")
-        capitalists_money.size-=transferred_amount
-        industry_money.size+=transferred_amount
+        capitalists_money.change_size(-transferred_amount)
+        industry_money.change_size(transferred_amount)
         industry_money.save()
         capitalists_money.save()
     set_initial_capital(simulation=simulation) #! as soon as we are ready for the next circuit, we should reset the initial capital
