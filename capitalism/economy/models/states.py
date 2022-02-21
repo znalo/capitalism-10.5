@@ -275,6 +275,6 @@ class TimeStamp(models.Model):
         return
 
     def __str__(self):
-        return f"{self.simulation.project_number}|{self.period}.{self.stage}.{self.step}[{self.id}]"
+        return f"[{self.simulation.project_number}]p{self.period}.{self.step}[{self.id}]"
 
 

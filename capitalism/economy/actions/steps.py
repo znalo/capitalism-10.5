@@ -38,6 +38,7 @@ def allocate(simulation):
 def trade(simulation):
     calculate_trade(simulation)
     calculate_commodity_totals(simulation,'Checksizes', 'Checkprices', 'Checkvalues')    
+    set_current_capital(simulation=simulation)    
 
 def production(simulation):
     calculate_production(simulation=simulation)    # ! The immediate results of production

@@ -140,7 +140,7 @@ class Industry(StockOwner):
         return 1
 
     def __str__(self):
-        return self.name
+        return f"{self.time_stamp}.{self.name}"
 
 class SocialClass(StockOwner):
     population = models.IntegerField(verbose_name="Population", default=1000)

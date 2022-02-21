@@ -1,35 +1,31 @@
 {% extends "base.html" %} {% block content %} {% load app_filters %}
 <h3 class="w3-center">Industries</h3>
-<table id="industry" class="display compact" style="width:80%">
+<table id="industry" class="display compact" style="width:90%">
     <thead>
         <tr>
             <th>Time Stamp</th>
-            <th>Project</th>
             <th>Industry</th>
             <th>Product</th>
             <th>Work in Progress</th>
             <th>Sales Stocks (#,$)</th>
-            <th>Money Stocks</th>
+            <th>Money Stocks (#,$)</th>
             <th>Initial Capital</th>
             <th>Current Capital</th>
             <th>Scale</th>
-            <th>Growth Rate</th>
         </tr>
     </thead>
     <tbody>
         {% for record in industry_list %}
         <tr>
             <td class="w3-center"> {{ record.time_stamp}}</td>
-            <td class="w3-center"> {{ record.simulation.project_number}} </td>
             <td> {{ record.name }}</td>
             <td> {{ record.commodity.name }} </td>
-            <td> ${{ record.work_in_progress}} </td>
+            <td> ${{ record.work_in_progress|has_changed:record.comparator_work_in_progress }} </td>
             <td> {{ record.sales_stock.size|has_changed:record.sales_stock.comparator_stock.size }}, ${{ record.sales_stock.price|has_changed:record.sales_stock.comparator_stock.price }} </td>
-            <td> {{ record.money_stock.size }} </td>
-            <td> {{ record.initial_capital }}</td>
-            <td> {{ record.current_capital }}</td>
+            <td> {{ record.money_stock.size|has_changed:record.comparator_money_stock.size }}, ${{ record.money_stock.price|has_changed:record.comparator_money_stock.price }} </td>
+            <td> ${{ record.initial_capital|has_changed:record.comparator_initial_capital }}</td>
+            <td> ${{ record.current_capital|has_changed:record.comparator_initial_capital }}</td>
             <td> {{ record.output_scale }}</td>
-            <td> {{ record.output_growth_rate }}</td>
         </tr>
         {% endfor %}
     </tbody>

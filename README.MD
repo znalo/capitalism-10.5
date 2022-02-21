@@ -108,7 +108,9 @@ Too much money is allocated to industries in the distribution stage
   * Debug price and value calculations
 ## 21 February
   * More fixes to comparator display. This is needed to debug the price revaluation logic, which is still faulty
-
+  * MAJOR CHANGE: added new 'stage' M'-M to separate out revenue and investment. Renamed the early parts of 'distribute' to 'reproduce'.
+  * This makes it much clearer what goes on in each stage of the circuit
+  
   
 
 

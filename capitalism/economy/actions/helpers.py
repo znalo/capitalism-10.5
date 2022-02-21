@@ -107,7 +107,7 @@ def set_initial_capital(simulation):
             capital+=stock.price
             if stock.usage_type==PRODUCTION:
                 work_in_progress+=stock.price
-                Trace.enter(simulation,2,f"Work in progress is now ${Trace.q(work_in_progress)}")
+                Trace.enter(simulation,2,f"Initial work in progress is now ${Trace.q(work_in_progress)}")
         industry.initial_capital=capital
         industry.current_capital=capital
         industry.work_in_progress=work_in_progress
@@ -137,6 +137,7 @@ def set_current_capital(simulation):
             capital+=stock.price
             if stock.usage_type==PRODUCTION:
                 work_in_progress+=stock.price
+                Trace.enter(simulation,2,f"Current work in progress is now ${Trace.q(work_in_progress)}")
             Trace.enter(simulation,3,f"Adding the price {Trace.q(stock.price)} of stock of {Trace.o(stock.commodity.name)}, type {Trace.o(stock.usage_type)}. Work in progress is {Trace.q(work_in_progress)} and capital is {Trace.q(capital)} ")
         industry.current_capital=capital
         industry.profit=capital-industry.initial_capital
