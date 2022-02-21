@@ -141,3 +141,5 @@ TODO this should be done with a dropdown list, or perhaps checkboxes, within the
 ## Commit Debug Price and Value calculations
 ## Commit Display logic is being extended systematically to all displayed variables in order to debug price logic, which is improving but still faulty
 ## Commit Major change introduction of M'-M stage of the circuit to track investment behaviour separately
+## Commit Project 5 initially tested and runs through correctly. More work on MELT needed
+
