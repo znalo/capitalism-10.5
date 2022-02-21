@@ -92,15 +92,15 @@ def calculate_price_changes_in_distribution(simulation):
     if simulation.price_response_type=="EQUALIZED":
         Trace.enter(simulation,1,"EQUAL PROFIT RATE CALCULATION")
         r=simulation.current_time_stamp.profit_rate
-        Trace.enter(simulation,2,f"General rate of profit is {r}")
+        Trace.enter(simulation,2,f"General rate of profit is {Trace.q(r)}")
         for industry in industries:
             commodity=industry.commodity
             x=commodity.size
             K=industry.initial_capital
-            Trace.enter(simulation,2,f"Industry {industry} has sales stock {x} and initial capital {K}")
+            Trace.enter(simulation,2,f"Industry {Trace.o(industry)} has sales stock {Trace.q(x)} and initial capital {Trace.q(K)}")
             desired_profit=(1+r/100)*K
             desired_unit_price=desired_profit/x
-            Trace.enter(simulation,2,f"The unit price is {commodity.unit_price} and will be set to {desired_unit_price} ")
+            Trace.enter(simulation,2,f"The unit price is {Trace.q(commodity.unit_price)} and will be set to {Trace.q(desired_unit_price)} ")
             commodity.unit_price=desired_unit_price
             commodity.save()
     return #! The caller must ensure that stocks are revalued

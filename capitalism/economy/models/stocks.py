@@ -46,7 +46,7 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
         return self.commodity.display_order
 
     @property
-    def old_size(self):
+    def comparator_size(self):
         if self.comparator_stock==None:
             return -1
         else:
@@ -54,14 +54,14 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
         return last_size
 
     @property
-    def old_demand(self):
+    def comparator_demand(self):
         if self.comparator_stock==None:
             return -1
         else:
             return self.comparator_stock.demand
 
     @property
-    def old_supply(self):
+    def comparator_supply(self):
         if self.comparator_stock==None:
             return -1
         else:

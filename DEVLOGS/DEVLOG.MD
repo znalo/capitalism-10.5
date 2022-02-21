@@ -139,3 +139,4 @@ TODO this should be done with a dropdown list, or perhaps checkboxes, within the
 ## Commit This version installed on remote server and tested for project 1
 ## Commit Improvements to comparator display and numeric displays
 ## Commit Debug Price and Value calculations
+## Commit Display logic is being extended systematically to all displayed variables in order to debug price logic, which is improving but still faulty

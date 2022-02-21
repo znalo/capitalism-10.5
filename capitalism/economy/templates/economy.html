@@ -56,7 +56,7 @@
             <td>{{ industry.commodity.name }}</td>
             {% for stock in productive_stocks %} {% if stock.industry.name == industry.name %}
             <td class='dt-body-right'>
-                {{ stock.size|has_changed:stock.old_size}}
+                {{ stock.size|has_changed:stock.comparator_size}}
             </td>
             <td class='dt-body-right'>
                 {{ stock.production_requirement}}
@@ -141,14 +141,14 @@
             <td>{{social_class.population}}</td>
             {% for stock in consumption_stocks %} {% if stock.social_class.name == social_class.name %}
             <td class='dt-body-right'>
-                {{ stock.size|has_changed:stock.old_size}}
+                {{ stock.size|has_changed:stock.comparator_size}}
             </td>
             <td class='dt-body-right'>
                 {{ stock.consumption_requirement}}
             </td>
             {% endif %} {% endfor %}
-            <td class='dt-body-right'> {{ social_class.class_stock|sales_filter }}</td>
-            <td class='dt-body-right'> {{ social_class.class_stock|money_filter }}</td>
+            <td class='dt-body-right'> {{ social_class.sales_stock.size|has_changed:social_class.comparator_sales_stock.size }}</td>
+            <td class='dt-body-right'> {{ social_class.money_stock.size|has_changed:social_class.comparator_money_stock.size }}</td>
             <td class='dt-body-right'> {{social_class.consumption_ratio}}</td>
             <td class='dt-body-right'>{{social_class.revenue}}</td>
             <td class='dt-body-right'>{{social_class.assets}}</td>

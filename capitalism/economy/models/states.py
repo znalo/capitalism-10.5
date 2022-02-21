@@ -3,13 +3,13 @@ from economy.global_constants import *
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import User
 
-
+"""
+NOTE: The time_stamp object has a foreign key relation to the user, because there are many stamps in a simulation.
+However, the User object also needs to know which simulation it is currently connected to.
+It therefore has a special field, current_simulation, that represents the simulation. We cannot cascade this field. 
+This is because, when the data is completely re-initialized, all the simulations owned by this user are deleted whether or not they are current (via the user attribute of the Simulation object) This would include the current simulation
+"""
 class User(AbstractUser):
-    #! The time_stamp object has a foreign key relation to the user, because there are many stamps in a simulation
-    #! However, the User object also needs to know which simulation it is currently connected to
-    #! It therefore has a special field, current_simulation, that represents the simulation. We cannot cascade this field. 
-    #! This is because, when the data is completely re-initialized, all the simulations owned by this user are deleted whether or not they are current
-    #! (via the user attribute of the Simulation object) This would include the current simulation
     current_simulation=models.OneToOneField("Simulation", related_name="simulation_user", on_delete=models.SET_NULL,blank=True, null=True, default=None) 
 
     @property
@@ -146,10 +146,14 @@ class TimeStamp(models.Model):
     step = models.CharField(max_length=50, default=UNDEFINED)
     stage = models.CharField(max_length=50, default=UNDEFINED)
     period = models.IntegerField(default=1)
-    initial_capital=models.FloatField(null=False, blank=False,default=-1)#! By setting negative default I hope programming errors will be easy to spot
+    melt=models.FloatField(null=False, blank=False,default=1) 
+    #! By setting negative defaults on the following fields, I hope programming errors will be easier to spot
+    total_value=models.FloatField(null=False, blank=False,default=-1)
+    total_price=models.FloatField(null=False, blank=False,default=-1)
+    initial_capital=models.FloatField(null=False, blank=False,default=-1)
     current_capital=models.FloatField(null=False, blank=False,default=1)
-    profit=models.FloatField(null=False, blank=False,default=1)
-    profit_rate=models.FloatField(null=False, blank=False,default=1)    
+    profit=models.FloatField(null=False, blank=False,default=-1)
+    profit_rate=models.FloatField(null=False, blank=False,default=-1)
 
     @property
     def project_number(self):
@@ -271,6 +275,6 @@ class TimeStamp(models.Model):
         return
 
     def __str__(self):
-        return f"{self.period}.{self.stage}.{self.step}[{self.id}]"
+        return f"{self.simulation.project_number}|{self.period}.{self.stage}.{self.step}[{self.id}]"
 
 

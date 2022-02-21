@@ -13,7 +13,9 @@ def evaluate_stocks(simulation):
     Trace.enter(simulation,1,f"Evaluate stock values and prices from commodity unit prices and values")
     logger.info(f"Calculate values and prices for simulation {simulation} and time stamp  {simulation.current_time_stamp}")
     for stock in Stock.objects.filter(time_stamp=simulation.current_time_stamp):
-        Trace.enter(simulation,3,f"{Trace.o(stock.stock_owner.name)} owns a stock of {Trace.o(stock.commodity.name)} whose size is presently {Trace.q(stock.size)}, with value {Trace.q(stock.value)} and price {Trace.q(stock.price)}")
+        owner=stock.stock_owner
+        verbs=owner.verbs()
+        Trace.enter(simulation,3,f"{Trace.o(owner.name)} {verbs[5]} a stock of {Trace.o(stock.commodity.name)} whose size is presently {Trace.q(stock.size)}, with value {Trace.q(stock.value)} and price {Trace.q(stock.price)}")
         stock.value=stock.size*stock.commodity.unit_value
         stock.price=stock.size*stock.commodity.unit_price
         Trace.enter(simulation,4,f"Unit value is {Trace.q(stock.commodity.unit_value)} so total value has been reset to {Trace.q(stock.value)}")

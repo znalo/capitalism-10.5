@@ -106,6 +106,8 @@ Too much money is allocated to industries in the distribution stage
 ## 20 February
   * Improvements to comparator display to make changes more easily visible
   * Debug price and value calculations
+## 21 February
+  * More fixes to comparator display. This is needed to debug the price revaluation logic, which is still faulty
 
   
 

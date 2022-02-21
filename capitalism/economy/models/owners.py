@@ -20,9 +20,6 @@ class StockOwner(models.Model): # Base class for Industry and Social Class
         else:
             return plurals
 
-    class meta:     #! helps view the objects in time stamp order in admin
-        ordering = ['time_stamp.time_stamp']
-
     @property
     def money_stock(self):
         stocks = Stock.objects.filter(time_stamp=self.time_stamp, usage_type=MONEY, stock_owner=self)
@@ -44,11 +41,18 @@ class StockOwner(models.Model): # Base class for Industry and Social Class
             logger.error(f"+++{self.name} has no sales stock") 
             return None
         return stocks.get()
-    
-    #! unique method because it hardwires the name of the class.
-    #TODO generalise this so it is not hardwired
-    
+
+    @property
+    def comparator_money_stock(self):
+        return self.money_stock.comparator_stock
+
+    @property
+    def comparator_sales_stock(self):
+        return self.sales_stock.comparator_stock
+
+    @property
     def capitalists(self):
+    #TODO generalise this so it is not hardwired
         try:
             capitalists_qs=SocialClass.objects.filter(time_stamp=self.time_stamp, name="Capitalists")
             capitalists=capitalists_qs.get()
@@ -57,8 +61,8 @@ class StockOwner(models.Model): # Base class for Industry and Social Class
             raise Exception("Too many capitalists. Cannot continue. This is either a data error or a programming error")
         return capitalists
 
-# TODO subclass this properly see https://stackoverflow.com/questions/13347287/django-filter-base-class-by-child-class-names
 class Industry(StockOwner):
+# TODO subclass this properly see https://stackoverflow.com/questions/13347287/django-filter-base-class-by-child-class-names
     output_scale = models.IntegerField(verbose_name="Output", default=1)
     output_growth_rate = models.IntegerField(verbose_name="Growth Rate", default=1)
     initial_capital=models.FloatField(default=0)
@@ -79,9 +83,9 @@ class Industry(StockOwner):
     def productive_stocks(self):
         return IndustryStock.objects.industrystock_set.filter(time_stamp=self.time_stamp,usage_type=PRODUCTION,industry=self)
 
-    #! calculate how much it will cost to purchase sufficient stocks for this industry to produce at its current scale
     @property
     def replenishment_cost(self):
+        #! calculate how much it will cost to purchase sufficient stocks for this industry to produce at its current scale
         simulation=self.simulation
         current_time_stamp=simulation.current_time_stamp
         #! Requires that demand is correctly set - this must be provided for by the caller 

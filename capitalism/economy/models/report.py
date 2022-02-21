@@ -31,4 +31,4 @@ class Trace(models.Model):
 
     @staticmethod
     def q(value):
-        return f"<span class = 'quantity-object'>{value}</span>"
+        return f"<span class = 'quantity-object'>{value:.2f}</span>"

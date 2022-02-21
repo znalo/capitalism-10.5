@@ -8,7 +8,7 @@
             <th>Industry</th>
             <th>Product</th>
             <th>Work in Progress</th>
-            <th>Sales Stocks</th>
+            <th>Sales Stocks (#,$)</th>
             <th>Money Stocks</th>
             <th>Initial Capital</th>
             <th>Current Capital</th>
@@ -24,8 +24,8 @@
             <td> {{ record.name }}</td>
             <td> {{ record.commodity.name }} </td>
             <td> ${{ record.work_in_progress}} </td>
-            <td> {{ record.industrystock_set.all|sales_filter }} </td>
-            <td> {{ record.industrystock_set.all|money_filter }} </td>
+            <td> {{ record.sales_stock.size|has_changed:record.sales_stock.comparator_stock.size }}, ${{ record.sales_stock.price|has_changed:record.sales_stock.comparator_stock.price }} </td>
+            <td> {{ record.money_stock.size }} </td>
             <td> {{ record.initial_capital }}</td>
             <td> {{ record.current_capital }}</td>
             <td> {{ record.output_scale }}</td>
