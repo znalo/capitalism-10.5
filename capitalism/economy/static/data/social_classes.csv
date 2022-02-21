@@ -3,8 +3,6 @@ project,time_stamp,social_class_name,population,participation_ratio,consumption_
 1,1,Workers,3000,1,0.5,0
 2,1,Capitalists,1500,0,1,1500
 2,1,Workers,3000,1,0.5,0
-3,1,Capitalists,1500,0,1,750
-3,1,Workers,3000,1,0.5,0
 4,1,Capitalists,1500,0,1,1500
 4,1,Workers,3000,1,0.5,0
 5,1,Capitalists,1500,0,1,1250

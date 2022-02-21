@@ -46,7 +46,7 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
         return self.commodity.display_order
 
     @property
-    def old_size(self):
+    def comparator_size(self):
         if self.comparator_stock==None:
             return -1
         else:
@@ -54,14 +54,14 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
         return last_size
 
     @property
-    def old_demand(self):
+    def comparator_demand(self):
         if self.comparator_stock==None:
             return -1
         else:
             return self.comparator_stock.demand
 
     @property
-    def old_supply(self):
+    def comparator_supply(self):
         if self.comparator_stock==None:
             return -1
         else:
@@ -88,7 +88,9 @@ class Stock(models.Model): # Base class for IndustryStock and SocialStock
         new_price=self.price+quantity*self.commodity.unit_price
         new_value=self.value+quantity*self.commodity.unit_value
         if new_size<0 or new_value<0 or new_price<0:
-            Trace.enter(self.simulation,0,"WARNING: the stock {self.commodity.name} of type {self.usage_type} owned by {self.stock_owner.name} will become negative with size {new_size}, value {new_value} and price {new_price}")
+            Trace.enter(self.simulation,0,f"WARNING: the stock {self.commodity.name} of type {self.usage_type} owned by {self.stock_owner.name} will become negative with size {new_size}, value {new_value} and price {new_price}")
+            logger.warning(f"the stock {self.commodity.name} of type {self.usage_type} owned by {self.stock_owner.name} will become negative with size {new_size}, value {new_value} and price {new_price}")
+            logger.warning(f"This took place after it was asked to change its size by {quantity} ") 
             # raise Exception (f"The stock {self} will become negative with size {new_size}, value {new_value} and price {new_price}")
         self.size=new_size
         self.price=new_price

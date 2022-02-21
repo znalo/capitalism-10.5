@@ -137,3 +137,9 @@ TODO this should be done with a dropdown list, or perhaps checkboxes, within the
 ## Commit [The original] (https://www.youtube.com/watch?v=aZ308aOOX04) No changes, just felt the tribute was needed
 ## [understand origins](https://www.youtube.com/watch?v=VH40n5lchQo) Understand origins
 ## Commit This version installed on remote server and tested for project 1
+## Commit Improvements to comparator display and numeric displays
+## Commit Debug Price and Value calculations
+## Commit Display logic is being extended systematically to all displayed variables in order to debug price logic, which is improving but still faulty
+## Commit Major change introduction of M'-M stage of the circuit to track investment behaviour separately
+## Commit Project 5 initially tested and runs through correctly. More work on MELT needed
+

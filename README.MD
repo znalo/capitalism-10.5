@@ -103,6 +103,15 @@ Too much money is allocated to industries in the distribution stage
   * removed another couple of bugs in the investment algorithm. 
   * Project 1 now runs from start to finish of a cycle, and ends up in the same state - which is what should in fact happen
   * This version installed on server and tested
+## 20 February
+  * Improvements to comparator display to make changes more easily visible
+  * Debug price and value calculations
+## 21 February
+  * More fixes to comparator display. This is needed to debug the price revaluation logic, which is still faulty
+  * MAJOR CHANGE: added new 'stage' M'-M to separate out revenue and investment. Renamed the early parts of 'distribute' to 'reproduce'.
+  * This makes it much clearer what goes on in each stage of the circuit
+  * As far as I can see, project 5 (Equal Profit Rate Price calculation) is now working, but we have not yet recalculated the MELT. This will be the next stage. In addition, the project 5 numbers should be made a little more realistic since the profit rate disparity between industries is rather large.
+  
 
   
 

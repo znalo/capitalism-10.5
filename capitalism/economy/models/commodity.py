@@ -45,7 +45,6 @@ class Commodity(models.Model):
     def comparator_size(self):
         return self.comparator_commodity().size
 
-
     @property
     def comparator_demand(self):
         return self.comparator_commodity().demand
@@ -57,6 +56,14 @@ class Commodity(models.Model):
     @property
     def comparator_total_price(self):
         return self.comparator_commodity().total_price
+
+    @property
+    def comparator_unit_price(self):
+        return self.comparator_commodity().unit_price
+
+    @property
+    def comparator_unit_value(self):
+        return self.comparator_commodity().unit_value
 
     @property
     def comparator_total_value(self):
@@ -71,7 +78,9 @@ class Commodity(models.Model):
         new_price=self.total_price+quantity*self.unit_price
         new_value=self.total_value+quantity*self.unit_value
         if new_size<0 or new_value<0 or new_price<0:
-            Trace.enter(self.simulation,0,"WARNING: The commodity {self.name} will become negative with size {new_size}, value {new_value} and price {new_price}")
+            Trace.enter(self.simulation,0,f"WARNING: The commodity {self.name} will become negative with size {new_size}, value {new_value} and price {new_price}")
+            logger.warning(f"Commodity {self.name} has become negative with size {new_size}, value {new_value} and price {new_price} ")
+            logger.warning(f"This took place after it was asked to change its size by {quantity} ")
             # raise Exception (f"The commodity {self} will become negative with size {new_size}, value {new_value} and price {new_price}")
         self.size=new_size
         self.total_price=new_price
@@ -83,7 +92,7 @@ class Commodity(models.Model):
         return Commodity.objects.filter(time_stamp=self.simulation.current_time_stamp)
 
     def __str__(self):
-        return f"[Time Stamp {self.time_stamp}] {self.name}"
+        return f"{self.simulation}:{self.name}:{self.time_stamp}"
 
 
 

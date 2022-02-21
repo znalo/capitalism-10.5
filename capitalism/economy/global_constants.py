@@ -25,7 +25,8 @@ CAPITAL="capital"
 REVALUE="revalue"
 M_C = "M-C (exchange)"
 C_P = "C-P-C' (produce)"
-C_M = "C'-M' (distribute)"
+C_M = "C'-M' (reproduce)"
+M_M = "M'-M (capital)"
 INITIAL="Initial"
 VALUES='Values',
 EQUALIZED='Equal Profit Rate',
@@ -78,19 +79,20 @@ STEPS={
   "demand":Step(name=DEMAND,stage_name="M_C", next_step=ALLOCATE, description="EVALUATE DEMAND AND SUPPLY"),
   "allocate":Step(name=ALLOCATE,stage_name="M_C", next_step=TRADE, description="ALLOCATE SUPPLY"),
   "trade":Step(name=TRADE,stage_name="M_C",next_step=PRODUCE, description="TRADE"),
-  "produce":Step(name=PRODUCE,stage_name="C_P", next_step=CAPITAL, description="PRODUCE"),
-  "capital":Step(name=CAPITAL,stage_name="C_P", next_step=REVALUE, description="CALCULATE CAPITAL AS THE IMMEDIATE RESULT OF PRODUCTION"),
-  "revalue":Step(name=REVALUE,stage_name="C_P", next_step=REPRODUCE, description="PRICE AND VALUE CHANGES ARISING FROM DISTRIBUTION"),
-  "reproduce":Step(name=REPRODUCE,stage_name="C_P", next_step=REVENUE, description="SOCIAL REPRODUCTION"),
-  "revenue":Step(name=REVENUE,stage_name="C_M",next_step=INVEST, description="REVENUES"),
-  "invest":Step(name=INVEST,stage_name="C_M", next_step=DEMAND, description="INVESTMENT"),
-  "UNDEFINED":Step(name=UNDEFINED,stage_name="C_M", next_step=UNDEFINED, description=UNDEFINED),
-  "Initial":Step(name=INITIAL,stage_name="C_M", next_step=INITIAL, description=UNDEFINED),
+  "produce":Step(name=PRODUCE,stage_name="C_P", next_step="revalue", description="PRODUCE"),
+  "revalue":Step(name=CAPITAL,stage_name="C_M", next_step="reprice", description="CALCULATE COMMODITY VALUES, STOCK VALUES, AND CAPITAL AS THE IMMEDIATE RESULT OF PRODUCTION"),
+  "reprice":Step(name=REVALUE,stage_name="C_M", next_step="reproduce", description="PRICE AND VALUE CHANGES ARISING FROM DISTRIBUTION"),
+  "reproduce":Step(name=REPRODUCE,stage_name="C_M", next_step=REVENUE, description="SOCIAL REPRODUCTION"),
+  "revenue":Step(name=REVENUE,stage_name="M_M",next_step=INVEST, description="REVENUES"),
+  "invest":Step(name=INVEST,stage_name="M_M", next_step=DEMAND, description="INVESTMENT"),
+  "UNDEFINED":Step(name=UNDEFINED,stage_name="M_C", next_step=UNDEFINED, description=UNDEFINED),
+  "Initial":Step(name=INITIAL,stage_name="M_C", next_step=INITIAL, description=UNDEFINED),
 }
 
 STAGES={
     "M_C":M_C,
     "C_P":C_P,
-    "C_M":C_M
+    "C_M":C_M,
+    "M_M":M_M,
 }
 

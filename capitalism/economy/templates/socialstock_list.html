@@ -3,7 +3,7 @@
 <table id="stocks" class="display compact" style="width:80%">
     <thead>
         <tr>
-            <th>Project</th>
+            <th>Id</th>
             <th>Time Stamp</th>
             <th>Social Class</th>
             <th>Commodity</th>
@@ -17,8 +17,8 @@
     <tbody>
         {% for stock in stock_list %}
         <tr>
-            <td> {{ stock.time_stamp.simulation.project_number }}</td>
-            <td> {{ stock.time_stamp.time_stamp }}</td>
+            <td> {{ stock.id}}</td>
+            <td> {{ stock.time_stamp }}</td>
             <td> {{ stock.social_class.name}} </td>
             <td> {{ stock.commodity.name }}</td>
             <td> {{ stock.usage_type }}</td>

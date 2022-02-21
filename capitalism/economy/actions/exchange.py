@@ -5,10 +5,12 @@ from economy.models.owners import StockOwner
 from economy.models.stocks import Stock, IndustryStock, SocialStock
 from ..global_constants import *
 
+"""
+Calculate the unconstrained demand for all stocks
+Use this to calculate the total demand for each commodity
+In 'allocate' we impose constraints arising from supply and (TODO) money shortages
+"""
 def calculate_demand(simulation):
-    #! Calculate the unconstrained demand for all stocks
-    #! Use this to calculate the total demand for each commodity
-    #! In 'allocate' we impose constraints arising from supply and (TODO) money shortages
     current_time_stamp=simulation.current_time_stamp
     periods_per_year=simulation.periods_per_year
     user=simulation.user
@@ -126,14 +128,8 @@ def calculate_trade(simulation):
             else:
                 Trace.enter(simulation,4,f"NO SALE: {Trace.o(seller_name)} {seller_verbs[4]} sell this")
         Trace.enter(simulation,2,f"BUYER FINAL STATUS: {Trace.o(buyer.name)} now {buyer_verbs[1]} ${Trace.q(buyer_money_stock.size)} and a stock of {Trace.q(buyer_stock.size)} with value ${Trace.q(buyer_stock.value)} and price ${Trace.q(buyer_stock.price)}")    
-    
-    #!Every industry now has the goods with which they will start production.
-    #!At the end of this process, we (and the owners) want to know how much profit the industries have made
-    #!Therefore, we now establish the total value and price of each commodity and stock
-    #!Then, the initial and current capital of each industry
-    calculate_commodity_totals(simulation=simulation)
-    set_initial_capital(simulation=simulation)
-    set_current_capital(simulation=simulation)
+    return   
+ 
 
 def sale(seller_stock, buyer_stock, seller, buyer, seller_money_stock, buyer_money_stock):
     try:

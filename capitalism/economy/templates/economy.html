@@ -12,14 +12,16 @@
             <th>Current Capital</th>
             <th>Profit</th>
             <th>Profit Rate</th>
+            <th>Price Response</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td>{{ simulation.current_time_stamp.initial_capital|has_changed:simulation.comparator_time_stamp.initial_capital }}</td>
-            <td>{{ simulation.current_time_stamp.current_capital|has_changed:simulation.comparator_time_stamp.current_capital }}</td>
-            <td>{{ simulation.current_time_stamp.profit|has_changed:simulation.current_time_stamp.profit }}</td>
-            <td>{{ simulation.current_time_stamp.profit_rate|has_changed:simulation.current_time_stamp.profit_rate }}</td>
+            <td>${{ simulation.initial_capital|has_changed:simulation.comparator_initial_capital }}</td>
+            <td>${{ simulation.current_capital|has_changed:simulation.comparator_current_capital }}</td>
+            <td>${{ simulation.profit|has_changed:simulation.comparator_profit }}</td>
+            <td>%{{ simulation.profit_rate|percent_has_changed:simulation.comparator_profit_rate }}</td>
+            <td>{{ simulation.price_response_type }} </td>
         </tr>
     </tbody>
 </table>
@@ -54,7 +56,7 @@
             <td>{{ industry.commodity.name }}</td>
             {% for stock in productive_stocks %} {% if stock.industry.name == industry.name %}
             <td class='dt-body-right'>
-                {{ stock.size|has_changed:stock.old_size}}
+                {{ stock.size|has_changed:stock.comparator_size}}
             </td>
             <td class='dt-body-right'>
                 {{ stock.production_requirement}}
@@ -96,7 +98,7 @@
             <td class='dt-body-right'>${{ industry.current_capital|has_changed:industry.comparator_current_capital }}
             </td>
             <td class='dt-body-right'>${{ industry.profit|has_changed:industry.comparator_profit }}</td>
-            <td class='dt-body-right'>%{{ industry.profit_rate|has_changed:industry.comparator_profit_rate|floatformat }}</td>
+            <td class='dt-body-right'>%{{ industry.profit_rate|percent_has_changed:industry.comparator_profit_rate}}</td>
         </tr>
         {% endfor %}
     </tbody>
@@ -139,14 +141,14 @@
             <td>{{social_class.population}}</td>
             {% for stock in consumption_stocks %} {% if stock.social_class.name == social_class.name %}
             <td class='dt-body-right'>
-                {{ stock.size|has_changed:stock.old_size}}
+                {{ stock.size|has_changed:stock.comparator_size}}
             </td>
             <td class='dt-body-right'>
                 {{ stock.consumption_requirement}}
             </td>
             {% endif %} {% endfor %}
-            <td class='dt-body-right'> {{ social_class.class_stock|sales_filter }}</td>
-            <td class='dt-body-right'> {{ social_class.class_stock|money_filter }}</td>
+            <td class='dt-body-right'> {{ social_class.sales_stock.size|has_changed:social_class.comparator_sales_stock.size }}</td>
+            <td class='dt-body-right'> {{ social_class.money_stock.size|has_changed:social_class.comparator_money_stock.size }}</td>
             <td class='dt-body-right'> {{social_class.consumption_ratio}}</td>
             <td class='dt-body-right'>{{social_class.revenue}}</td>
             <td class='dt-body-right'>{{social_class.assets}}</td>
@@ -185,8 +187,8 @@
             <td>{{commodity.usage }}</td>
             <td>{{commodity.origin}}</td>
             <td class='dt-body-right'>{{commodity.turnover_time }}</td>
-            <td class='dt-body-right'>${{commodity.unit_value }}</td>
-            <td class='dt-body-right'>${{commodity.unit_price }}</td>
+            <td class='dt-body-right'>${{commodity.unit_value|percent_has_changed:commodity.comparator_unit_value }}</td>
+            <td class='dt-body-right'>${{commodity.unit_price|percent_has_changed:commodity.comparator_unit_price }}</td>
             <td class='dt-body-right'>{{commodity.size|has_changed:commodity.comparator_size }}</td>
             <td class='dt-body-right'>${{commodity.total_value|has_changed:commodity.comparator_total_value }}</td>
             <td class='dt-body-right'>${{commodity.total_price|has_changed:commodity.comparator_total_price }}</td>
